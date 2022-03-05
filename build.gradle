@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    // Shadow plugin, used to shade any dependencies needed.
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 group 'me.longbow122'
@@ -10,13 +12,35 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.jetbrains:annotations:22.0.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver
-    implementation group: 'org.mongodb', name: 'mongodb-driver', version: '3.6.3'
+
+    // MongoDB API, can be used to connect to the Database Cluster
+    // https://mongodb.github.io/mongo-java-driver/4.5/apidocs/mongodb-driver-core/index.html
+    implementation 'org.mongodb:mongodb-driver-sync:4.5.0'
+
+    // Google GSON, being used to read from the configuration file.
+    // School system administrators would edit the config file to throw in their MongoDB
+    // connection string in order to allow 'Homeroom' to connect to a MongoDB cloud cluster.
+    implementation 'com.google.code.gson:gson:2.9.0'
 
 }
 
 test {
     useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName.set("Homeroom")
+    archiveVersion.set('')
+    archiveClassifier.set('')
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'me.longbow122.Homeroom.Main'
+        )
+    }
 }
