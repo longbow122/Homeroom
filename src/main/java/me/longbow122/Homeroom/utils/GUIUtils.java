@@ -1,7 +1,4 @@
 package me.longbow122.Homeroom.utils;
-
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -10,33 +7,58 @@ import java.awt.*;
  */
 public class GUIUtils {
 
+    private final Window frame;
     /**
-     * Will produce an empty frame which can have components added to it as needed.
-     * Default size is 1000x1000, but this can be overridden.
-     *
-     * @return Empty JFrame which can hold other components
+     * New constructor to work with this class. Will return an instance of the class that can be accessed throughout the program.
+     * <p>
+     * </p>
+     * An empty constructor should be used if you want to access any other method within the program.
+     * This constructor will also open an empty {@link JFrame} which can be filled with components by using methods implemented within this class
+     * as seen fit.
+     * <p>
+     * If more than one {@link Window} is to be opened, then it is recommended that a new object be instantiated.
+     * </p>
+     * @param title The title of the {@link JFrame} to be shown when opened.
+     * @param height The "height" of the {@link JFrame}. How much vertical space the window should take up.
+     * @param width The "width" of the {@link JFrame}. How much horizontal space the window should take up.
+     * @param locationX How deep to the left into the screen the {@link JFrame} should be. Relative to the top-left corner of the screen.
+     * @param locationY How deep downwards into the screen the {@link JFrame} should be. Relative to the top-left corner of the screen.
      */
-    public JFrame openFrame(String title, int height, int width, int locationX, int locationY) {
+    public GUIUtils(String title, int height, int width, int locationX, int locationY) {
         JFrame frame = new JFrame(title);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | UnsupportedLookAndFeelException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
-            return null;
         }
         frame.pack();
-        if (height == 0) height = 1000;
+        if (height == 0) height = 1000; //TODO L36 AND 37 need reworking. Look into tenary operators.
         if (width == 0) width = 1000;
         frame.setBounds(locationX, locationY, width, height);
         frame.setLayout(null);
+        frame.setVisible(true);
+        this.frame = frame;
+    }
+
+    /**
+     * Basic getter for the {@link Window} that all of these methods refer to.
+     * <p>
+     *     Is useful to have when needing to do things such as {@link JOptionPane#createDialog(Component, String)}, where you do not have a
+     *     parent component to actually pass through.
+     * </p>
+     * Other than using it for the above use-case, the use of this getter is generally not recommended unless the window is to be closed.
+     * @return {@link Window} representing the JFrame that is currently open and associated with this object.
+     */
+    public Window getFrame() {
         return frame;
     }
 
     /**
      * Basic method to add buttons to a frame.
-     *
-     * @param frame        Standard {@link Window} that is to be filled.
+     * <p>
+     *     Fills the {@link Window} that is attributed with this class.
+     * </p>
      * @param buttonTitle  Name of the button in the middle.
      * @param buttonHeight How "tall" the button should be.
      * @param buttonWidth  How "wide" the button should be.
@@ -44,7 +66,7 @@ public class GUIUtils {
      * @param locationY    The Y-coordinate where the button is to be located, relative to the top-left corner of the screen.
      * @return {@link JButton} that the user is able to interact with.
      */
-    public JButton addButtonToFrame(Window frame, String buttonTitle, int buttonHeight, int buttonWidth, int locationX, int locationY) {
+    public JButton addButtonToFrame(String buttonTitle, int buttonHeight, int buttonWidth, int locationX, int locationY) {
         JButton button = new JButton(buttonTitle);
         frame.add(button);
         button.setSize(buttonWidth, buttonHeight);
@@ -55,8 +77,9 @@ public class GUIUtils {
 
     /**
      * Basic method to add a text field to a frame. This will allow me to add uneditable lines of text to my GUI.
-     *
-     * @param frame     Standard {@link Window} that is to be filled. {@link Window} is being used instead of a {@link JFrame} to allow for more options in terms of what can be done.
+     * <p>
+     *     Fills the {@link Window} using the constructor within this class and its attributes.
+     * </p>
      * @param textField The text that is to be displayed within the text field
      * @param locationX The X-coordinate where the label is to be located, relative to the top-left corner of the screen.
      * @param locationY The Y-coordinate where the label is to be located, relative to the top-left corner of the screen.
@@ -65,7 +88,7 @@ public class GUIUtils {
      * @param width How "wide" should the text field be?
      * @return {@link JLabel} that the user is able to see, but cannot do anything with.
      */
-    public JLabel addLabelToFrame(Window frame, String textField, int locationX, int locationY, int width, int height, boolean bold) {
+    public JLabel addLabelToFrame(String textField, int locationX, int locationY, int width, int height, boolean bold) {
         JLabel label = new JLabel(textField);
         frame.add(label);
         label.setBounds(locationX, locationY, width, height);
@@ -78,14 +101,16 @@ public class GUIUtils {
     /**
      * Basic method to add a text field for one-lined input. Will come in handy when entering in student information.
      * Is used to generate a text field intended for one-lined input of any size.
-     * @param frame Standard {@link Window} that is to be filled.
+     * <p>
+     * Fills the {@link Window} as specified by the constructor for this class.
+     * </p>
      * @param locationX The X-coordinate where the fields is to be located, relative to the top-left corner of the screen.
      * @param locationY The Y-coordinate where the field is to be located, relative to the top-left corner of the screen.
      * @param width How "wide" the text field should be.
      * @param height How "tall" the text field should be.
      * @return {@link JTextField} that can be further interacted with and used within the code. The user is able to input data here provided a listener has been written.
      */
-    public JTextField addTextField(@NotNull Window frame, int locationX, int locationY, int width, int height) {
+    public JTextField addTextField(int locationX, int locationY, int width, int height) {
         JTextField field = new JTextField();
         frame.add(field);
         field.setToolTipText("Enter the username used to log into Homeroom here!");
@@ -95,7 +120,7 @@ public class GUIUtils {
         return field;
     }
 
-    public JPasswordField addPasswordField(Window frame, int locationX, int locationY, int width, int height) {
+    public JPasswordField addPasswordField(int locationX, int locationY, int width, int height) {
         JPasswordField field = new JPasswordField();
         frame.add(field);
         field.setToolTipText("Enter the password used to log into Homeroom here!");

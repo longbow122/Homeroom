@@ -4,9 +4,6 @@ import me.longbow122.Homeroom.utils.ConfigReader;
 import me.longbow122.Homeroom.utils.GUIUtils;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +14,6 @@ import java.net.URISyntaxException;
  * The main class which will store all called programs, and the main method to be run.
  */
 public class Main {
-    private static GUIUtils gui = new GUIUtils();
 
     //TODO
     // LOGIN PAGE WORKS DECENTLY, JUST NEEDS TO HAVE IT LOG INTO THE DB CLUSTER WITH USER INPUT
@@ -36,22 +32,21 @@ public class Main {
 
     private static void openLoginPage() {
 
-        JFrame frame = gui.openFrame("Homeroom Login", 300, 600, 700, 300);
-        frame.setVisible(true);
-        gui.addLabelToFrame(frame, "Username: ", 30, 100, 100, 30, false);
-        JTextField usernameField = gui.addTextField(frame,100, 100, 400, 25);
-        gui.addLabelToFrame(frame, "Password: ", 30, 125, 100, 30, false);
-        JTextField passwordField = gui.addPasswordField(frame, 100, 125, 400, 25);
-        gui.addLabelToFrame(frame, "Homeroom Login", 225, 65, 1000, 30, true);
-        JButton loginButton = gui.addButtonToFrame(frame, "Login", 30, 400, 100, 150);
+        GUIUtils frame = new GUIUtils("Homeroom Login", 300, 600, 700, 300);
+        frame.addLabelToFrame("Username: ", 30, 100, 100, 30, false);
+        JTextField usernameField = frame.addTextField(100, 100, 400, 25);
+        frame.addLabelToFrame("Password: ", 30, 125, 100, 30, false);
+        JTextField passwordField = frame.addPasswordField(100, 125, 400, 25);
+        frame.addLabelToFrame("Homeroom Login", 225, 65, 1000, 30, true);
+        JButton loginButton = frame.addButtonToFrame("Login", 30, 400, 100, 150);
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
             if(username.equals("longbow") && password.equals("ahaha")) {
-                JOptionPane.showConfirmDialog(frame, "Success?");
+                JOptionPane.showConfirmDialog(frame.getFrame(), "Success?");
                 return;
-            }
-            JOptionPane.showMessageDialog(frame, "Failure to login!");
+            } //TODO LOGIN LOGIC WOULD GO HERE
+            JOptionPane.showMessageDialog(frame.getFrame(), "Failure to login!");
         });
     }
 

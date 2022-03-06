@@ -1,8 +1,5 @@
 package me.longbow122.Homeroom.utils;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-
 public class DBUtils {
 
 /*
