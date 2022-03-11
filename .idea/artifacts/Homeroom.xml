@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Homeroom">
+    <output-path>$USER_HOME$/Desktop/Dhruvil Homework/Year 12/Computer Science/NEA Programming Project/Homeroom Test Env</output-path>
+    <root id="archive" name="Homeroom.jar">
+      <element id="module-output" name="Homeroom.main" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/config.json" />
+    </root>
+  </artifact>
+</component>
