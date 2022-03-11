@@ -11,9 +11,7 @@ import org.bson.conversions.Bson;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DBUtils {
 
@@ -26,16 +24,12 @@ public class DBUtils {
         this.username = username;
         this.password = password;
         db = connect();
-        // TODO
-        // LOGIN LOGIC HERE.
     }
 
     /**
      * Method to verify the connection to a database. Requires no parameters as is able to make use of the attributes of this class
      * to facilitate a connection instead. Returns an integer depending on the success or failure of the operation. 0 if successful.
-     * @return 0 if successfull.
-     * @return 1 if timed out connection or failed connection.
-     * @return 2 if bad credentials passed through.
+     * @return 0 if successful. 1 if timed out connection or failed connection. 2 if bad credentials passed through.
      */
     public int isConnected() {
         System.out.println("Testing connection");
@@ -44,8 +38,8 @@ public class DBUtils {
             Document connection = db.runCommand(document);
             System.out.println(connection);
             List authUserRoles = ((Document) connection.get("authInfo")).get("authenticatedUserRoles", List.class);
-            Map<String, Object> config = new HashMap<>();
             if (!(authUserRoles.isEmpty())) {
+                System.out.println("connection seen as valid");
                 return 0;
             }
         } catch (MongoTimeoutException e) { //Connection timed out, no point trying to connect again!
@@ -73,6 +67,7 @@ TODO
 Write to the DB, and upload data
 Read from the DB, and download data
 Write connect and disconnect methods
+Have method to show what level of permission each user has
  */
 
 

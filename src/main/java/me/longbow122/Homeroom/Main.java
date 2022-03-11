@@ -4,23 +4,22 @@ import me.longbow122.Homeroom.utils.ConfigReader;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 /**
  * The main class which will store all called programs, and the main method to be run.
  */
 public class Main {
-
-    //TODO
-    // HAVE THE MAIN GUI'S BUTTON LISTENERS WORKED ON ONE BY ONE, WORKING ON THE BACKEND AS PROGRESS IS MADE
-    // LOGIN BUTTON ALSO NEEDS TO TAKE IN LOGIN INFORMATION UPON PRESSING OF THE ENTER KEY
-    // WORK ON CONNECTING TO DB CLUSTER BEFORE WORRYING ABOUT TAKING IN INPUT
 
     /*
     Main method to be called.
@@ -32,39 +31,124 @@ public class Main {
         openLoginPage();
     }
 
+    /*
+    Got to be a cleaner way of writing the below code. This just seems messy and outright untidy.
+    Open to worded suggestions if anyone had any. (As in, you tell me what you think would work, but try to avoid directly
+    spoonfeeding the answer where possible. Thank you!)
+
+    Thinking I could bring the action listener for the login button into the fieldList array if I change its type to Component.
+    But then how would I add the action listener without ending up with the same amount of lines as before?
+    Trying to keep lines of code to a minimum and clean up this code where possible.
+     */
     private static void openLoginPage() {
         GUIUtils loginGUI = new GUIUtils("Homeroom Login", 300, 600, 700, 300);
-        loginGUI.addLabelToFrame("Username: ", 30, 100, 100, 30, false);
+        loginGUI.addLabelToFrame("Username: ", 30, 100, 70, 30, false);
         JTextField usernameField = loginGUI.addTextField(100, 100, 400, 25);
-        loginGUI.addLabelToFrame("Password: ", 30, 125, 100, 30, false);
+        loginGUI.addLabelToFrame("Password: ", 30, 125, 70, 30, false);
         JTextField passwordField = loginGUI.addPasswordField(100, 125, 400, 25);
         loginGUI.addLabelToFrame("Homeroom Login", 225, 65, 1000, 30, true);
         JButton loginButton = loginGUI.addButtonToFrame("Login", 30, 400, 100, 150);
+        JTextField[] fieldList = new JTextField[]{usernameField, passwordField};
+        for (JTextField x : fieldList) {
+            x.addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                }
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        String username = usernameField.getText();
+                        String password = passwordField.getText();
+                        System.out.println("Attempt Connection!");
+                        int connection = new DBUtils(username, password).isConnected();
+                        while(connection != 0 && connection != 99) {
+                            switch (connection) {
+                                case 1: //Timed out or failed connection
+                                    System.out.println("Connection timed out, failed connection!");
+                                    Object[] options = new Object[]{"Reconnect", "Cancel, exit Homeroom"};
+                                    int reconnectOption = JOptionPane.showOptionDialog(loginGUI.getFrame(), "Failed to connect due to a timeout! Would you like to reconnect?", "Homeroom failed to connect!", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"), options, "Test");
+                                    System.out.println(reconnectOption);
+                                    switch (reconnectOption) {
+                                        case 0:
+                                            System.out.println("Reconnect button clicked!");
+                                            break;
+                                        case 1:
+                                            System.out.println("Cancel button pressed!");
+                                            break;
+                                        default:
+                                            System.out.println("Failed login!");
+                                            JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed login due to a misc error. Please try again!", "Whoops!", JOptionPane.ERROR_MESSAGE);
+                                            break;
+                                    }
+                                case 2: //Bad credentials passed through
+                                    System.out.println("Bad credentials passed through, cannot log in!");
+                                    JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed to connect due to bad credentials! Please try logging in again.", "Whoops!", JOptionPane.ERROR_MESSAGE);
+                                    connection = 99;
+                                    break;
+                            }
+                        }
+                        System.out.println("Wasn't 0, get passed through as valid connection");
+                        if(connection != 99) {
+                            loginGUI.closeFrame();
+                            openMainGUI(username);
+                            return;
+                        }
+                        usernameField.setText("");
+                        passwordField.setText("");
+                    }
+                }
+                @Override
+                public void keyReleased(KeyEvent e) {
+                }
+            });
+        }
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
-            switch (new DBUtils(username, password).isConnected()){
-                case 0:
-                    System.out.println("Successful connection!");
-                    loginGUI.getFrame().setVisible(false);
-                    openMainGUI(username);
-                    break;
-                case 1: //Timed Out or failed connection.
-                    System.out.println("Connection timed out, failed connection!");
-                    JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed to connect due to a timeout! Would you like to reconnect?", "Whoops!", JOptionPane.ERROR_MESSAGE);
-                    break; //TODO MAKE A NICER OPTION PANE WITH RECONNECT AND CANCEL OPTIONS
-                case 2: //Security exception, bad credentials!
-                    System.out.println("Bad credentials passed through, cannot log in!");
-                    JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed to connect due to bad credentials! Please try logging in again.", "Whoops!", JOptionPane.ERROR_MESSAGE);
-                    break;
-                default:
-                    System.out.println("Failed login!");
-                    JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed login due to a misc error. Please try again!", "Whoops!", JOptionPane.ERROR_MESSAGE);
-                    break;
+            System.out.println("Attempt Connection!");
+            int connection = new DBUtils(username, password).isConnected();
+            while(connection != 0 && connection != 99) {
+                switch (connection) {
+                    case 1: //Timed out or failed connection
+                        System.out.println("Connection timed out, failed connection!");
+                        Object[] options = new Object[]{"Reconnect", "Cancel, exit Homeroom"};
+                        int reconnectOption = JOptionPane.showOptionDialog(loginGUI.getFrame(), "Failed to connect due to a timeout! Would you like to reconnect?", "Homeroom failed to connect!", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"), options, "Test");
+                        System.out.println(reconnectOption);
+                        switch (reconnectOption) {
+                            case 0:
+                                System.out.println("Reconnect button clicked!");
+                                break;
+                            case 1:
+                                System.out.println("Cancel button pressed!");
+                                break;
+                            default:
+                                System.out.println("Failed login!");
+                                JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed login due to a misc error. Please try again!", "Whoops!", JOptionPane.ERROR_MESSAGE);
+                                break;
+                        }
+                    case 2: //Bad credentials passed through
+                        System.out.println("Bad credentials passed through, cannot log in!");
+                        JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed to connect due to bad credentials! Please try logging in again.", "Whoops!", JOptionPane.ERROR_MESSAGE);
+                        connection = 99;
+                        break;
+                }
             }
+            System.out.println("Wasn't 0, get passed through as valid connection");
+            if(connection != 99) {
+                loginGUI.closeFrame();
+                openMainGUI(username);
+                return;
+            }
+            usernameField.setText("");
+            passwordField.setText("");
         });
     }
 
+    /*
+    Got to be a cleaner way of writing the below code. This just seems messy and outright untidy.
+    Open to worded suggestions if anyone had any. (As in, you tell me what you think would work, but try to avoid directly
+    spoonfeeding the answer where possible. Thank you!)
+     */
     private static void openMainGUI(String username) {
         GUIUtils mainGUI = new GUIUtils("Homeroom", 1000, 1220, 300, 0);
         JButton manageStudents = mainGUI.addButtonToFrame("Manage Students", 300, 400, 0, 50);
@@ -93,6 +177,11 @@ public class Main {
         usernameField.setFont(new Font(mainGUI.getFrame().getFont().getName(), Font.PLAIN, 25));
         JLabel permissionField = mainGUI.addLabelToFrame("Permissions: ", 300, 0, 300, 30, false);
         permissionField.setFont(new Font(mainGUI.getFrame().getFont().getName(), Font.PLAIN, 25));
+        exit.addActionListener(e -> {
+            System.out.println("Logging out of Homeroom and exiting!");
+            System.exit(0);
+        });
+
         //TODO
         // HAVE USER INFORMATION DISPLAY AT THE TOP
         // USERNAME AND PERMISSIONS NEED TO BE SHOWN AT THE TOP.
