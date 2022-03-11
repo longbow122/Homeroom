@@ -42,6 +42,13 @@ public class GUIUtils {
     }
 
     /**
+     * Basic method written to easily close down {@link JFrame}s.
+     */
+    public void closeFrame() {
+        frame.setVisible(false);
+    }
+
+    /**
      * Basic getter for the {@link Window} that all of these methods refer to.
      * <p>
      *     Is useful to have when needing to do things such as {@link JOptionPane#createDialog(Component, String)}, where you do not have a
@@ -120,6 +127,17 @@ public class GUIUtils {
         return field;
     }
 
+    /**
+     * Basic method to add a password field for one-lined, obfuscated input. Is only generally used to enter passwords.
+     * <p>
+     * Fills the {@link Window} as specified by the constructor for this class.
+     * </p>
+     * @param locationX The X-coordinate where the fields is to be located, relative to the top-left corner of the screen.
+     * @param locationY The Y-coordinate where the field is to be located, relative to the top-left corner the screen.
+     * @param width How "wide" the text field should be.
+     * @param height How "tall" the text field should be.
+     * @return {@link JPasswordField} that can be further interacted with and used within the code. The user is able to input data here provided a listener has been written.
+     */
     public JPasswordField addPasswordField(int locationX, int locationY, int width, int height) {
         JPasswordField field = new JPasswordField();
         frame.add(field);

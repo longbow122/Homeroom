@@ -38,18 +38,12 @@ public class ConfigReader {
             e.printStackTrace();
             return null;
         }
-        if (configTree == null || !configTree.isJsonArray()) {
-            return null;
-        }
+        if (configTree == null || !configTree.isJsonArray()) return null;
         JsonArray tree = configTree.getAsJsonArray();
         for (JsonElement x : tree) {
-            if (!(x.isJsonObject())) {
-                continue;
-            }
+            if (!(x.isJsonObject())) continue;
             JsonObject potentialString = x.getAsJsonObject();
-            if (!(potentialString.has("connectionString"))) {
-                continue;
-            }
+            if (!(potentialString.has("connectionString"))) continue;
             return potentialString.get("connectionString").toString();
         }
         return null;
