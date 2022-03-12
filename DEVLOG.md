@@ -76,3 +76,8 @@ I should now be able to start work on the main GUI and it's involved backend now
 Also managed to work on some major planning in terms of the functionality of almost everything to do with the main Homeroom GUI. Some features are still to be planned, but I am confident I'll be able to get around to it as soon as possible. 
 
 The next stage in development is testing of the login system developed for Homeroom.
+
+### 12/03/2022 - Saturday
+Didn't manage to get much work done, but did manage to do some minor code-cleanups here and there within the GUIUtils class.
+
+Will hopefully make a start on planning some other features of Homeroom, but that is uncertain for now.

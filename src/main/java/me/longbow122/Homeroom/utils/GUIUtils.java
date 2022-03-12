@@ -42,6 +42,27 @@ public class GUIUtils {
     }
 
     /**
+     * Another constructor which can be used to instantiate the GUIUtils class. Makes use of method overloading to allow for default values within the height and width of the {@link Window}
+     * @param title The title of the {@link JFrame} to be shown when opened.
+     * @param locationX How deep to the left of the screen the {@link JFrame} should be. Relative to the top-left corner of the screen.
+     * @param locationY How deep downwards into the screen the {@link JFrame} should be. Relative to the top-left corner of the screen.
+     */
+    public GUIUtils(String title, int locationX, int locationY) {
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        frame.pack();
+        frame.setBounds(locationX, locationY, 1000, 1000);
+        frame.setLayout(null);
+        frame.setVisible(true);
+        this.frame = frame;
+    }
+
+    /**
      * Basic method written to easily close down {@link JFrame}s.
      */
     public void closeFrame() {
