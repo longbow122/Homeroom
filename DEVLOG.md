@@ -81,3 +81,101 @@ The next stage in development is testing of the login system developed for Homer
 Didn't manage to get much work done, but did manage to do some minor code-cleanups here and there within the GUIUtils class.
 
 Will hopefully make a start on planning some other features of Homeroom, but that is uncertain for now.
+
+### 17/03/2022 - Thursday
+Managed to make a little bit more progress, but it wasn't enough work in terms of the code that was written.
+
+I've done some planning as to the fields of data I want to have handled by Homeroom, and I've commissioned third parties to generate said data for me. As the NEA is something you're meant to do entirely without help, this may contradict my "no help at all" policy. However, as this is something as mundane and insignificant as data entry, I don't see why I should have to waste my time entering in each student myself like this. As such, I've simply paid someone to generate 1000 students worth of data, with fields of information I felt would typically be stored by a school.
+
+Using this data (in the form of an Excel file), I can manually upload this to my MongoDB cluster, and then write code accordingly to ensure that 'Homeroom' is able to read from the database, and get the according information from the students.
+
+After this, I can then work on deletion of data (as that will be easier than having to handle the code for data writing), and then the code for actually writing the data. Once all of that has been written, that will essentially be the code for the first major feature (The ability to add, remove and edit the data of students accordingly) complete. The testing process for that will be somewhat long, but hopefully, I should be able to make quick progress once I get over the roadblock of learning how to make use of MongoDB.
+
+I've been trying to convince myself for some time that doing this through MySQL would arguably be quicker and easier to do, but I am still not confident in MySQLs abilities to handle said data at scale and speed, nor am I sure if the data that needs storing is entirely applicable to what I'm handling.
+
+### 29/03/2022 - Tuesday
+Did some very minor work on Homeroom, implemented the icon within the GUI,so Homeroom now makes use of the custom icon I found on the internet instead the default Java icon.
+
+### 31/03/2022 - Thursday
+Did some thinking about the structure of Homeroom's database, and ensured that it has been designed in Third Normal Form. This will allow for minimal amounts of data to be edited where needed.
+
+Databases also need to ensure that the data within it can be easily searched for and edited if need be. Foreign keys need to be considered carefully to make sure that if they need to be deleted and/or edited, minimal actions are done.
+
+Collections of documents need to be searched through efficiently if need be, primary keys should be the only set of keys that need to be searched through, but it is hard to say what data may need to be used. Secondary keys such as names would also likely need to be searched through for QOL for the user.
+
+My current structure currently holds three entities, with two "link tables" ensuring relations between each object. These can then be used within the rest of the program to build assumptions between each object, and to insert data.
+
+What also needs to be planned is when database entries are made, to ensure that data is inserted at the right time, when the right information is made available to the system. Since I am currently working on the addition, editing and deletion of students, this is fortunately a problem I don't need to handle until later.
+However, it is still likely an issue I need to take on some point soon, and it should be tackled when I have the time and space to think through things properly.
+
+### 14/04/2022 - Thursday
+Managed to import a pre-made database of students for use within my program. This pre-made database will be a sample set of data I can use within my program as needed for testing, but normally, users will be making their own data. I also need to think of a way to allow users to configure what data they can input into the system, as I feel that would be a good way of going about it. As every school holds potentially different pieces of information, such a feature is important. I feel like having this be possible through a config file would be a good idea, but I'm not 100% on it yet.
+
+For now, I plan on having the fields of information that users can throw in  be hard-coded, as that will make things much easier in the long-run, as I now need to rush somewhat to meet the deadline for 75%. Already added a Trello card for this improvement, but it will need to be done at some point later down the line.
+
+I also plan on implementing compatiability for multiple databases, as now thet I have properly planned my database, MySQL could be very applicable within this program, although having it run across multiple applications is a potential issue.
+
+I've also started writing some base code for the Student Management system, and I'm hoping to have at least that part done within these next few days. I intend on taking the longest with this, as I will be using this to learn how MongoDB queries work, and how I can write them to do what I need to do most efficiently. After that, it should be slow, but steady progress. I've certainly got a lot of testing to do, and I definitely need to work as fast as possible, as I am now handling core features of the program in one chunk. Not sure how my workflow has managed to allow for this, but I've dug my own grave, now I'm going to lie in it.
+
+### 15/04/2022 - Friday
+Begun working on some basic database queries, but I need to be able to get the hang of each use-case of each different type of query using MongoDB's Java Driver before I can move on. After that, it should just be a matter of mathematically finding a way to recursively display the information into the GUI, which shouldn't be too hard.
+
+The only issue I have with what I'm currently doing is that there is little to no documentation within the MongoDB Javadocs, meaning I'm essentially left to fend for myself with what's on here.
+
+I hope to at least get somewhere today, with the implementation of at least one method, but progress will be slow until I can figure out what's going wrong with each query.
+
+### 16/04/2022 - Saturday
+Started some minor work on the frontend for Student Management. Once I handle the logic behind this, and the database queries involved, I don't see any other issues that may halt major progress for a few days. 
+
+Once I do some minor tests with the frontend, and some more complicated writing of methods to allow for automatic formatting and finding of student search results, I should be able to make use of some of the backend methods already written to work on proper student editing.
+
+Once I work on student data viewing, and editing with permissions, I'll move onto student addition and deletion. 
+
+It is also worth noting that I will only be giving these permissions to ADMIN accounts, although TEACHER accounts will be allowed to view information as needed.
+
+### 17/04/2022 - Sunday
+Slightly reworked the searching method for students to allow for all types of fields. This will make searching more exact and much easier to do. I also need to make some minor additions to the GUI handling class and make some further changes to my Student Management GUI to allow for further filtering and exact searching.
+
+Successfully added a drop-down menu and accordingly reworked the GUI to ensure that there is space for the new components. The next part that needs to be done is a listener which is able to accordingly set the type of the search filter. Once I have done this, I need to do some minor testing with a clickable, uneditable text field (or whatever seems to work better/look nicer) and see if I can use that and some basic maths to recursively display student information through the search.
+
+Once I have done that, I need to be able to make use of the same logic to ensure that users are able to open and view the student information. I also need to work with permissions at this point in time.
+
+I hope to at least have the logic for the search filter done today.
+
+### 18/04/2022 - Monday
+Managed to make a minor addition to my GUIs thanks to a new library found. SwingX holds new functions which can be used within Swing to improve the UI and UX aspects of my GUI. No form of testing really needs to be done here, as it is just a cosmetic feature.
+
+Had some minor issues with handling the key typed event when working on student searching of any type. Thanks to a more universal method that has been written by me, I've been able to ensure that there is only one universal way of searching for students, no matter what is used to search for them.
+
+Minor improvements to the way searching is done needs to be done to ensure that display of these students can be handled, however, that is another issue that also needs to be handled today.
+
+Once I've ironed through some of the logic errors and improvements which need to be made within student searching, I hope to make use of Microsoft Access to test this searching through their software, and mine. If both programs achieve the same result (albeit, MSA will be faster, then I'll be satisfied in assuming that it is able to search for data reliably.
+
+Once testing is done, I can move onto displays, that I need to figure out listeners for to ensure that they can be clicked.
+
+**P.S:** I've decided to come back to handling the key typing event for "live" searching, and simply add a search button and a listener to listen for ENTER key presses instead. This is a lot simpler to handle, and shouldn't seemingly mess with things as much. I don't know why I'm suddenly having these issues with code that worked fine yesterday, but it's clearly something that needs to be fixed. Immediately.
+
+***P.P.S:*** After finishing the slight rework in Student Management GUIs, I also noticed a minor issue with the logi n system which was also fixed. A more efficient way of searching through the database was also written, but it is still going through some teething issues. It needs to be tested more thoroughly to actually ensure that it is a robust system that would work.
+I also had the faint though of having the system manually go through each type of searching until it came up with a result, but this is still something I need to consider, as it would lead to overexcessive database queries, which are computationally intensive on both ends.
+
+### 19/04/2022 - Tuesday
+Did some further testing of the searching system within Homeroom. I need to give them some further documentation, but I'm now able to move onto the student name display portion.
+
+Not sure how I'll be able to make use of clickable text fields which need to be of standardised sizing and amounts. To be able to handle searches at scale, I need to be able to make "pages" within the GUI which can then cycle through to the next set of students which can be found. 
+
+As I have a List object of everyone found, I should be able to do this to some degree of ease.
+
+**P.S:** Managed to make use of JButtons to work around this issue with searching by removing all buttons and replacing them with the new search result buttons. I can now get these buttons and edit their looks through other methods to make them look however I like.
+
+However, this now comes with their own set of issues. There are now a few questions (with their respective problems) that I need to ask myself, and solve. *What happens if the buttons are generated so many times to the point where the buttons go out of view? Is there a way of mathematically finding this? Is there a way of finding how many buttons are left on the list of buttons to generate? Is there a way of sorting these out into other pages, which can be displayed with a button?*
+
+If I plan on progressing any further with the student search work, I'll have to handle this issue immediately. Unfortunately, I feel that this issue with rather overly complex, and will definitely take a lot longer to solve, so I feel like I'm going to bench the work I'm doing on the searching functions and work on the ability to add, view, edit and delete records of data with permissions.
+
+### 20/04/2022 - Wednesday
+Successfully managed to add permission handling to users, although it's not as clean as I want it to be. At some point, a refactor needs to be done to make sure that the code is as clean as possible.
+
+I also need to work on the general UI and UX of the Student Management GUI when viewing a specific student. Right now, it doesn't look as nice, nor does it look very functional. For now, I plan on finishing this before moving onto the actual backend work for editing students. There are obviously major challenges and issues that need to be handled when it comes to the UI/UX aspect of this program, but those are challenges I expect to overcome with general ease.
+
+Once I have finished, that I can move on to deleting and adding new students.
+
+**P.S:** Had some issues with finding a way to have the date be selected and used within the rest of the program, but after some further testing and the new implementation of the LGoodDatePicker library, I've managed to solve the issue of taking in date input in an easier way for the user. 

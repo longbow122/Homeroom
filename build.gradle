@@ -18,14 +18,29 @@ dependencies {
 
     // MongoDB API, can be used to connect to the Database Cluster
     // https://mongodb.github.io/mongo-java-driver/4.5/apidocs/mongodb-driver-core/index.html
-    implementation 'org.mongodb:mongodb-driver-sync:4.5.0'
+    implementation 'org.mongodb:mongodb-driver-sync:4.5.1'
 
     // Google GSON, being used to read from the configuration file.
     // School system administrators would edit the config file to throw in their MongoDB
     // connection string in order to allow 'Homeroom' to connect to a MongoDB cloud cluster.
     implementation 'com.google.code.gson:gson:2.9.0'
 
-    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.29'
+    // SLF4J, not sure what this is for, forgot to document it. Will need to do some research on it.
+    //TODO
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.36'
+
+    //SwingLabs SwingX. Used to provide additional functionality to Java's Swing, which is the GUI Library I am using.
+    implementation("org.swinglabs.swingx:swingx-all:1.6.5-1")
+
+    // Apache Commons Lang. Used to handle basic string manipulation and other useful methods.
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // LGoodDatePicker. A Nice library that does what I need it to do for picking dates.
+    // https://mvnrepository.com/artifact/com.github.lgooddatepicker/LGoodDatePicker
+    implementation 'com.github.lgooddatepicker:LGoodDatePicker:11.2.1'
+
+
 }
 
 test {

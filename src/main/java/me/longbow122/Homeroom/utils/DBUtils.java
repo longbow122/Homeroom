@@ -10,7 +10,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DBUtils {
@@ -26,6 +28,10 @@ public class DBUtils {
         db = connect();
     }
 
+    public MongoDatabase getHomeroomDB() {
+        return db;
+    }
+
     /**
      * Method to verify the connection to a database. Requires no parameters as is able to make use of the attributes of this class
      * to facilitate a connection instead. Returns an integer depending on the success or failure of the operation. 0 if successful.
@@ -39,15 +45,41 @@ public class DBUtils {
             System.out.println(connection);
             List authUserRoles = ((Document) connection.get("authInfo")).get("authenticatedUserRoles", List.class);
             if (!(authUserRoles.isEmpty())) {
+                System.out.println(authUserRoles);
                 System.out.println("connection seen as valid");
                 return 0;
             }
-        } catch (MongoTimeoutException e) { //Connection timed out, no point trying to connect again!
+        } catch (MongoTimeoutException e ) { //Connection timed out, no point trying to connect again!
             return 1;
-        } catch (MongoSecurityException e) {
+        } catch (MongoSecurityException e) { //Bad credentials passed through
             return 2;
         }
         return 1;
+    }
+
+    /**
+     * Method written that converts MongoDB's pre-generated roles into a numerical representation that can be used throughout the
+     * program to get permissions from the user, which will dictate what each user can do within Homeroom. <p></p> "readWriteAnyDatabase" is a permission that should generally be granted to Admins. <p></p>
+     * "readAnyDatabase" is a permission that should be granted to general Users only. <p></p>
+     * 1 if the user is able to read, but NOT EDIT any database. <p></p>
+     * 2 if the user is able to read and write to any database. <p></p>
+     * 0 if there is no role found/designated.
+     * @return {@link Integer} representing the level of permissions the user has.
+     */
+    public int getPermission() {
+        System.out.println("Getting authentication roles");
+        Bson document = new Document("connectionStatus", 1);
+        Document connection = db.runCommand(document);
+        Document authUserRoles = ((Document) connection.get("authInfo"));
+        System.out.println(authUserRoles);
+        String role = ((ArrayList<Document>) authUserRoles.get("authenticatedUserRoles")).get(0).get("role").toString();
+        switch(role) {
+            case "readWriteAnyDatabase":
+                return 2;
+            case "readAnyDatabase":
+                return 1;
+        }
+        return 0;
     }
 
     private MongoDatabase connect() {
@@ -62,11 +94,11 @@ public class DBUtils {
         return cl.getDatabase("Homeroom");
     }
 
+
+
 /*
 TODO
 Write to the DB, and upload data
-Read from the DB, and download data
-Write connect and disconnect methods
 Have method to show what level of permission each user has
  */
 
