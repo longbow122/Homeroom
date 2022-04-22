@@ -256,4 +256,26 @@ public class GUIUtils {
         dp.getComponentToggleCalendarButton().setToolTipText(tooltip);
         return dp;
     }
+
+    /**
+     * Basic method to add a multi-line, multi-column, editable (unless specified otherwise through a method) area of text input. <p></p> Fills the {@link Window} as specified by the constructor.
+     * @param locationX The X-Coordinate where the area is to be located, relative to the top-left corner of the screen.
+     * @param locationY The Y-Coordinate where the area is to be located, relative to the top-left corner of the screen.
+     * @param width How "wide" the area should be.
+     * @param height How "tall" the area should be.
+     * @param tooltip The tooltip text within the area. What text should be shown to the user when they hover over this?
+     * @return {@link JTextArea} object which has been placed within a GUI and can still be further interacted with and used.
+     */
+    public JTextArea addTextArea(int locationX, int locationY, int width, int height, String tooltip) {
+        JTextArea area = new JTextArea();
+        //area.setBounds(locationX, locationY, width, height);
+        area.setToolTipText(tooltip);
+        area.setVisible(true);
+        JScrollPane scroll = new JScrollPane(area);
+        frame.add(scroll);
+        scroll.setBounds(locationX, locationY, width, height);
+        scroll.setVisible(true);
+        area.setFont(new Font(frame.getFont().getName(), Font.PLAIN, frame.getFont().getSize()));
+        return area;
+    }
 }

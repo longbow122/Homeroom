@@ -5,6 +5,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.bson.Document;
@@ -127,11 +128,29 @@ public class Student {
                 return new Student(connectionUsername, connectionPassword, x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString());
             }
             return null;
-        } // Finally block used to execute this statement regardless of an exception being thrown. Used when statements MUST be run no matter what.
-        // In this case, closing the cursor connection must be done, regardless of an operation success or failure. As such, it belongs in a finally block.
+        }
     }
 
-    /** TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
+    /**
+     * Method that updates a specified field of a {@link Student} that has been specified. Any field can be updated provided that the right field name has been given.
+     * The specified string is the string that the field will be updated to. There is no input validation done on the string.
+     * @param student The Student to update.
+     * @param fieldToUpdate The field to be updated. Should be a valid field name.
+     * @param updateString The string that the field will be updated to. Should be a valid string, storing valid information that the staff will use. There is no input validation done on this string.
+     * @return {@link Boolean} that represents the success or failure of this operation.
+     */
+    public boolean updateStudent(Student student, String fieldToUpdate, String updateString) {
+        if(db.isConnected() != 0) {
+            return false;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection students = homeroom.getCollection("Students");
+        students.findOneAndUpdate(Filters.eq("StudentID", student.getStudentID()), Updates.set(fieldToUpdate, updateString));
+        return true;
+    }
+
+    //TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
+    /**
      * Method that returns a list of all students depending on the {@link StudentSearchType}. The parameter string will look for an exact match or a similar match.
      * This is used within the user interface for "searching" of students. Users will then be able to click on a student and access their information through there. <p></p>
      * WARNING: THIS METHOD DOES NOT HAVE ANY SCOPE FOR PROPER NULL HANDLING!!! THIS NEEDS TO BE HANDLED SEPARATELY.
@@ -147,23 +166,23 @@ public class Student {
         List<Document> matches;
         if(searchType == null) setStudentSearchType(StudentSearchType.NAME); // Ensures that it defaults to NAME searching if there is no default value.
         switch(searchType) {
-            case UUID: //TODO UUID SEARCHING WORKS GOOD, SORTED
+            case UUID:
                 System.out.println("Searching for a student using their UUID!");
                 matches = (List<Document>) students.find(Filters.regex("StudentID", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;
-            case DOB: //TODO DOB SEARCHING WORKS GOOD, SORTED.
+            case DOB:
                 System.out.println("Searching for a student using their date of birth!");
                 matches = (List<Document>) students.find(Filters.regex("StudentDOB", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;
-            case PHONE: //TODO PHONE SEARCHING WORKS GOOD, SORTED.
+            case PHONE:
                 System.out.println("Searching for a student using their phone number!");
                 matches = (List<Document>) students.find(Filters.regex("StudentPhone", Pattern.compile("(?i)^(\\+" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;
-            case ADDRESS: //TODO ADDRESS SEARCHING WORKS GOOD, SORTED.
+            case ADDRESS:
                 System.out.println("Searching for a student using their address!");
                 matches = (List<Document>) students.find(Filters.regex("StudentAddress", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;
-            default: //TODO NAMES SEARCHING WORKS GOOD, SORTED
+            default:
                 System.out.println("Searching for a student using their name!");
                 matches = (List<Document>) students.find(Filters.regex("StudentName", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;

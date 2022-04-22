@@ -14,11 +14,11 @@ The login system involves passing two strings through a Swing GUI, where these a
 
 *Issues were also seen when connecting under certain networks. When making use of my home network/mobile hotspot to connect to the DB, it seemed to work just fine.*
 
-| Type of Data    | Username Input | Password Input | Expected Output                       | Achieved Output? | Real Output |
-|-----------------|----------------|----------------|---------------------------------------|------------------|-------------|
-| Erroneous       | asdadas        | dasdadads      | Error Message stating bad credentials | Yes!             | N/A         |
-| Normal/Expected | dhruvil_patel  | pp             | Successful login                      | Yes!             | N/A         |
-| Erroneous       | null/no input  | null/no input  | Error Message stating bad credentials | Yes!             | N/A         |
+| Type of Data    | Username Input                 | Password Input | Expected Output                       | Achieved Output? | Real Output |
+|-----------------|--------------------------------|----------------|---------------------------------------|------------------|-------------|
+| Erroneous       | asdadas                        | dasdadads      | Error Message stating bad credentials | Yes!             | N/A         |
+| Normal/Expected | [REDACTED FOR PRIVACY REASONS] | pp             | Successful login                      | Yes!             | N/A         |
+| Erroneous       | null/no input                  | null/no input  | Error Message stating bad credentials | Yes!             | N/A         |
 
 ## Bulk Student Searching
 This system was implemented to allow for searching for students by names. This is where a string is passed through a text entry field within a GUI, which can then be passed through a method written to search through the Collection of Documents for names containing any instance of the string to be searched for anywhere in the name.

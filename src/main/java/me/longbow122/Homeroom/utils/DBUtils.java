@@ -10,7 +10,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,21 +85,12 @@ public class DBUtils {
         String connectionString;
         try {
             connectionString = new ConfigReader(Main.getConfigFile()).getConnectionStringFromConfig().replace("<username>", URLEncoder.encode(username, "UTF-8")).replace("<password>", URLEncoder.encode(password, "UTF-8")).replace("\"", "");
+            MongoClient cl = MongoClients.create(connectionString);
+            return cl.getDatabase("Homeroom");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return null;
         }
-        MongoClient cl = MongoClients.create(connectionString);
-        return cl.getDatabase("Homeroom");
+
     }
-
-
-
-/*
-TODO
-Write to the DB, and upload data
-Have method to show what level of permission each user has
- */
-
-
 }

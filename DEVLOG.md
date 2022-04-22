@@ -7,7 +7,7 @@ Some progress was made. Main documentation for ‘Homeroom’ was done through t
 
 Additionally worked on some issue templates for GitHub. Had a minor look at Milestones, Projects and Actions which seem like a good way to automate a few things such as releases. Projects seem like a good way to organise some more stuff. I need to look into that, as right now it sounds similar to a Trello in terms of organisation. Should this be the case, it’s not really best for me.
 
-Also started working on a stakeholder interview form. This will be distributed across to teachers, administrative staff and tutors where I deem fit. I am also considering users on Reddit as a reliable source of potential stakeholder opinion due to the wide range of people their community holds. It will not be hard to find school administrators and teachers willing to fill out a small survey. Teachers within my school will also be able to help with the completion of this survey. Due to privacy issues within the Avanti Schools Trust, the forms have had to be hosted on my personal computer. A .csv file holding results will need to be attached detailing any useful results. 
+Also started working on a stakeholder interview form. This will be distributed across to teachers, administrative staff and tutors where I deem fit. I am also considering users on Reddit as a reliable source of potential stakeholder opinion due to the wide range of people their community holds. It will not be hard to find school administrators and teachers willing to fill out a small survey. Teachers within my school will also be able to help with the completion of this survey. Due to privacy issues within the [REDACTED FOR PRIVACY PURPOSES], the forms have had to be hosted on my personal computer. A .csv file holding results will need to be attached detailing any useful results. 
 
 ### 18/02/2022 - Friday
 Did some extra planning and finally got some form of order in as to what should be worked on first in terms of the writing of code. This is a decent step forward in the right direction, ensuring that the code written behind ‘Homeroom’ is written as fast as possible. 
@@ -178,4 +178,22 @@ I also need to work on the general UI and UX of the Student Management GUI when 
 
 Once I have finished, that I can move on to deleting and adding new students.
 
-**P.S:** Had some issues with finding a way to have the date be selected and used within the rest of the program, but after some further testing and the new implementation of the LGoodDatePicker library, I've managed to solve the issue of taking in date input in an easier way for the user. 
+**P.S:** Had some issues with finding a way to have the date be selected and used within the rest of the program, but after some further testing and the new implementation of the LGoodDatePicker library, I've managed to solve the issue of taking in date input in an easier way for the user.
+
+### 21/04/2022 - Thursday
+Have finished work on the Student Management GUI, which has been given a much larger amount of screen space to allow for any additional readjustment or additions should they require any. I feel that the UI and UX is designed somewhat well, but is too minimalistic.
+
+I also need to be able to work on the editing of student information (provided the user logging in has the right permissions). The adding of new students and the deletion of students also needs to be handled. Using the permissions system I have, I'm also able to entirely remove the option for teachers/sub-users, which is likely a good feature to make use of. My only concern for this is that it will make the rest of the GUI look strange.
+
+I'm having some small issues with editing the fields of data, as it is hard to find the right event which is able to do what I need. I need to ensure that an event is fired when there is a change in the text of the field. I either need to find an event which is able to handle this, or I need to find an event that I can use in a hacker, less clean workaround.
+
+I'm still growing increasingly concerned that I'm falling behind the deadline for the project. For my 75% deadline I ***NEED*** to have at least 3 of the main features and buttons to be fully developed. Once I've gotten the first half done, I don't see the rest of it being too hard. 
+
+### 22/04/2022 - Friday
+Have managed to get some work done on the internal logic behind Homeroom's Student Management, discarding, saving and editing. It needs to have some touching up purely due to the fact that **it is not clean code.** It does the job, but that's all it seems to do. Operations, where applicable, have been compacted into a loop, but this has not been done enough. I need to be able to find better ways of writing essentially all methods that are within the Main class. These methods have high line-counts, and contain operations that make up the GUI. 
+
+The methods that are being called in question are far too long, and code needs to be compacted to become more readable. As soon as main functionality is achieved within all main buttons, the clean-up of code is something that will become immediately prioritised.
+
+
+
+### 23/04/2022 - Saturday

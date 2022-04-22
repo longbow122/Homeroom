@@ -1,24 +1,23 @@
 package me.longbow122.Homeroom;
 
 import com.github.lgooddatepicker.components.DatePicker;
-import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
-import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import me.longbow122.Homeroom.utils.ConfigReader;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.jdesktop.swingx.prompt.PromptSupport;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,11 +209,8 @@ public class Main {
             // Open manage students
         });
 
-
         //TODO
-        // HAVE USER INFORMATION DISPLAY AT THE TOP
-        // USERNAME AND PERMISSIONS NEED TO BE SHOWN AT THE TOP.
-        // BUTTON LISTENERS NEED TO BE SHOWN
+        // BUTTON LISTENERS FOR EVERY BUTTON.
     }
 
     private static void openManageStudentsGUI(String username, String password) {
@@ -237,7 +233,7 @@ public class Main {
                 return;
             }
             System.out.println(searches.size() + " results found!");
-            showSearchResults(searches, gui, new DBUtils(username, password).getPermission());
+            showSearchResults(searches, gui, new DBUtils(username, password).getPermission(), username, password);
         });
         JButton exitButton = gui.addButtonToFrame("Exit Student Management", 60, 300, 920, 0);
         gui.addLabelToFrame("Search Type: ", 630, 10, 170, 30, true, 25);
@@ -285,7 +281,7 @@ public class Main {
                         return;
                     }
                     System.out.println(searches.size() + " results found!");
-                    showSearchResults(searches, gui, new DBUtils(username, password).getPermission());
+                    showSearchResults(searches, gui, new DBUtils(username, password).getPermission(), username, password);
                 }
             }
             @Override
@@ -317,7 +313,7 @@ public class Main {
      * @param searchResults The List of student found within the database query.
      * @param gui The {@link JFrame} in the questions
      */
-    private static void showSearchResults(List<Student> searchResults, GUIUtils gui, int permission) {
+    private static void showSearchResults(List<Student> searchResults, GUIUtils gui, int permission, String username, String password) {
         int xLoc = 0;
         int yLoc = 100;
         if(searchButtons != null) {
@@ -330,7 +326,7 @@ public class Main {
             JButton option = gui.addButtonToFrame(x.getStudentName(), 50, 150, xLoc, yLoc);
             option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
             option.addActionListener(e -> {
-                viewStudentInformation(x, permission);
+                viewStudentInformation(x, permission, username, password);
             });
             buttons.add(option);
             xLoc = xLoc + 150;
@@ -347,13 +343,14 @@ public class Main {
 
     /**
      * Quick method that allows users to view information about a student. This GUI also allows users to view, edit and delete student information depending on the level of permissions the user has.
-     * This permissions level will need to be passed through using parameters within the method.
+     * This permissions level will need to be passed through using parameters within the method. <p></p>
+     * This method seems far too hard-coded to me, and is definitely not a method that is up to standard. Too many operations, that need to be
+     * reduced using loops and switch statements where possible.
      * @param student The student in question, the student for which information should be displayed.
      * @param permission The level of permission that the user is viewing the information from. Dictates whether student information can be edited or deleted.
      */
-    private static void viewStudentInformation(Student student, int permission) {
+    private static void viewStudentInformation(Student student, int permission, String username, String password) {
         GUIUtils gui = new GUIUtils("Student Management | View Student", 1000, 1700, 0, 0, false);
-        //TODO WHEN THE GUI IS CLOSED, COMPARE NEW AND OLD FIELDS AND SEE IF ANY ARE DIFFERENT, THEN UPDATE THEM ALL.
         gui.addLabelToFrame("Student Name", 100, 0, 150, 25, false, 18);
         JTextField nameField = gui.addTextField(100, 30, 120, 30, "Name of the Student");
         PromptSupport.setPrompt("Student Name", nameField);
@@ -367,25 +364,210 @@ public class Main {
         dateField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
         DatePicker dp = gui.addDatePicker(310, 30, 100, 30, "<html>" + "Select " +  "<br>" +  "Date" + "</html>", "Click here to select the date of birth for a student.");
         dp.setDate(LocalDate.parse(student.getStudentDOB(), DateTimeFormatter.ofPattern("MM/dd/yyyy")));
-        dp.addDateChangeListener(new DateChangeListener() {
-            @Override
-            public void dateChanged(DateChangeEvent event) {
-                DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-                String convertedDate = event.getNewDate().getMonthValue() + "/" + event.getNewDate().getDayOfMonth() + "/" + event.getNewDate().getYear();
-                LocalTime newConvertedDate = LocalTime.parse(convertedDate, format);
-                dateField.setText(newConvertedDate.toString());
-                return;
-            }
+        dp.addDateChangeListener(event -> {
+            String month = String.valueOf(event.getNewDate().getMonthValue());
+            String day = String.valueOf(event.getNewDate().getDayOfMonth());
+            if(month.length() != 2) { month = "0" + month; }
+            if(day.length() != 2) day = "0" + day;
+            String convertedDate = month + "/" + day + "/" + event.getNewDate().getYear();
+            dateField.setText(convertedDate);
         });
-        //TODO ADD ACTION LISTENER THAT LISTENS TO THE CHANGE IN DATE, FORMATS THE STRING AND THROWS IT IN THE FIELD.
-        JTextField[] entryFields = {nameField, dateField}; //TODO fields will be added to this list, and then recursively made non-editable.
+        gui.addLabelToFrame("Student Address", 450, 0, 150, 25, false, 18);
+        JTextArea addressField = gui.addTextArea(450, 30, 200, 75, "Enter the address of the student here");
+        addressField.setText(student.getStudentAddress());
+        PromptSupport.setPrompt("Student Address", addressField);
+        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, addressField);
+        gui.addLabelToFrame("Student Phone", 675, 0, 150, 25, false, 18);
+        JTextField phoneField = gui.addTextField(675, 25, 150, 25, "Enter the students phone number here!");
+        PromptSupport.setPrompt("Phone Number", phoneField);
+        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, phoneField);
+        phoneField.setText(student.getStudentPhone());
+        phoneField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
+        gui.addLabelToFrame("Student Medical", 850, 0, 150, 25, false, 18);
+        JTextArea medicField = gui.addTextArea(850, 30, 200, 75, "Enter student medical information here!");
+        PromptSupport.setPrompt("Student Medical", medicField);
+        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, medicField);
+        medicField.setText(student.getStudentMedical());
+        gui.addLabelToFrame("Guardian Phone", 1075, 0, 150, 25, false, 18);
+        JTextField guardianPhone = gui.addTextField(1075, 30, 150, 25, "Enter the student's guardian's phone number.");
+        guardianPhone.setText(student.getGuardianPhone());
+        guardianPhone.setFont(new Font(gui.getFrame().getName(), Font.PLAIN, 15));
+        PromptSupport.setPrompt("Guardian Phone", guardianPhone);
+        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, guardianPhone);
+        gui.addLabelToFrame("Guardian Address", 100, 75, 150, 25, false, 18);
+        JTextArea guardianAddress = gui.addTextArea(100, 100, 200, 75, "Enter the student's guardian's address.");
+        guardianAddress.setText(student.getGuardianAddress());
+        gui.addLabelToFrame("Guardian Name", 450, 105, 200, 25, false, 18);
+        JTextField guardianName = gui.addTextField(450, 130, 150, 25, "Enter the student's guardian's name.");
+        guardianName.setText(student.getGuardianName());
+        guardianName.setFont(new Font(gui.getFrame().getName(), Font.PLAIN, 15));
+        //TODO "DELETE STUDENT" BUTTON TO BE ADDED
+        JTextComponent[] entryFields = {nameField, dateField, addressField, phoneField, guardianPhone, guardianAddress, guardianName, medicField};
         if(permission != 2) {
             dp.setVisible(false);
-            for(JTextField x : entryFields) {
+            //TODO REMOVE DELETE STUDENT BUTTON HERE.
+            for(JTextComponent x : entryFields) {
                 x.setEditable(false);
             }
         }
+        setCallAgain(true);
+        for(JTextComponent x : entryFields) {
+            x.getDocument().addDocumentListener(new DocumentListener() {
+                @Override //When a character is inserted into the field, this event will be fired.
+                public void insertUpdate(DocumentEvent e) {
+                    if(getCallAgain()) {
+                        displayEditedButtons(gui, student, entryFields, username, password);
+                    }
+                    setCallAgain(false);
+                }
 
+                @Override //When a character is removed from the field, this event will be fired.
+                public void removeUpdate(DocumentEvent e) {
+                    if(getCallAgain()) {
+                        displayEditedButtons(gui, student, entryFields, username, password);
+                    }
+                    setCallAgain(false);
+                }
+
+                @Override //When the document is changed, this event will be fired
+                public void changedUpdate(DocumentEvent e) {
+                    if(getCallAgain()) {
+                        displayEditedButtons(gui, student, entryFields, username, password);
+                    }
+                    setCallAgain(false);
+                }
+            });
+        }
+        //TODO
+        //PREVENT USER FROM CLOSING IF THEY HAVE MADE AN EDIT. HAVE A BOOLEAN LISTENING FOR CHANGES TO EACH FIELD.
+        // HAVE THE "SAVE AND EXIT" BUTTON APPEAR IF AN EDIT WAS MADE.
+        // HAVE THE "DISCARD CHANGES AND EXIT" BUTTON APPEAR IF AN EDIT WAS MADE.
+        // HAVE THE "REVERT CHANGES" BUTTON APPEAR IF AN EDIT WAS MADE.
+    }
+
+    private static boolean callAgain;
+    private static boolean getCallAgain() {
+        return callAgain;
+    }
+    private static void setCallAgain(boolean callAgain1) {
+        callAgain = callAgain1;
+    }
+
+    /**
+     * Method that handles the displaying of special buttons that will only be shown to administrative users to ensure that they have a way of saving, discarding and reverting their changes.
+     * @param gui The GUI in question to display these buttons on.
+     * @param student The Student that you are viewing and editing the information for.
+     * @param fields The input fields of data that you are working with.
+     * @param username The username used to log into Homeroom.
+     * @param password The password used to log into Homeroom.
+     */
+    private static void displayEditedButtons(GUIUtils gui, Student student, JTextComponent[] fields, String username, String password) {
+        JFrame frame = (JFrame) gui.getFrame();
+        JButton saveEdit = gui.addButtonToFrame("Save Edits", 50, 200, 500, 600);
+        JButton revertChanges = gui.addButtonToFrame("Revert Changes", 50, 200, 700, 600);
+        JButton discardChangesExit = gui.addButtonToFrame("Discard Changes and Exit", 50, 200, 100, 600);
+        JButton saveChangesExit = gui.addButtonToFrame("Save Changes and Exit", 50, 200, 300, 600);
+        JButton[] buttons = {saveEdit, revertChanges, discardChangesExit, saveChangesExit};
+        Student update = new Student(username, password);
+        String updatedName = fields[0].getText();
+        String updatedDate = fields[1].getText();
+        String updatedAddress = fields[2].getText();
+        String updatedPhone = fields[3].getText();
+        String updatedGuardianPhone = fields[4].getText();
+        String updatedGuardianAddress = fields[5].getText();
+        String updatedGuardianName = fields[6].getText();
+        String updatedMedic = fields[7].getText(); //TODO, use the #getName() and #setName() methods with the SearchType enums to make up a way of looping through and getting each field.
+        //TODO You could use their string values, and then the valueOf method to implement this logic!
+        saveEdit.addActionListener(e -> {
+            update.updateStudent(student, "StudentName", updatedName);
+            update.updateStudent(student, "StudentDOB", updatedDate);
+            update.updateStudent(student, "StudentAddress", updatedAddress);
+            update.updateStudent(student, "StudentPhone", updatedPhone);
+            update.updateStudent(student, "GuardianPhone", updatedGuardianPhone);
+            update.updateStudent(student, "GuardianAddress", updatedGuardianAddress);
+            update.updateStudent(student, "GuardianName", updatedGuardianName);
+            update.updateStudent(student, "StudentMedical", updatedMedic);
+            for(JButton x : buttons) {
+                x.setVisible(false);
+            }
+            return;
+        });
+        revertChanges.addActionListener(e -> {
+            for(JTextComponent x : fields) {
+                x.setText("");
+            }
+            fields[0].setText(student.getStudentName());
+            fields[1].setText(student.getStudentDOB());
+            fields[2].setText(student.getStudentAddress());
+            fields[3].setText(student.getStudentPhone());
+            fields[4].setText(student.getGuardianPhone());
+            fields[5].setText(student.getGuardianAddress());
+            fields[6].setText(student.getGuardianName());
+            fields[7].setText(student.getStudentMedical());
+            return;
+        });
+        discardChangesExit.addActionListener(e -> {
+            frame.dispose();
+            return;
+        });
+        saveChangesExit.addActionListener(e -> {
+            update.updateStudent(student, "StudentName", updatedName);
+            update.updateStudent(student, "StudentDOB", updatedDate);
+            update.updateStudent(student, "StudentAddress", updatedAddress);
+            update.updateStudent(student, "StudentPhone", updatedPhone);
+            update.updateStudent(student, "GuardianPhone", updatedGuardianPhone);
+            update.updateStudent(student, "GuardianAddress", updatedGuardianAddress);
+            update.updateStudent(student, "GuardianName", updatedGuardianName);
+            update.updateStudent(student, "StudentMedical", updatedMedic);
+            System.out.println("Fields should have successfully been updated. Exiting!");
+            frame.dispose();
+            return;
+        });
+        frame.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+            }
+            @Override
+            public void windowClosing(WindowEvent e) {
+                Object[] options = {"Save Edits and Exit", "Discard Changes and Exit"};
+                int saveOption = JOptionPane.showOptionDialog(frame, "Would you like to save your changes and exit?", "Homeroom | Exiting Student Management", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), options, "Test");
+                switch (saveOption) {
+                    case 0:
+                        update.updateStudent(student, "StudentName", updatedName);
+                        update.updateStudent(student, "StudentDOB", updatedDate);
+                        update.updateStudent(student, "StudentAddress", updatedAddress);
+                        update.updateStudent(student, "StudentPhone", updatedPhone);
+                        update.updateStudent(student, "GuardianPhone", updatedGuardianPhone);
+                        update.updateStudent(student, "GuardianAddress", updatedGuardianAddress);
+                        update.updateStudent(student, "GuardianName", updatedGuardianName);
+                        update.updateStudent(student, "StudentMedical", updatedMedic);
+                        System.out.println("Fields should have successfully been updated. Exiting!");
+                        frame.setVisible(false);
+                        break;
+                    case 1:
+                        frame.setVisible(false);
+                        System.out.println("Discarding changes and exiting!");
+                        return;
+                }
+                return;
+            }
+            @Override
+            public void windowClosed(WindowEvent e) {
+            }
+            @Override
+            public void windowIconified(WindowEvent e) {
+            }
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+            }
+            @Override
+            public void windowActivated(WindowEvent e) {
+            }
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+            }
+        });
+        return;
     }
 
     /**
