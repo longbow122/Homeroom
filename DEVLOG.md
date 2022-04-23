@@ -194,6 +194,4 @@ Have managed to get some work done on the internal logic behind Homeroom's Stude
 
 The methods that are being called in question are far too long, and code needs to be compacted to become more readable. As soon as main functionality is achieved within all main buttons, the clean-up of code is something that will become immediately prioritised.
 
-
-
 ### 23/04/2022 - Saturday
