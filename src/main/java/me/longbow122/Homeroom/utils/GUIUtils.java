@@ -44,8 +44,6 @@ public class GUIUtils {
             e.printStackTrace();
         }
         frame.pack();
-        if (height == 0) height = 1000; //TODO Default Heights need reworking. Look into tenary operators.
-        if (width == 0) width = 1000;
         frame.setBounds(locationX, locationY, width, height);
         frame.setLayout(null);
         frame.setVisible(true);

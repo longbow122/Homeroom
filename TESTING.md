@@ -78,3 +78,10 @@ Null-Handling has already been accounted for, and it should ensure that when a n
 | Phone Number   | Edge-Case       | +44                                  | 300 Results Found! | Yes!             |
 | Phone Number   | Erroneous       | +73                                  | No Results Found!  | Yes!             |
 
+## Student Data Editing
+Each Student will hold certain sets of information that can be edited through the use of Homeroom's GUI. 
+
+Each field of information within the document can be edited and updated. This needs to be tested thoroughly to ensure that the system is robust.
+
+
+

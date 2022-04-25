@@ -195,3 +195,11 @@ Have managed to get some work done on the internal logic behind Homeroom's Stude
 The methods that are being called in question are far too long, and code needs to be compacted to become more readable. As soon as main functionality is achieved within all main buttons, the clean-up of code is something that will become immediately prioritised.
 
 ### 23/04/2022 - Saturday
+Tested every single button that is made within the Student Management GUI that will allow for just the editing of student information. Buttons and events that trigger the reversion of changed fields into their original pieces of data seem to work well, but I'm having some inital issues with the saving of new fields into the database. 
+
+When a field is edited, the updated data does not seem to properly save into the new field where it is meant to be.I'd be lying if I said I didn't expect some issues from a method that was written once and not tested again, and as such, I need to ensure I fix it today. Once I get that done, I need to move onto the addition and deletion of students. That shouldn't be too hard, and I can then mark the Student Management feature "done" for now.
+
+Compatibility with classes and form groups still need to be worked on within the Student Management GUI, but until those are actually done, I'll need to wait until I get those features developed.
+
+### 25/04/2022 - Monday
+Still struggling with the method I've written to update documents. With some testing, I've decided to deduce that the problem lies with the way I'm making use of MongoDB's methods within the Java Driver. As such, I need to refactor code accordingly to ensure that my update statements work. Will need to do some reading into possible solutions by browsing through the JavaDoc.

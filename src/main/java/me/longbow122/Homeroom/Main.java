@@ -32,9 +32,10 @@ public class Main {
     The called program
      */
     public static void main(String[] args) {
-        File config = getConfigFile();
+        Main main = new Main();
+        File config = main.getConfigFile();
         System.out.println(new ConfigReader(config).getConnectionStringFromConfig());
-        openLoginPage();
+        main.openLoginPage();
     }
 
     /*
@@ -46,7 +47,7 @@ public class Main {
     But then how would I add the action listener without ending up with the same amount of lines as before?
     Trying to keep lines of code to a minimum and clean up this code where possible.
      */
-    private static void openLoginPage() {
+    private void openLoginPage() {
         GUIUtils loginGUI = new GUIUtils("Homeroom Login", 300, 600, 700, 300, true);
         loginGUI.addLabelToFrame("Username: ", 30, 100, 70, 30, false);
         JTextField usernameField = loginGUI.addTextField(100, 100, 400, 25, "Enter the username used to log into Homeroom here!");
@@ -162,7 +163,7 @@ public class Main {
     Open to worded suggestions if anyone had any. (As in, you tell me what you think would work, but try to avoid directly
     spoonfeeding the answer where possible. Thank you!)
      */
-    private static void openMainGUI(String username, String password) {
+    private void openMainGUI(String username, String password) {
         GUIUtils mainGUI = new GUIUtils("Homeroom", 1000, 1220, 300, 0, true);
         JButton manageStudents = mainGUI.addButtonToFrame("Manage Students", 300, 400, 0, 50);
         manageStudents.setToolTipText("Manage all Students in your school from here.");
@@ -213,7 +214,7 @@ public class Main {
         // BUTTON LISTENERS FOR EVERY BUTTON.
     }
 
-    private static void openManageStudentsGUI(String username, String password) {
+    private void openManageStudentsGUI(String username, String password) {
         Student searchClass = new Student(username, password);
         GUIUtils gui = new GUIUtils("Manage Students | Homeroom", 1000, 1220, 300, 0, false);
         JButton addStudent = gui.addButtonToFrame("New Student", 60, 200, 0,0);
@@ -313,7 +314,7 @@ public class Main {
      * @param searchResults The List of student found within the database query.
      * @param gui The {@link JFrame} in the questions
      */
-    private static void showSearchResults(List<Student> searchResults, GUIUtils gui, int permission, String username, String password) {
+    private void showSearchResults(List<Student> searchResults, GUIUtils gui, int permission, String username, String password) {
         int xLoc = 0;
         int yLoc = 100;
         if(searchButtons != null) {
@@ -325,9 +326,7 @@ public class Main {
         for(Student x : searchResults) {
             JButton option = gui.addButtonToFrame(x.getStudentName(), 50, 150, xLoc, yLoc);
             option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
-            option.addActionListener(e -> {
-                viewStudentInformation(x, permission, username, password);
-            });
+            option.addActionListener(e -> viewStudentInformation(x, permission, username, password));
             buttons.add(option);
             xLoc = xLoc + 150;
             if(xLoc > 1050) {
@@ -349,7 +348,7 @@ public class Main {
      * @param student The student in question, the student for which information should be displayed.
      * @param permission The level of permission that the user is viewing the information from. Dictates whether student information can be edited or deleted.
      */
-    private static void viewStudentInformation(Student student, int permission, String username, String password) {
+    private void viewStudentInformation(Student student, int permission, String username, String password) {
         GUIUtils gui = new GUIUtils("Student Management | View Student", 1000, 1700, 0, 0, false);
         gui.addLabelToFrame("Student Name", 100, 0, 150, 25, false, 18);
         JTextField nameField = gui.addTextField(100, 30, 120, 30, "Name of the Student");
@@ -438,11 +437,6 @@ public class Main {
                 }
             });
         }
-        //TODO
-        //PREVENT USER FROM CLOSING IF THEY HAVE MADE AN EDIT. HAVE A BOOLEAN LISTENING FOR CHANGES TO EACH FIELD.
-        // HAVE THE "SAVE AND EXIT" BUTTON APPEAR IF AN EDIT WAS MADE.
-        // HAVE THE "DISCARD CHANGES AND EXIT" BUTTON APPEAR IF AN EDIT WAS MADE.
-        // HAVE THE "REVERT CHANGES" BUTTON APPEAR IF AN EDIT WAS MADE.
     }
 
     private static boolean callAgain;
@@ -453,6 +447,12 @@ public class Main {
         callAgain = callAgain1;
     }
 
+    private static boolean closeShow;
+    private static boolean getCloseShow() { return closeShow; }
+    private static void setCloseShow(boolean closeShow1) {
+        closeShow = closeShow1;
+    }
+
     /**
      * Method that handles the displaying of special buttons that will only be shown to administrative users to ensure that they have a way of saving, discarding and reverting their changes.
      * @param gui The GUI in question to display these buttons on.
@@ -461,7 +461,8 @@ public class Main {
      * @param username The username used to log into Homeroom.
      * @param password The password used to log into Homeroom.
      */
-    private static void displayEditedButtons(GUIUtils gui, Student student, JTextComponent[] fields, String username, String password) {
+    private void displayEditedButtons(GUIUtils gui, Student student, JTextComponent[] fields, String username, String password) {
+        setCloseShow(true);
         JFrame frame = (JFrame) gui.getFrame();
         JButton saveEdit = gui.addButtonToFrame("Save Edits", 50, 200, 500, 600);
         JButton revertChanges = gui.addButtonToFrame("Revert Changes", 50, 200, 700, 600);
@@ -487,10 +488,14 @@ public class Main {
             update.updateStudent(student, "GuardianAddress", updatedGuardianAddress);
             update.updateStudent(student, "GuardianName", updatedGuardianName);
             update.updateStudent(student, "StudentMedical", updatedMedic);
+            for(JTextComponent x : fields) {
+                System.out.println(x.getText());
+            }
+            System.out.println("Edit saved button clicked!");
             for(JButton x : buttons) {
                 x.setVisible(false);
             }
-            return;
+            setCloseShow(false);
         });
         revertChanges.addActionListener(e -> {
             for(JTextComponent x : fields) {
@@ -504,11 +509,14 @@ public class Main {
             fields[5].setText(student.getGuardianAddress());
             fields[6].setText(student.getGuardianName());
             fields[7].setText(student.getStudentMedical());
-            return;
+            setCloseShow(false);
+            for(JButton x : buttons) {
+                x.setVisible(false);
+            }
         });
         discardChangesExit.addActionListener(e -> {
+            setCloseShow(false);
             frame.dispose();
-            return;
         });
         saveChangesExit.addActionListener(e -> {
             update.updateStudent(student, "StudentName", updatedName);
@@ -520,8 +528,8 @@ public class Main {
             update.updateStudent(student, "GuardianName", updatedGuardianName);
             update.updateStudent(student, "StudentMedical", updatedMedic);
             System.out.println("Fields should have successfully been updated. Exiting!");
+            setCloseShow(false);
             frame.dispose();
-            return;
         });
         frame.addWindowListener(new WindowListener() {
             @Override
@@ -529,27 +537,27 @@ public class Main {
             }
             @Override
             public void windowClosing(WindowEvent e) {
-                Object[] options = {"Save Edits and Exit", "Discard Changes and Exit"};
-                int saveOption = JOptionPane.showOptionDialog(frame, "Would you like to save your changes and exit?", "Homeroom | Exiting Student Management", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), options, "Test");
-                switch (saveOption) {
-                    case 0:
-                        update.updateStudent(student, "StudentName", updatedName);
-                        update.updateStudent(student, "StudentDOB", updatedDate);
-                        update.updateStudent(student, "StudentAddress", updatedAddress);
-                        update.updateStudent(student, "StudentPhone", updatedPhone);
-                        update.updateStudent(student, "GuardianPhone", updatedGuardianPhone);
-                        update.updateStudent(student, "GuardianAddress", updatedGuardianAddress);
-                        update.updateStudent(student, "GuardianName", updatedGuardianName);
-                        update.updateStudent(student, "StudentMedical", updatedMedic);
-                        System.out.println("Fields should have successfully been updated. Exiting!");
-                        frame.setVisible(false);
-                        break;
-                    case 1:
-                        frame.setVisible(false);
-                        System.out.println("Discarding changes and exiting!");
-                        return;
+                if(getCloseShow()) {
+                    Object[] options = {"Save Edits and Exit", "Discard Changes and Exit"};
+                    int saveOption = JOptionPane.showOptionDialog(frame, "Would you like to save your changes and exit?", "Homeroom | Exiting Student Management", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), options, "Test");
+                    switch (saveOption) {
+                        case 0:
+                            update.updateStudent(student, "StudentName", updatedName);
+                            update.updateStudent(student, "StudentDOB", updatedDate);
+                            update.updateStudent(student, "StudentAddress", updatedAddress);
+                            update.updateStudent(student, "StudentPhone", updatedPhone);
+                            update.updateStudent(student, "GuardianPhone", updatedGuardianPhone);
+                            update.updateStudent(student, "GuardianAddress", updatedGuardianAddress);
+                            update.updateStudent(student, "GuardianName", updatedGuardianName);
+                            update.updateStudent(student, "StudentMedical", updatedMedic);
+                            System.out.println("Fields should have successfully been updated. Exiting!");
+                            frame.setVisible(false);
+                            break;
+                        case 1:
+                            frame.setVisible(false);
+                            System.out.println("Discarding changes and exiting!");
+                    }
                 }
-                return;
             }
             @Override
             public void windowClosed(WindowEvent e) {
@@ -567,7 +575,6 @@ public class Main {
             public void windowDeactivated(WindowEvent e) {
             }
         });
-        return;
     }
 
     /**

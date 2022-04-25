@@ -5,7 +5,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.bson.Document;
@@ -46,16 +45,18 @@ public class Student {
      * Constructor for the Student class. Does not make use of any attributes, as you should be using the methods within this class to either find students, or make new Students within the database.
      * <p></p>
      * Methods within this class will return {@link Student} objects for you to use within the program, but this plain constructor SHOULD NOT be used without another method suffixing it.
-     * @
+     * @param connectionUsername The username used to connect to the database with.
+     * @param connectionPassword The password used to connect to the database with.
      */
     public Student(String connectionUsername, String connectionPassword) {
+        connect(connectionUsername, connectionPassword);
         this.connectionUsername = connectionUsername;
         this.connectionPassword = connectionPassword;
-        db = new DBUtils(connectionUsername, connectionPassword);
     }
 
     /**
-     * Private constructor for use within this class. As there will be multiple methods which are to be used within the class, this constructor will help with methods that return any Student objects.
+     * Private constructor for use within this class. As there will be multiple methods which are to be used within the class, this constructor will help with methods that return any Student objects. <p></p>
+     * WARNING: DOES NOT MAKE A CONNECTION TO THE DATABASE. YOU SHOULD USE A "PLAIN CONSTRUCTOR" to connect to the database if needed. The {@link #connect(String, String)} method can also be used to do this too.
      * @param studentID - The ID of the student. Should be a version 4 UUID in a String. Should be entirely unique.
      * @param studentName - The name of the student. Could, in theory be used as a secondary key, but not worth the risk.
      * @param studentDOB - The date of birth of the student. Stored as a {@link String} since you cannot store the slashes for the date format in an Integer. Seemed easier to use this too.
@@ -66,7 +67,7 @@ public class Student {
      * @param guardianAddress - The address of the guardian. Will normally be the same as the Student's address, but just in case, it is stored seperately.
      * @param guardianPhone - The phone number of the guardian. Stored as a {@link String} to allow for international country codes.
      */
-    private Student(String connectionUsername, String connectionPassword, String studentID, String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
+    private Student(String studentID, String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
         this.studentID = studentID;
         this.studentName = studentName;
         this.studentDOB = studentDOB;
@@ -76,9 +77,11 @@ public class Student {
         this.guardianName = guardianName;
         this.guardianPhone = guardianPhone;
         this.guardianAddress = guardianAddress;
-        this.connectionPassword = connectionPassword;
-        this.connectionUsername = connectionUsername;
+    }
+
+    public DBUtils connect(String connectionUsername, String connectionPassword) {
         db = new DBUtils(connectionUsername, connectionPassword);
+        return db;
     }
 
     public String getStudentName() {
@@ -125,7 +128,7 @@ public class Student {
         try (MongoCursor<Document> found = students.find(query).iterator()) {
             while (found.hasNext()) {
                 Document x = found.next();
-                return new Student(connectionUsername, connectionPassword, x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString());
+                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString());
             }
             return null;
         }
@@ -145,7 +148,8 @@ public class Student {
         }
         MongoDatabase homeroom = db.getHomeroomDB();
         MongoCollection students = homeroom.getCollection("Students");
-        students.findOneAndUpdate(Filters.eq("StudentID", student.getStudentID()), Updates.set(fieldToUpdate, updateString));
+        Document updateDoc = new Document("$set", new Document(fieldToUpdate, updateString));
+        students.updateOne(new Document("StudentID", student.getStudentID()), updateDoc);
         return true;
     }
 
@@ -203,7 +207,7 @@ public class Student {
                 medicalInfo = "N/A"; //Doesn't seem to contain a key
             } else medicalInfo = x.get("StudentMedical").toString();
             System.out.println(x.get("StudentName"));
-            found.add(new Student(connectionUsername, connectionPassword, x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString()));
+            found.add(new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString()));
         }
         progress.closeFrame();
         return found;
