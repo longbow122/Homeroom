@@ -5,13 +5,18 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -147,13 +152,69 @@ public class Student {
             return false;
         }
         MongoDatabase homeroom = db.getHomeroomDB();
-        MongoCollection students = homeroom.getCollection("Students");
-        Document updateDoc = new Document("$set", new Document(fieldToUpdate, updateString));
-        students.updateOne(new Document("StudentID", student.getStudentID()), updateDoc);
+        MongoCollection<Document> students = homeroom.getCollection("Students");
+        Document queryDoc = new Document("StudentID", student.getStudentID());
+        Bson update = Updates.set(fieldToUpdate, updateString);
+        UpdateOptions options = new UpdateOptions().upsert(false);
+        students.updateOne(queryDoc, update, options);
         return true;
     }
 
+    /**
+     * Method that deleted a specified record of a {@link Student} that has been specified. This is done by getting the Student's ID.
+     * @param student The Student to delete.
+     * @return {@link Boolean} that represents the success or failure of this operation.
+     */
+    public boolean deleteStudent(Student student) {
+        if(db.isConnected() != 0) {
+            return false;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection<Document> students = homeroom.getCollection("Students");
+        Document queryDoc = new Document("StudentID", student.getStudentID());
+        students.deleteOne(queryDoc);
+        return true;
+    }
+
+    //TODO IMPLEMENT THE ADD STUDENT METHOD FOR THE DATABASE AND TEST IT!!
+
+    /**
+     * Basic method written to add students to the database of Homeroom. This method also generates a version 4 UUID for the user to make use of when working within the program and when handling data.
+     * Checks are already made to ensure that the UUID will be valid within the database and will not be wrong. <br>
+     * This method should generally be used with an instance of the Student class that is able to make connections. If this method is not possible, then the developer should make use of the {@link #connect(String, String)} method.
+     * @param studentName The name of the Student in question.
+     * @param studentDOB The date of birth of the Student in question.
+     * @param studentAddress The address of the Student in question.
+     * @param studentPhone The phone number of the Student in question.
+     * @param studentMedical The medical information of the Student in question.
+     * @param guardianName The name of the guardian of the Student in question.
+     * @param guardianAddress The address of the guardian of the Student in question.
+     * @param guardianPhone The phone number of the guardian of the address in question.
+     * @return A representation of the Student in Object form. Can be used to pull and handle information throughout the rest of the program.
+     */
+    public Student addStudentToDB(String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
+        UUID uuid = UUID.randomUUID();
+        while(getStudentFromID(uuid.toString()) != null) { //Make sure that the UUID generated does not point to another student already.
+            uuid = UUID.randomUUID();
+        }
+        MongoCollection<Document> studentsDB = db.getHomeroomDB().getCollection("Students");
+        HashMap<String, Object> dataValues = new HashMap<>();
+        dataValues.put("StudentID", uuid.toString());
+        dataValues.put("StudentName", studentName);
+        dataValues.put("StudentDOB", studentDOB);
+        dataValues.put("StudentAddress", studentAddress);
+        dataValues.put("StudentPhone", studentPhone);
+        dataValues.put("StudentMedical", studentMedical);
+        dataValues.put("GuardianName", guardianName);
+        dataValues.put("GuardianAddress", guardianAddress);
+        dataValues.put("GuardianPhone", guardianPhone);
+        Document insertInfoDocument = new Document(dataValues);
+        studentsDB.insertOne(insertInfoDocument);
+        return new Student(uuid.toString(), studentName, studentDOB, studentAddress, studentPhone, studentMedical, guardianName, guardianAddress, guardianPhone);
+    }
+
     //TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
+
     /**
      * Method that returns a list of all students depending on the {@link StudentSearchType}. The parameter string will look for an exact match or a similar match.
      * This is used within the user interface for "searching" of students. Users will then be able to click on a student and access their information through there. <p></p>
@@ -203,7 +264,7 @@ public class Student {
             bar.setString("Searching for Students: " + roundedPercent + "%");
             bar.setValue(roundedPercent);
             String medicalInfo;
-            if(x.containsKey("StudentMedical") == false || x.get("StudentMedical") == null) { //Problem line, needs to have it be null somewhere if there is no medical value
+            if(!x.containsKey("StudentMedical") || x.get("StudentMedical") == null) { //Problem line, needs to have it be null somewhere if there is no medical value
                 medicalInfo = "N/A"; //Doesn't seem to contain a key
             } else medicalInfo = x.get("StudentMedical").toString();
             System.out.println(x.get("StudentName"));

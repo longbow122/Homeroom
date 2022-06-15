@@ -76,12 +76,60 @@ Null-Handling has already been accounted for, and it should ensure that when a n
 | Address        | Erroneous       | Qqanfnfhdysts                        | No Results Found!  | Yes!             |
 | Phone Number   | Expected/Normal | +44 7911 867535                      | One Result Found!  | Yes!             |
 | Phone Number   | Edge-Case       | +44                                  | 300 Results Found! | Yes!             |
-| Phone Number   | Erroneous       | +73                                  | No Results Found!  | Yes!             |
+| Phone Number   | Edge-Case       | +73                                  | No Results Found!  | Yes!             |
 
 ## Student Data Editing
 Each Student will hold certain sets of information that can be edited through the use of Homeroom's GUI. 
 
 Each field of information within the document can be edited and updated. This needs to be tested thoroughly to ensure that the system is robust.
 
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Student Information. This aspect of testing was **successful**
 
+| Type of Edit     | Original Data Value                                                    | New Data Value                  | Expected Result                 | Achieved Result? |
+|------------------|------------------------------------------------------------------------|---------------------------------|---------------------------------|------------------|
+| Student Name     | Dave Gordon                                                            | Bill Gordon                     | Bill Gordon                     | Yes!             |
+| Student DOB      | 09/08/2002                                                             | 05/12/1998                      | 05/12/1998                      | Yes!             |
+| Student Address  | 9 Farman Street, Hove, HN3 1AL                                         | 55 Farman Street, Hove, HN3 1AL | 55 Farman Street, Hove, HN3 1AL | Yes!             |
+| Student Phone    | +44 7911 242246                                                        | +44 7911 242243                 | +44 7911 242243                 | Yes!             |
+| Student Medical  | Student has ADHD, student gets restless and loses concentration easily | N/A                             | N/A                             | Yes!             |
+| Guardian Phone   | +44 7457 331582                                                        | +44 7457 331599                 | +44 7457 331599                 | Yes!             |
+| Guardian Address | 9 Farman Street, Hove, HN3 1AL                                         | 99 Farman Street, Hove, HN3 1AL | 99 Farman Street, Hove, HN3 1AL | Yes!             |
+| Guardian Name    | Jerry Gordon                                                           | Juan Gordon                     | Juan Gordon                     | Yes!             |
+
+## Student Deletion
+When Students leave the institution, the school (as per data protection laws, and as is good practise) are required to delete all relevant data on their alumni after a certain amount of time.
+
+This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to be tested as much, but should be tested somewhat extensively.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions should be able to delete permissions. This aspect of testing was **successful.**
+
+The following students to be deleted are as follows:
+
+| Student Name  | Student DOB  | Student Address                                       | Student Phone   | Student Medical      | Guardian Phone  | Guardian Address                                        | Guardian Name  | Deletion Successful?  |
+|---------------|--------------|-------------------------------------------------------|-----------------|----------------------|-----------------|---------------------------------------------------------|----------------|-----------------------|
+| Allana Dyer   | 31/08/2005   | 49 Evan St, Stonehaven, AB39 2ET                      | +44 7700 167364 | Thyroid Problems,    | +44 7948 82482  | 49 Evan St, Stonehaven, AB39 2ET                        | Brenden Stones | Yes!                  |
+| Abby Donnelly | 02/16/2004   | Flat 10, Bevan House, 1 Rookery Lane, Barnet, EN4 0BW | +44 7911 29759  | Student has dyslexia | +44 7457 918162 | Flat 10, 1 Bevan House, 1 Rookery Lane, Barnet, EN4 0BW | Reggie Fisher  | Yes!                  |
+| Bill Gordon   | 05/12/1998   | 55 Farman Street, Hove, BN3 1AL                       | +44 7911 242243 | N/A                  | +44 7457 331599 | 99 Farman Street, Hove, BN3 1AL                         | Juan Gordon    | Yes!                  |
+
+
+
+## Student Data Addition
+When a Student joins the institution, the school must add their data to the database to ensure that they can make use of this data within the school as and when is needed.
+
+This is a feature that 'Homeroom' is able to handle through a basic GUI-based form. The user can enter data through this form, then either close the form or press a button within the form to send the data and add the data for the Student to the database.
+
+Certain fields of information also MUST not be empty, and certain fields of text within the form are forced to follow a certain format due to being uneditable, and only editable through a GUI.
+
+| Student Name  | Student DOB  | Student Address                                       | Student Phone   | Student Medical      | Guardian Phone  | Guardian Address                                        | Guardian Name  | Addition Successful? |
+|---------------|--------------|-------------------------------------------------------|-----------------|----------------------|-----------------|---------------------------------------------------------|----------------|----------------------|
+| Allana Dyer   | 31/08/2005   | 49 Evan St, Stonehaven, AB39 2ET                      | +44 7700 167364 | Thyroid Problems,    | +44 7948 82482  | 49 Evan St, Stonehaven, AB39 2ET                        | Brenden Stones | Yes!                 |
+| Abby Donnelly | 02/16/2004   | Flat 10, Bevan House, 1 Rookery Lane, Barnet, EN4 0BW | +44 7911 29759  | Student has dyslexia | +44 7457 918162 | Flat 10, 1 Bevan House, 1 Rookery Lane, Barnet, EN4 0BW | Reggie Fisher  | Yes!                 |
+| Bill Gordon   | 05/12/1998   | 55 Farman Street, Hove, BN3 1AL                       | +44 7911 242243 | N/A                  | +44 7457 331599 | 99 Farman Street, Hove, BN3 1AL                         | Juan Gordon    | Yes!                 |
+
+**P.S:** An issue was found, where the field for inputs of phone numbers accepted alphanumerical values. Characters within the alphabet should not be accepted, and input validation should be worked on to ensure that bad input is caught.
+
+This was implemented by doing checks on the denary ASCII value of each string. If a character that is not a number is within the value of 65-90, or 97-122, or it is not 33, then it is a character that is not part of a valid phone number and as such, should be flagged.
+The checks I have made on each ASCII value check whether the character is a letter, or not a "+" character. These are the only characters that make up a part of a valid phone number.
+
+**P.P.S:** Forgot to account for the space character, which can be used within phone numbers with international country codes. All I needed to do was add an extra check for the space character into the phone number check.
 

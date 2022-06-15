@@ -1,5 +1,7 @@
 NEA Programming Project Devlog
 ---
+
+# First Iteration - Initial Development
 This document will entail the development log for ‘Homeroom’. If any challenges are encountered, the solutions will also be documented. Documentation will be done every day that some form of relevant progress has been made.
 
 ### 19/01/2022 - Wednesday
@@ -203,3 +205,46 @@ Compatibility with classes and form groups still need to be worked on within the
 
 ### 25/04/2022 - Monday
 Still struggling with the method I've written to update documents. With some testing, I've decided to deduce that the problem lies with the way I'm making use of MongoDB's methods within the Java Driver. As such, I need to refactor code accordingly to ensure that my update statements work. Will need to do some reading into possible solutions by browsing through the JavaDoc.
+
+### 26/04/2022 - Tuesday
+Made some minor progress on the program by doing some minor class refactoring. Ensured that uneeded connections within the program are not made where possible. One such example was within my "search" method, where Students would be searched for, and upin being found, a new connection would be made. This happened as when a new Student object was instantiated, a new connection would be made for EOU. At scale, this would likely not work in my favour.
+
+### 04/05/2022 - Wednesday
+Failed to fix the issue at hand. Found the cause of it, but need to do some major refactoring to ensure that full and intended functionality is there.
+
+**P.S:** Somehow managed to more or less fix it. However, it seems I'm "caching" the results of the search within the student management menu, so I need to find a way to be able to refresh the menu after a saving operation of editing of data has been called. This refresh operation will need to be done across the board. This refresh operation also needs to be automatic, as relying on users to refresh things manually is stretching too far.
+
+### 06/05/2022 - Friday
+Did some minor testing of deletion and editing of student information. It is becoming increasingly clear that the "refreshing" of search results after a particular action on a Student is done needs to be implemented. When a Student is deleted, as the refresh does not occur, the Student's information can be still viewed and edited.
+
+It is likely that this will cause a major conflict with data entry if a sub-user should choose to edit said deleted student, then the student will likely be re-added to the database, which is not an intended feature.
+
+Further testing needs to be done, and the search GUI needs to be refreshed no matter what.
+
+Additionally, there is an increasingly worrying amount of private, static variables being used within my code. While this may be the only potential solution that can be used, it is not always best practise. My Main class needs to be refactored accoridngly to ensure that this does not continue.
+
+**P.S:** Ensuring that the GUI can be refreshed through the call of a method or through some other hacky workaround is going to be a challenge. Finding a clean and reliable way will be incredibly hard. This needs to be done as soon as possible, and preferably before I handle pagination.
+
+Once pagination is handled, that will be an entire feature developed, and I can begin to move onto another aspect of the program.
+
+To ensure I have a little more time to finish working on this issue, I've decided to temporarily move onto the addition of Students before working on GUI refreshing and pagination.
+
+### 17/05/2022 - Tuesday
+Did some planning of functionality for the addition of students. Also implemented a few lines of code which will entirely handle this feature. This requires a lot more testing, as I have had trouble with MongoDB's API due to the large clash in documentation.
+
+Once I have finished and properly tested the addition of Student's data, the deletion of students also needs to be tested. Once that has been tested, I need to find a good way of paginating results that are larger than what the GUI can hold. The way I see it, I have two options to explore when it comes to this, scroll panes or simple page buttons. I'll decide once I start working on it, but I need to be able to pick what seems easier to work on.
+
+## 18/05/2022 - Wednesday
+Did some minor work on student addition and also worked on major pieces of the documentation for it. Testing needs to be done for it, but the main components of the code have been written. Some final database methods need to be written, but once that's been written that should be the first piece of the program done.
+
+## 20/05/2022 - Friday
+Wrote some basic code that will handle the final bits and pieces of Student Management. All that now needs to be done is the handling work for the nicer details within the program. Once final finishing touches have been put in, I'll work on the rest of the program.
+
+The newer set of features also requires intensive testing, and this needs to be done before I can move on. I don't want to have to swamp myself with testing once the entire program is developed and I also don't want to have to handle ferocious bugs in one large go.
+
+## 27/05/2022 - Friday
+Code for adding and removing students seems to work fine, but as the data is stored cached at first, the data for deleted students can still be viewed somewhat quickly through the window. **It is now of vital importance that the GUI is refreshed with a new set of buttons to ensure that deleted students can't be viewed.
+
+Once I have handled that, Student Management is done and I can now move onto the next feature for Homeroom.
+
+I've also had a quick read through my main class and have done some minor work towards trying to clean up my code, but it is still not up to standard. I've definitely got to go over multiple refactors once functionality is achieved.
