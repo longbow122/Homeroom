@@ -248,3 +248,53 @@ Code for adding and removing students seems to work fine, but as the data is sto
 Once I have handled that, Student Management is done and I can now move onto the next feature for Homeroom.
 
 I've also had a quick read through my main class and have done some minor work towards trying to clean up my code, but it is still not up to standard. I've definitely got to go over multiple refactors once functionality is achieved.
+
+## 15/06/2022 - Wednesday
+Spent a long time refactoring a few methods, implementing further page refreshing upon addition and deletion of Students and also added large section to the testing document to ensure that every feature of Homeroom is appropriately documented.
+
+I've more or less finished one entire piece of my program (Student Management), and can now begin to start planning another section of the project. Before I do that, I need to work on pagination or scrolling of the Student Management menu to ensure that if buttons are created that end up going out of bounds of the original window, the user is still able to view those buttons by scrolling down.
+
+I hope to have a general plan for this feature fully worked out and finished by today at the least, but implementation might take a little longer to do.
+
+## 16/06/2022 - Thursday
+I've made some minor work on the method for pagination, which will likely be finished today. Once I finish this, I'll move straight onto Form Group work, which will end up being much quicker to implement, due to it having an extremely similar, if not smaller structure to Students.
+
+Once I finish work on Form Groups, I can start moving onto Lessons, which will also work the same, (if not similar to Form Groups), only added with some extra functionality to add Students to the Lesson and Form Group.
+
+Once that has been finished, scheduling (likely the harder feature to implement) will need to be done. Due to the way that comparisons between days and times need to be done, I predict it will take me most if not the entire summer to ensure that it is as efficient as possible.
+
+In my personal opinion, (although I haven't started it), I predict that the write up will be generally easy. The supplementary documents I am writing (such as this development log and the testing document) will let me get things documented within the write-up quickly and easily.
+
+**P.S:** The way I'm making use of method to handle the creation and display of my GUIs is definitely not smart, nor is it efficient. This needs to be worked on immediately after functionality is achieved. Due to University applications and personal statement work ramping up, I fear I may not have much time to do everything I need to do, but we will have to see.
+
+## 20/06/2022 - Monday
+First attempt to handle pagination smoothly through the use of a JScrollPane seemed to have failed, but I hope to have rectified that by making two JButtons which will then move through a List of Lists of Buttons. These lists will be "pages" of buttons containing student information, which can then be flicked between by users, provided that the search results are large enough to require this.
+
+Once I have sorted through this, I will begin work on the Forms Management, which will hopefully become must easier, as they will work incredibly similarly to Student Management.
+
+The quality and overall readability of my code is a major concern, and is something I need to keep a tab on if I want to save myself a large amount of time in the future.
+
+Currently, my code focuses purely on functionality. The programs works and nothing else. The code is by all means not clean and easy to read, and is definitely not efficient.
+
+I feel my reliance on the ArrayList data type is far too much. This, technically would be okay, but if it is beginning to affect my code with the excessive use of private fields, excessive use of if statements and general bad code practise, then it needs to stop. I will likely be spending an entire iteration's worth of work trying to figure out how to clean up each class.
+
+While the code may not consume many resources computationally, it is able to take significantly less, which is the best solution that is needed. Once I finish testing the new pagination solution, I will be ready to move on, and begin merging the student branch.
+
+**P.S:** Encounters some issues when handling pagination logic through the JButtons. I'm still in progress of diagnosing as to exactly why the issue I have is occuring, but I believe I'm slowly getting to the root of it.
+
+It seems to be a combination of problems only revealing themselves now due to the new system with pagination and handling Lists.
+
+## 21/06/2022 - Tuesday
+I still seem to be having issues with pagination logic, of which I'm not completely sure how to fix. I managed to trace the method's logic issues down to the List of buttons that it's meant to be iterating through.
+
+Not sure what the issue is exactly, but I'll work on figuring it out. I'm sure that the list of lists contains the right buttons, meaning that it might be an issue with making the buttons visible and invisible. Not sure why this is causing an issue, but I'll need to look into it.
+
+**P.S:** Found the issue at hand. The index doesn't seem to be shifting properly in terms of the new paged index, meaning that the same JButton is then being made invisible and visible again. This would obviously cause issues, as it does not give the effect to the user that the page is actually "shifting". I'll need to find a way to properly fix this before moving on.
+
+**P.P.S:** Issue found. The list of lists for the buttons does not seem to be properly shifting across due to the fact that it is not properly adding buttons. The logic behind this needs to be debugged and reworked to ensure that all 300 elements in my sample data set are successfully added and viewable.
+
+***P.P.P.S:*** Found the issue at hand and managed to fix it. Seemed to be an issue with the List of buttons I was recycling in order to save resources not properly wiping every object within the list. Resolved this by creating a new ArrayList and replacing it in memory.
+
+*I will now begin to make a move on the Form Management section of Homeroom, allowing me to temporarily finish Student Management until form group functionality needs to be implemented within Student Management.*
+
+## 22/06/2022 - Wednesday

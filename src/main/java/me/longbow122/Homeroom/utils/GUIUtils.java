@@ -14,7 +14,11 @@ import java.io.IOException;
  */
 public class GUIUtils {
 
+
+
     private final Window frame;
+
+
     /**
      * New constructor to work with this class. Will return an instance of the class that can be accessed throughout the program.
      * <p>

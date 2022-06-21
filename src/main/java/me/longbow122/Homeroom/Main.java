@@ -11,7 +11,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -359,7 +360,6 @@ public class Main {
                         }
                     }
                 }
-                //TODO DO CHECKS FOR PHONE NUMBER VALIDATION HERE!!!
                 String[] phoneNumbers = {studentPhone.getText(), guardianPhone.getText()};
                 for(String x : phoneNumbers) {
                     for(Character ch : x.toCharArray()) {
@@ -383,12 +383,7 @@ public class Main {
                 add.closeFrame();
                 return;
             });
-            //TODO
-            // ENSURE THAT THERE IS A LISTENER UPON CLOSING THE GUI THAT ADDS THE STUDENT AFTER A CONFIRMATION
-            // ENSURE THAT THE CONFIRMATION HAS A CANCEL OPTION
         });
-        //TODO
-        // ENSURE THAT THE SEARCH GUI IS "REFRESHABLE"
     }
 
     /**
@@ -402,10 +397,51 @@ public class Main {
         return check >= one && check <= two;
     }
 
-    private List<JButton> searchButtons;
+    private List<List<JButton>> searchButtonsPages;
 
-    private void setSearchButtons(List<JButton> buttons) {
-        searchButtons = buttons;
+    private int searchButtonIndex;
+
+    private void setSearchButtons(List<List<JButton>> buttons) {
+        searchButtonsPages = buttons;
+    }
+
+    /**
+     * Method which emulates the "shifting" of pages, all current buttons are made invisible, and the new pages are made visible.
+     * <p></p>
+     * Hard-coded numerical values are used for the shift amount as there is a specified amount of shifts that can be made per button press.
+     * @param currentIndex The current numbered index that the page is currently on.
+     * @param shiftAmount The amount to shift the index by. The index number should be positive if you want to move up a page and index number should be negative if you want to move down a page.
+     */
+    private void shiftPage(int currentIndex, int shiftAmount, GUIUtils gui) {
+        if(shiftAmount < 0) {
+            System.out.println("The shift amount is negative! Subtraction should occur!");
+            if(currentIndex - 1 < 0) {
+                System.out.println("After subtraction, index would be negative and as such, no more pages!");
+                JOptionPane.showMessageDialog(gui.getFrame(),"There are no more pages for you to move through!");
+                return;
+            }
+            searchButtonIndex = searchButtonIndex - 1;
+        } else {
+            System.out.println("The shift amount is positive? Should be incrementing!");
+            if(currentIndex + shiftAmount >= searchButtonsPages.size()) {
+                System.out.println("Out of index for that addition!");
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no more pages for you to move through!");
+                return;
+            }
+            searchButtonIndex++;
+        }
+        for(JButton i : searchButtonsPages.get(currentIndex)) {
+            i.setVisible(false);
+            System.out.println(i.getText());
+        }
+        System.out.println("Old pages should be invisible.");
+        System.out.println("Current index: " + currentIndex);
+        System.out.println("New index: " + searchButtonIndex);
+        for(JButton x : searchButtonsPages.get(searchButtonIndex)) {
+            x.setVisible(true);
+            System.out.println(x.getText());
+        }
+        System.out.println("New page should be visible.");
     }
 
     /**
@@ -420,27 +456,70 @@ public class Main {
     private void showSearchResults(List<Student> searchResults, GUIUtils gui, int permission, String username, String password) {
         int xLoc = 0;
         int yLoc = 100;
-        if(searchButtons != null) {
-            for (JButton i : searchButtons) {
-                i.setVisible(false);
+        if(searchButtonsPages != null) {
+            for(List<JButton> x : searchButtonsPages) {
+                for(JButton i : x) {
+                    i.setVisible(false);
+                }
             }
         }
+        List<List<JButton>> pages = new ArrayList<>();
         List<JButton> buttons = new ArrayList<>();
         for(Student x : searchResults) {
             JButton option = gui.addButtonToFrame(x.getStudentName(), 50, 150, xLoc, yLoc);
             option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
             option.addActionListener(e -> viewStudentInformation(x, permission, username, password, gui));
             buttons.add(option);
+            System.out.println("A button was added to the list of buttons!");
+            option.setVisible(false);
             xLoc = xLoc + 150;
             if(xLoc > 1050) {
                 yLoc = yLoc + 50;
                 xLoc = 0;
             }
-            //TODO IF yLoc is LARGER THAN 1000, THEN NEXT PAGE SHOULD BE CREATED.
-            // FIND A WAY OF MAKING PAGINATION WORK
+            if(yLoc > 930) {
+                pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
+                System.out.println("A list of buttons has been added to the page list!");
+                buttons = new ArrayList<JButton>();
+                yLoc = 100; //Reset to y= 100
+            }
             System.out.println(searchResults.indexOf(x) + " out of " + searchResults.size());
+    }
+        pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
+        JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
+        JButton backPage = gui.addButtonToFrame("<<", 30, 60, 920, 65);
+        nextPage.setToolTipText("Go to the next page of search results.");
+        backPage.setToolTipText("Go to the previous page of search results.");
+        if(!pages.isEmpty()) {
+            List<JButton> firstPage = pages.get(0);
+            for(JButton i : firstPage) {
+                i.setVisible(true);
+            }
+        } else {
+            for(JButton x : buttons) {
+                x.setVisible(true);
+            }
         }
-        setSearchButtons(buttons);
+        searchButtonIndex = 0;
+        setSearchButtons(pages);
+        nextPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Pages list is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, 1, gui); //Go forward one page
+        });
+        backPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Page is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, -1, gui); //Go back one page
+        });
     }
 
     /**
@@ -519,7 +598,6 @@ public class Main {
                     break;
             }
         });
-        //TODO "DELETE STUDENT" BUTTON TO BE TESTED
         JTextComponent[] entryFields = {nameField, dateField, addressField, phoneField, guardianPhone, guardianAddress, guardianName, medicField};
         if(permission != 2) {
             dp.setVisible(false);
