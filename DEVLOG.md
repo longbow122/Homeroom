@@ -1,5 +1,7 @@
 NEA Programming Project Devlog
 ---
+
+# First Iteration - Initial Development
 This document will entail the development log for ‘Homeroom’. If any challenges are encountered, the solutions will also be documented. Documentation will be done every day that some form of relevant progress has been made.
 
 ### 19/01/2022 - Wednesday
@@ -194,6 +196,105 @@ Have managed to get some work done on the internal logic behind Homeroom's Stude
 
 The methods that are being called in question are far too long, and code needs to be compacted to become more readable. As soon as main functionality is achieved within all main buttons, the clean-up of code is something that will become immediately prioritised.
 
-
-
 ### 23/04/2022 - Saturday
+Tested every single button that is made within the Student Management GUI that will allow for just the editing of student information. Buttons and events that trigger the reversion of changed fields into their original pieces of data seem to work well, but I'm having some inital issues with the saving of new fields into the database. 
+
+When a field is edited, the updated data does not seem to properly save into the new field where it is meant to be.I'd be lying if I said I didn't expect some issues from a method that was written once and not tested again, and as such, I need to ensure I fix it today. Once I get that done, I need to move onto the addition and deletion of students. That shouldn't be too hard, and I can then mark the Student Management feature "done" for now.
+
+Compatibility with classes and form groups still need to be worked on within the Student Management GUI, but until those are actually done, I'll need to wait until I get those features developed.
+
+### 25/04/2022 - Monday
+Still struggling with the method I've written to update documents. With some testing, I've decided to deduce that the problem lies with the way I'm making use of MongoDB's methods within the Java Driver. As such, I need to refactor code accordingly to ensure that my update statements work. Will need to do some reading into possible solutions by browsing through the JavaDoc.
+
+### 26/04/2022 - Tuesday
+Made some minor progress on the program by doing some minor class refactoring. Ensured that uneeded connections within the program are not made where possible. One such example was within my "search" method, where Students would be searched for, and upin being found, a new connection would be made. This happened as when a new Student object was instantiated, a new connection would be made for EOU. At scale, this would likely not work in my favour.
+
+### 04/05/2022 - Wednesday
+Failed to fix the issue at hand. Found the cause of it, but need to do some major refactoring to ensure that full and intended functionality is there.
+
+**P.S:** Somehow managed to more or less fix it. However, it seems I'm "caching" the results of the search within the student management menu, so I need to find a way to be able to refresh the menu after a saving operation of editing of data has been called. This refresh operation will need to be done across the board. This refresh operation also needs to be automatic, as relying on users to refresh things manually is stretching too far.
+
+### 06/05/2022 - Friday
+Did some minor testing of deletion and editing of student information. It is becoming increasingly clear that the "refreshing" of search results after a particular action on a Student is done needs to be implemented. When a Student is deleted, as the refresh does not occur, the Student's information can be still viewed and edited.
+
+It is likely that this will cause a major conflict with data entry if a sub-user should choose to edit said deleted student, then the student will likely be re-added to the database, which is not an intended feature.
+
+Further testing needs to be done, and the search GUI needs to be refreshed no matter what.
+
+Additionally, there is an increasingly worrying amount of private, static variables being used within my code. While this may be the only potential solution that can be used, it is not always best practise. My Main class needs to be refactored accoridngly to ensure that this does not continue.
+
+**P.S:** Ensuring that the GUI can be refreshed through the call of a method or through some other hacky workaround is going to be a challenge. Finding a clean and reliable way will be incredibly hard. This needs to be done as soon as possible, and preferably before I handle pagination.
+
+Once pagination is handled, that will be an entire feature developed, and I can begin to move onto another aspect of the program.
+
+To ensure I have a little more time to finish working on this issue, I've decided to temporarily move onto the addition of Students before working on GUI refreshing and pagination.
+
+### 17/05/2022 - Tuesday
+Did some planning of functionality for the addition of students. Also implemented a few lines of code which will entirely handle this feature. This requires a lot more testing, as I have had trouble with MongoDB's API due to the large clash in documentation.
+
+Once I have finished and properly tested the addition of Student's data, the deletion of students also needs to be tested. Once that has been tested, I need to find a good way of paginating results that are larger than what the GUI can hold. The way I see it, I have two options to explore when it comes to this, scroll panes or simple page buttons. I'll decide once I start working on it, but I need to be able to pick what seems easier to work on.
+
+## 18/05/2022 - Wednesday
+Did some minor work on student addition and also worked on major pieces of the documentation for it. Testing needs to be done for it, but the main components of the code have been written. Some final database methods need to be written, but once that's been written that should be the first piece of the program done.
+
+## 20/05/2022 - Friday
+Wrote some basic code that will handle the final bits and pieces of Student Management. All that now needs to be done is the handling work for the nicer details within the program. Once final finishing touches have been put in, I'll work on the rest of the program.
+
+The newer set of features also requires intensive testing, and this needs to be done before I can move on. I don't want to have to swamp myself with testing once the entire program is developed and I also don't want to have to handle ferocious bugs in one large go.
+
+## 27/05/2022 - Friday
+Code for adding and removing students seems to work fine, but as the data is stored cached at first, the data for deleted students can still be viewed somewhat quickly through the window. **It is now of vital importance that the GUI is refreshed with a new set of buttons to ensure that deleted students can't be viewed.
+
+Once I have handled that, Student Management is done and I can now move onto the next feature for Homeroom.
+
+I've also had a quick read through my main class and have done some minor work towards trying to clean up my code, but it is still not up to standard. I've definitely got to go over multiple refactors once functionality is achieved.
+
+## 15/06/2022 - Wednesday
+Spent a long time refactoring a few methods, implementing further page refreshing upon addition and deletion of Students and also added large section to the testing document to ensure that every feature of Homeroom is appropriately documented.
+
+I've more or less finished one entire piece of my program (Student Management), and can now begin to start planning another section of the project. Before I do that, I need to work on pagination or scrolling of the Student Management menu to ensure that if buttons are created that end up going out of bounds of the original window, the user is still able to view those buttons by scrolling down.
+
+I hope to have a general plan for this feature fully worked out and finished by today at the least, but implementation might take a little longer to do.
+
+## 16/06/2022 - Thursday
+I've made some minor work on the method for pagination, which will likely be finished today. Once I finish this, I'll move straight onto Form Group work, which will end up being much quicker to implement, due to it having an extremely similar, if not smaller structure to Students.
+
+Once I finish work on Form Groups, I can start moving onto Lessons, which will also work the same, (if not similar to Form Groups), only added with some extra functionality to add Students to the Lesson and Form Group.
+
+Once that has been finished, scheduling (likely the harder feature to implement) will need to be done. Due to the way that comparisons between days and times need to be done, I predict it will take me most if not the entire summer to ensure that it is as efficient as possible.
+
+In my personal opinion, (although I haven't started it), I predict that the write up will be generally easy. The supplementary documents I am writing (such as this development log and the testing document) will let me get things documented within the write-up quickly and easily.
+
+**P.S:** The way I'm making use of method to handle the creation and display of my GUIs is definitely not smart, nor is it efficient. This needs to be worked on immediately after functionality is achieved. Due to University applications and personal statement work ramping up, I fear I may not have much time to do everything I need to do, but we will have to see.
+
+## 20/06/2022 - Monday
+First attempt to handle pagination smoothly through the use of a JScrollPane seemed to have failed, but I hope to have rectified that by making two JButtons which will then move through a List of Lists of Buttons. These lists will be "pages" of buttons containing student information, which can then be flicked between by users, provided that the search results are large enough to require this.
+
+Once I have sorted through this, I will begin work on the Forms Management, which will hopefully become must easier, as they will work incredibly similarly to Student Management.
+
+The quality and overall readability of my code is a major concern, and is something I need to keep a tab on if I want to save myself a large amount of time in the future.
+
+Currently, my code focuses purely on functionality. The programs works and nothing else. The code is by all means not clean and easy to read, and is definitely not efficient.
+
+I feel my reliance on the ArrayList data type is far too much. This, technically would be okay, but if it is beginning to affect my code with the excessive use of private fields, excessive use of if statements and general bad code practise, then it needs to stop. I will likely be spending an entire iteration's worth of work trying to figure out how to clean up each class.
+
+While the code may not consume many resources computationally, it is able to take significantly less, which is the best solution that is needed. Once I finish testing the new pagination solution, I will be ready to move on, and begin merging the student branch.
+
+**P.S:** Encounters some issues when handling pagination logic through the JButtons. I'm still in progress of diagnosing as to exactly why the issue I have is occuring, but I believe I'm slowly getting to the root of it.
+
+It seems to be a combination of problems only revealing themselves now due to the new system with pagination and handling Lists.
+
+## 21/06/2022 - Tuesday
+I still seem to be having issues with pagination logic, of which I'm not completely sure how to fix. I managed to trace the method's logic issues down to the List of buttons that it's meant to be iterating through.
+
+Not sure what the issue is exactly, but I'll work on figuring it out. I'm sure that the list of lists contains the right buttons, meaning that it might be an issue with making the buttons visible and invisible. Not sure why this is causing an issue, but I'll need to look into it.
+
+**P.S:** Found the issue at hand. The index doesn't seem to be shifting properly in terms of the new paged index, meaning that the same JButton is then being made invisible and visible again. This would obviously cause issues, as it does not give the effect to the user that the page is actually "shifting". I'll need to find a way to properly fix this before moving on.
+
+**P.P.S:** Issue found. The list of lists for the buttons does not seem to be properly shifting across due to the fact that it is not properly adding buttons. The logic behind this needs to be debugged and reworked to ensure that all 300 elements in my sample data set are successfully added and viewable.
+
+***P.P.P.S:*** Found the issue at hand and managed to fix it. Seemed to be an issue with the List of buttons I was recycling in order to save resources not properly wiping every object within the list. Resolved this by creating a new ArrayList and replacing it in memory.
+
+*I will now begin to make a move on the Form Management section of Homeroom, allowing me to temporarily finish Student Management until form group functionality needs to be implemented within Student Management.*
+
+## 22/06/2022 - Wednesday

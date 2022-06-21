@@ -9,5 +9,5 @@ public enum StudentSearchType {
     NAME,
     DOB,
     ADDRESS,
-    PHONE;
+    PHONE
 }

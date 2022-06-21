@@ -18,15 +18,15 @@ dependencies {
 
     // MongoDB API, can be used to connect to the Database Cluster
     // https://mongodb.github.io/mongo-java-driver/4.5/apidocs/mongodb-driver-core/index.html
-    implementation 'org.mongodb:mongodb-driver-sync:4.5.1'
+    implementation 'org.mongodb:mongodb-driver-sync:4.6.0'
 
     // Google GSON, being used to read from the configuration file.
     // School system administrators would edit the config file to throw in their MongoDB
     // connection string in order to allow 'Homeroom' to connect to a MongoDB cloud cluster.
     implementation 'com.google.code.gson:gson:2.9.0'
 
-    // SLF4J, not sure what this is for, forgot to document it. Will need to do some research on it.
-    //TODO
+    //Simple Logging Facade 4 Java. A basic logging framework likely used as a dependency for other libraries being used within this program.
+    // I personally have no use for this, so this will likely need to be removed if I find out that there is no practical use for it within my program.
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.36'
 
     //SwingLabs SwingX. Used to provide additional functionality to Java's Swing, which is the GUI Library I am using.

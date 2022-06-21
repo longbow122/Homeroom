@@ -14,7 +14,11 @@ import java.io.IOException;
  */
 public class GUIUtils {
 
+
+
     private final Window frame;
+
+
     /**
      * New constructor to work with this class. Will return an instance of the class that can be accessed throughout the program.
      * <p>
@@ -44,8 +48,6 @@ public class GUIUtils {
             e.printStackTrace();
         }
         frame.pack();
-        if (height == 0) height = 1000; //TODO Default Heights need reworking. Look into tenary operators.
-        if (width == 0) width = 1000;
         frame.setBounds(locationX, locationY, width, height);
         frame.setLayout(null);
         frame.setVisible(true);

@@ -5,14 +5,18 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -46,16 +50,18 @@ public class Student {
      * Constructor for the Student class. Does not make use of any attributes, as you should be using the methods within this class to either find students, or make new Students within the database.
      * <p></p>
      * Methods within this class will return {@link Student} objects for you to use within the program, but this plain constructor SHOULD NOT be used without another method suffixing it.
-     * @
+     * @param connectionUsername The username used to connect to the database with.
+     * @param connectionPassword The password used to connect to the database with.
      */
     public Student(String connectionUsername, String connectionPassword) {
+        connect(connectionUsername, connectionPassword);
         this.connectionUsername = connectionUsername;
         this.connectionPassword = connectionPassword;
-        db = new DBUtils(connectionUsername, connectionPassword);
     }
 
     /**
-     * Private constructor for use within this class. As there will be multiple methods which are to be used within the class, this constructor will help with methods that return any Student objects.
+     * Private constructor for use within this class. As there will be multiple methods which are to be used within the class, this constructor will help with methods that return any Student objects. <p></p>
+     * WARNING: DOES NOT MAKE A CONNECTION TO THE DATABASE. YOU SHOULD USE A "PLAIN CONSTRUCTOR" to connect to the database if needed. The {@link #connect(String, String)} method can also be used to do this too.
      * @param studentID - The ID of the student. Should be a version 4 UUID in a String. Should be entirely unique.
      * @param studentName - The name of the student. Could, in theory be used as a secondary key, but not worth the risk.
      * @param studentDOB - The date of birth of the student. Stored as a {@link String} since you cannot store the slashes for the date format in an Integer. Seemed easier to use this too.
@@ -66,7 +72,7 @@ public class Student {
      * @param guardianAddress - The address of the guardian. Will normally be the same as the Student's address, but just in case, it is stored seperately.
      * @param guardianPhone - The phone number of the guardian. Stored as a {@link String} to allow for international country codes.
      */
-    private Student(String connectionUsername, String connectionPassword, String studentID, String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
+    private Student(String studentID, String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
         this.studentID = studentID;
         this.studentName = studentName;
         this.studentDOB = studentDOB;
@@ -76,9 +82,11 @@ public class Student {
         this.guardianName = guardianName;
         this.guardianPhone = guardianPhone;
         this.guardianAddress = guardianAddress;
-        this.connectionPassword = connectionPassword;
-        this.connectionUsername = connectionUsername;
+    }
+
+    public DBUtils connect(String connectionUsername, String connectionPassword) {
         db = new DBUtils(connectionUsername, connectionPassword);
+        return db;
     }
 
     public String getStudentName() {
@@ -125,7 +133,7 @@ public class Student {
         try (MongoCursor<Document> found = students.find(query).iterator()) {
             while (found.hasNext()) {
                 Document x = found.next();
-                return new Student(connectionUsername, connectionPassword, x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString());
+                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString());
             }
             return null;
         }
@@ -144,12 +152,69 @@ public class Student {
             return false;
         }
         MongoDatabase homeroom = db.getHomeroomDB();
-        MongoCollection students = homeroom.getCollection("Students");
-        students.findOneAndUpdate(Filters.eq("StudentID", student.getStudentID()), Updates.set(fieldToUpdate, updateString));
+        MongoCollection<Document> students = homeroom.getCollection("Students");
+        Document queryDoc = new Document("StudentID", student.getStudentID());
+        Bson update = Updates.set(fieldToUpdate, updateString);
+        UpdateOptions options = new UpdateOptions().upsert(false);
+        students.updateOne(queryDoc, update, options);
         return true;
     }
 
+    /**
+     * Method that deleted a specified record of a {@link Student} that has been specified. This is done by getting the Student's ID.
+     * @param student The Student to delete.
+     * @return {@link Boolean} that represents the success or failure of this operation.
+     */
+    public boolean deleteStudent(Student student) {
+        if(db.isConnected() != 0) {
+            return false;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection<Document> students = homeroom.getCollection("Students");
+        Document queryDoc = new Document("StudentID", student.getStudentID());
+        students.deleteOne(queryDoc);
+        return true;
+    }
+
+    //TODO IMPLEMENT THE ADD STUDENT METHOD FOR THE DATABASE AND TEST IT!!
+
+    /**
+     * Basic method written to add students to the database of Homeroom. This method also generates a version 4 UUID for the user to make use of when working within the program and when handling data.
+     * Checks are already made to ensure that the UUID will be valid within the database and will not be wrong. <br>
+     * This method should generally be used with an instance of the Student class that is able to make connections. If this method is not possible, then the developer should make use of the {@link #connect(String, String)} method.
+     * @param studentName The name of the Student in question.
+     * @param studentDOB The date of birth of the Student in question.
+     * @param studentAddress The address of the Student in question.
+     * @param studentPhone The phone number of the Student in question.
+     * @param studentMedical The medical information of the Student in question.
+     * @param guardianName The name of the guardian of the Student in question.
+     * @param guardianAddress The address of the guardian of the Student in question.
+     * @param guardianPhone The phone number of the guardian of the address in question.
+     * @return A representation of the Student in Object form. Can be used to pull and handle information throughout the rest of the program.
+     */
+    public Student addStudentToDB(String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
+        UUID uuid = UUID.randomUUID();
+        while(getStudentFromID(uuid.toString()) != null) { //Make sure that the UUID generated does not point to another student already.
+            uuid = UUID.randomUUID();
+        }
+        MongoCollection<Document> studentsDB = db.getHomeroomDB().getCollection("Students");
+        HashMap<String, Object> dataValues = new HashMap<>();
+        dataValues.put("StudentID", uuid.toString());
+        dataValues.put("StudentName", studentName);
+        dataValues.put("StudentDOB", studentDOB);
+        dataValues.put("StudentAddress", studentAddress);
+        dataValues.put("StudentPhone", studentPhone);
+        dataValues.put("StudentMedical", studentMedical);
+        dataValues.put("GuardianName", guardianName);
+        dataValues.put("GuardianAddress", guardianAddress);
+        dataValues.put("GuardianPhone", guardianPhone);
+        Document insertInfoDocument = new Document(dataValues);
+        studentsDB.insertOne(insertInfoDocument);
+        return new Student(uuid.toString(), studentName, studentDOB, studentAddress, studentPhone, studentMedical, guardianName, guardianAddress, guardianPhone);
+    }
+
     //TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
+
     /**
      * Method that returns a list of all students depending on the {@link StudentSearchType}. The parameter string will look for an exact match or a similar match.
      * This is used within the user interface for "searching" of students. Users will then be able to click on a student and access their information through there. <p></p>
@@ -199,11 +264,11 @@ public class Student {
             bar.setString("Searching for Students: " + roundedPercent + "%");
             bar.setValue(roundedPercent);
             String medicalInfo;
-            if(x.containsKey("StudentMedical") == false || x.get("StudentMedical") == null) { //Problem line, needs to have it be null somewhere if there is no medical value
+            if(!x.containsKey("StudentMedical") || x.get("StudentMedical") == null) { //Problem line, needs to have it be null somewhere if there is no medical value
                 medicalInfo = "N/A"; //Doesn't seem to contain a key
             } else medicalInfo = x.get("StudentMedical").toString();
             System.out.println(x.get("StudentName"));
-            found.add(new Student(connectionUsername, connectionPassword, x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString()));
+            found.add(new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString()));
         }
         progress.closeFrame();
         return found;
