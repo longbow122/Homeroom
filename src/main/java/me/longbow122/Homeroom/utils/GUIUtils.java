@@ -59,6 +59,7 @@ public class GUIUtils {
         }
     }
 
+
     /**
      * Basic method written to easily close down {@link JFrame}s.
      */

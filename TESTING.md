@@ -131,5 +131,18 @@ Certain fields of information also MUST not be empty, and certain fields of text
 This was implemented by doing checks on the denary ASCII value of each string. If a character that is not a number is within the value of 65-90, or 97-122, or it is not 33, then it is a character that is not part of a valid phone number and as such, should be flagged.
 The checks I have made on each ASCII value check whether the character is a letter, or not a "+" character. These are the only characters that make up a part of a valid phone number.
 
-**P.P.S:** Forgot to account for the space character, which can be used within phone numbers with international country codes. All I needed to do was add an extra check for the space character into the phone number check.
+**P.P.S:** Forgot to account for the space character, which can be used within phone numbers with international country codes. All I needed to do was add an extra check for the space character into the phone number check. This has since been fixed.
+
+
+## Bulk Form Searching
+
+## Exact Form Searching through Primary Key
+
+## Form Searching using Search Parameters
+
+## Form Data Editing
+
+## Form Deletion
+
+## Form Data Addition
 

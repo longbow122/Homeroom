@@ -38,10 +38,6 @@ public class Student {
     private DBUtils db;
     private StudentSearchType searchType;
 
-    private StudentSearchType getStudentSearchType() {
-        return searchType;
-    }
-
     public void setStudentSearchType(StudentSearchType type) {
         searchType = type;
     }
@@ -175,8 +171,6 @@ public class Student {
         students.deleteOne(queryDoc);
         return true;
     }
-
-    //TODO IMPLEMENT THE ADD STUDENT METHOD FOR THE DATABASE AND TEST IT!!
 
     /**
      * Basic method written to add students to the database of Homeroom. This method also generates a version 4 UUID for the user to make use of when working within the program and when handling data.

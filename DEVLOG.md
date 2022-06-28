@@ -4,6 +4,8 @@ NEA Programming Project Devlog
 # First Iteration - Initial Development
 This document will entail the development log for ‘Homeroom’. If any challenges are encountered, the solutions will also be documented. Documentation will be done every day that some form of relevant progress has been made.
 
+This main section of the devlog details the main development process for 'Homeroom'.
+
 ### 19/01/2022 - Wednesday
 Some progress was made. Main documentation for ‘Homeroom’ was done through the use of a GitHub repository. Main wiki for a user manual will be held there as will the software licensing. GitHub repository will also be used to store source code (obviously!) for ‘Homeroom’. A Trello board will serve as the main form of task tracking and should ensure I see what needs to be done first and soonest. Only thing I need to be aware of is falling behind on that and accidentally missing deadlines. 
 
@@ -276,7 +278,7 @@ The quality and overall readability of my code is a major concern, and is someth
 
 Currently, my code focuses purely on functionality. The programs works and nothing else. The code is by all means not clean and easy to read, and is definitely not efficient.
 
-I feel my reliance on the ArrayList data type is far too much. This, technically would be okay, but if it is beginning to affect my code with the excessive use of private fields, excessive use of if statements and general bad code practise, then it needs to stop. I will likely be spending an entire iteration's worth of work trying to figure out how to clean up each class.
+I feel my reliance on the ArrayList data structure is far too much. This, technically would be okay, but if it is beginning to affect my code with the excessive use of private fields, excessive use of if statements and general bad code practise, then it needs to stop. I will likely be spending an entire iteration's worth of work trying to figure out how to clean up each class.
 
 While the code may not consume many resources computationally, it is able to take significantly less, which is the best solution that is needed. Once I finish testing the new pagination solution, I will be ready to move on, and begin merging the student branch.
 
@@ -298,3 +300,22 @@ Not sure what the issue is exactly, but I'll work on figuring it out. I'm sure t
 *I will now begin to make a move on the Form Management section of Homeroom, allowing me to temporarily finish Student Management until form group functionality needs to be implemented within Student Management.*
 
 ## 22/06/2022 - Wednesday
+Made a major start on Form Management, but have not managed to come anywhere near a stage where I can actually begin testing the feature and see how it's shaping up in terms of the GUI. As the feature (fortunately!) works incredibly similarly to Student Management, I currently plan on being able to implement this very quickly, and with general ease. Currently the process of implementing Forms seems to be a glorified copy and paste job, handling variable names and method signatures as the only real change in the code.
+
+Due to this point, I have come to the realisation that a better way of implementing this would likely be through handing a basic "Entities" object, which can hold all of the template information that may be needed. This might even be applicable to become an abstract class, as all Homeroom objects will hold some form of information. This, I feel would likely be a better way of making use of Object-Oriented Programming. This is something I have managed to plan, but I have not managed to implement.
+
+I am not sure what I plan on implementing after this, but once I finish working on a barebones implementation of Form Management, a large testing process will likely be underway, and as a result of that, I will likely need to make a large addition to the testing document to ensure that every feature has been appropriately documented and tested. I am also yet to document the uses of Homeroom and every feature that Homeroom has to offer. This has been planned, but will likely be a rush job that is done straight after implementation.
+
+I am also growing increasingly worried that I will not be able to make multiple iterations over my program to ensure improvement and updates (as is standard with the Agile model of development). This is something I need to plan carefully and think about.
+
+## 23/06/2022 - Thursday
+Still continuing to make major progress, but due to the linked nature of all the classes (in as, every method tends to call code from another method, which still needs to be written), it seems that the easiest way of going about writing the Forms feature is to write the logic for the entire feature (bar a few minor touches) and then test in one go.
+
+My only concern in doing this is that I may end up with a large amount of bugs which will just be harder to fix due to the larger amount of code to trace through. This makes things much harder to handle. I have also written a few extra convenience methods that are being called throughout the program, but I am yet to test them. As they involve stopping the thread of logic and waiting for a response, I do have my concerns as to how that might affect the rest of the program, but we will likely just have to wait and see.
+
+## 27/06/2022 - Tuesday
+Made major progress, and managed to implement a fair majority of the Form Management logic. The finishing touches will be a large amount of document addition and testing, which needs to be done at speed.
+
+My concerns have also been justified, and I have begun to experience issues with the way I am freezing the thread to allow for the program to wait for input from the user for selecting a Student to be added to the form. This issue simply lies in where I make my method calls and how I go about freezing the thread, which needs to be fixed somehow. I'm not sure how to go about doing this, but I'll need to find a way quickly.
+
+My ability to test, debug and write code has also seriously been harmed by the fact that I have run out of mobile data. This means I cannot test my product on the go, and will need to do so at home, if I am able to find the time.
