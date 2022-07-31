@@ -135,14 +135,44 @@ The checks I have made on each ASCII value check whether the character is a lett
 
 
 ## Bulk Form Searching
+This system was implemented to allow for searching for forms by names. This is where a string is passed through a text entry field within a GUI, which can then be passed through a method written to search through the Collection of Documents for names containing any instance of the string to be searched for anywhere in the name.
+
+For example, if the user were to search for "A", then any Form with the letter "A" in their name will be returned. Various different types of inputs can be used here, and as such, certain types of error handling needs to be done.
+
+No such sample dataset was made availiable for this, so I have had to make one myself, and work with it to ensure that everything works as I need to.
 
 ## Exact Form Searching through Primary Key
+Each Form will be assigned a version 4 UUID when being added to the table. Homeroom will automatically account for this and assign a UUID accordingly.
+
+In this section, a method was written to test for searching of specific forms using their unique user ID. This can be passed through a method and can be used to retrieve information of any form, no matter what field is identical.
+
+Data that was passed through in this test were UUIDs, and random strings. In the case of a random string being passed through, a message should be returned. Later down the line, some other form of error handling will have to be written to account for the rest of it. 
 
 ## Form Searching using Search Parameters
+Each Form will obviously hold certain sets of information that they can also be identified with. This means that Homeroom can make use of these pieces of information to identify forms.
+
+These fields of information can now be used to search for Forms within Homeroom's database, using many different types of parameters. Users would enter in a search string, and the system would check each field to see whether the search term started with that field. If this is a match, then it will identify it as a found search result. This is something that needs to be tested for each field, and each potential type of input.
+
+Null-Handling has already been accounted for, and it should ensure that when a null list (AKA, nothing has been found that matches the search) is returned, the program is able to cope with this sort of data being fed through, and can adjust to it while providing a different output.
 
 ## Form Data Editing
+Each Form will hold certain sets of information that can be edited through the use of Homeroom's GUI.
+
+Each field of information which the document can be edited and updated. This needs to be tested thoroughly to ensure that the system is robust.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Form information. This aspect of testing was **successful**
 
 ## Form Deletion
+When a Form no longer needs to be in the system, presumably because the Form has left school as a whole, the school (as per data protection law, and as is good practise) are required to delete all relevant data on their alumni after a certain amount of time.
+
+This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to tested as much, but should be tested somewhat extensively.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions should be able to delete permissions. This aspect of testing was **successful**.
 
 ## Form Data Addition
+When a Form needs to be created, the school must add their data to the database to ensure that they can make use of this data within the school as and when needed.
+
+This is a feature that 'Homeroom' is able to handle through a basic GUI-based form. The user can enter data through this form, then either close the form or press a button within the form to send the data and add the data for the Form to the database.
+
+Certain fields of information also MUST not be empty, and certain fields of text within the form are forced to follow a certain format due to being uneditable, and only editable through a GUI.
 

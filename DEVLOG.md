@@ -319,3 +319,17 @@ Made major progress, and managed to implement a fair majority of the Form Manage
 My concerns have also been justified, and I have begun to experience issues with the way I am freezing the thread to allow for the program to wait for input from the user for selecting a Student to be added to the form. This issue simply lies in where I make my method calls and how I go about freezing the thread, which needs to be fixed somehow. I'm not sure how to go about doing this, but I'll need to find a way quickly.
 
 My ability to test, debug and write code has also seriously been harmed by the fact that I have run out of mobile data. This means I cannot test my product on the go, and will need to do so at home, if I am able to find the time.
+
+## 08/07/2022 - Friday
+Failed to make any relevant progress in the time that has elapsed. The issue seems to lie where the thread freezes over due to the call on the wait method. I'm entirely unsure as to how to resolve the issue, but I'm sure there'll be a solution.
+
+I believe the issue lies in where the method call actually is, but I'll have to see.
+
+## 31/07/2022 - Sunday
+I have essentially 3 weeks to finish the entire project, which is a deadline I may just about hit if I manage to fix this issue within a day and am lucky enough to encounter no issues.
+
+After some research, it appears that I have taken the wrong approach to concurrency then I think I have, and as such, will need to work on refactoring the entire selection method to ensure that a user can search for and select a student to add to a form, and to perform other general tasks.
+
+It is worth noting that the only reason I am choosing to pursue the development of this feature is because it will bring a great amount of utility to Homeroom upon completion.
+
+**P.S:** I've managed to find myself options, but I can't be certain if any of them work, nor am I certain if any of them will actually be a valid choice for me. I've decided to make an entirely seperate branch of code, and work on testing it there. It's become evident to me that there is such a large amount of refactoring and code editing that needs to be done that I no longer feel that the work I am doing belongs on the forms-branch. 

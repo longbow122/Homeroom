@@ -398,7 +398,7 @@ public class StudentManagement {
                 }
             });
             buttons.add(option);
-            System.out.println("A button was added to the list of buttons!");
+            System.out.println("The button for " + x.getStudentName() + " has been implemented, but has not been made visible!");
             option.setVisible(false);
             xLoc = xLoc + 150;
             if(xLoc > 1050) {
@@ -411,7 +411,6 @@ public class StudentManagement {
                 buttons = new ArrayList<JButton>();
                 yLoc = 100; //Reset to y= 100
             }
-            System.out.println(searchResults.indexOf(x) + " out of " + searchResults.size());
         }
         pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
         JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
@@ -448,6 +447,8 @@ public class StudentManagement {
             }
             shiftPage(searchButtonIndex, -1, gui); //Go back one page
         });
+        System.out.println("Did the button message actually display?");
+        //TODO ENSURE THAT ALL BUTTONS ACTUALLY GET DISPLAYED???
         synchronized (lock) {
             try {
                 System.out.println("Thread is about to be locked!");
@@ -458,8 +459,14 @@ public class StudentManagement {
                 e.printStackTrace();
             }
         }
+        System.out.println(getStudentSelected().getStudentName());
         return getStudentSelected();
     }
+    //TODO CONSIDER THE BELOW
+    // Use SwingWorkers and concurrency to handle the display of the button. Maybe then, it will allow for the notification to go through??
+    // SwingWorker will handle the display of the button in the background, while the rest of the code executes and freezes the main thread.
+    // Through this, the buttons should be operable? Might need to actually have the page buttons also be moved to another thread, no idea how that's going to work#
+    // Another option might be using thread.interrupt in a special way. either way, using synchronised blocks was not the way to go.
 
     /**
      * A method used to display a certain amount of students within the main Student Management GUI.

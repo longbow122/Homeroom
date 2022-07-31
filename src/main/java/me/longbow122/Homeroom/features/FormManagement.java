@@ -96,9 +96,10 @@ public class FormManagement {
             List<Student> studentsToAdd = new ArrayList<>();
             selectStudent.addActionListener(e1 -> {
                 Student selected = new StudentManagement().studentSelection(username, password);
-                studentsToAdd.add(selected);
-                System.out.println(selected.getStudentName() + " was added to the list!");
-                displayAllStudentsInInfoGUI(studentsToAdd, add, username, password);
+                System.out.println("Method should have finished calling?");
+                //studentsToAdd.add(selected); TODO GET RID OF DEBUG COMMENTS EVENTUALLY
+                //System.out.println(selected.getStudentName() + " was added to the list!");
+                //displayAllStudentsInInfoGUI(studentsToAdd, add, username, password);
             });
             //TODO ADD CONFIRM ADDITION BUTTONS
             JButton confirm = add.addButtonToFrame("Add Form", 25, 150, 500, 30);

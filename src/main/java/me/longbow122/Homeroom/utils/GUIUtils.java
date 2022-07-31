@@ -10,9 +10,12 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Utility class for the core GUI work that needs to be done within Homeroom.
+ * Utility class for the core GUI work that needs to be done within Homeroom. <p></p>
+ * Extends {@link JFrame} since an instance of GUIUtils is <i>technically</i> an instance of the JFrame class.
+ *
+ * @author Dhruvil Patel
  */
-public class GUIUtils {
+public class GUIUtils extends JFrame {
 
 
 
