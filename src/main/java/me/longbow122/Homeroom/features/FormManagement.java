@@ -90,17 +90,8 @@ public class FormManagement {
             JLabel teacherNameLabel = add.addLabelToFrame("Teacher Name:", 250, 30, 200, 20, true, 20);
             teacherNameLabel.setForeground(Color.RED);
             JTextField teacherName = add.addTextField(250, 70, 200, 25, "Enter the name of the teacher that will watch over the form.");
-            //TODO THE ABOVE LOGIC FOR TEACHERS NEEDS TO BE RE-WORKED. ACCOMMODATE FOR THIS AT SOME POINT WHEN HANDLING CONFIGURATION.
-            JLabel studentLabel = add.addLabelToFrame("Students:", 25, 130, 200, 25, true, 20);
-            JButton selectStudent = add.addButtonToFrame("Select Student", 50, 200, 25, 175);
-            List<Student> studentsToAdd = new ArrayList<>();
-            selectStudent.addActionListener(e1 -> {
-                Student selected = new StudentManagement().studentSelection(username, password);
-                System.out.println("Method should have finished calling?");
-                //studentsToAdd.add(selected); TODO GET RID OF DEBUG COMMENTS EVENTUALLY
-                //System.out.println(selected.getStudentName() + " was added to the list!");
-                //displayAllStudentsInInfoGUI(studentsToAdd, add, username, password);
-            });
+            //TODO THE ABOVE LOGIC FOR TEACHERS NEEDS TO BE RE-WORKED. ACCOMMODATE FOR THIS AT SOME POINT WHEN HANDLING CONFIGURATION. IT NEEDS TO BE DONE IN THE SAME WAY THAT ADDING A STUDENT TO A FORM IS DONE.
+            // TODO LOGIC FOR ADDING STUDENTS TO FORMS HAS BEEN REMOVED. THIS NEEDS TO BE RE-WORKED SO THAT YOU CAN ONLY ADD STUDENTS TO A FORM WHEN EDITING THE FORM.
             //TODO ADD CONFIRM ADDITION BUTTONS
             JButton confirm = add.addButtonToFrame("Add Form", 25, 150, 500, 30);
             confirm.addActionListener(e12 -> {
@@ -121,14 +112,8 @@ public class FormManagement {
                         }
                     }
                 }
-                if(studentsToAdd.isEmpty()) {
-                    JOptionPane.showMessageDialog(add.getFrame(), "There must be at least one student within a form! ", "Oops!", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                String[] studentIDs =  new String[studentsToAdd.size()];
-                for(Student x : studentsToAdd) {
-                    studentIDs[studentsToAdd.indexOf(x)]  = x.getStudentID();
-                }
+                //TODO FIND OUT IF YOU ARE ABLE TO PASS AN EMPTY ARRAY INTO THIS FIELD, AND HAVE MONGODB SAFELY HANDLE IT!!!
+                String[] studentIDs = new String[0];
                 Form added = new Form(username, password).addFormToDB(teacherName.getText(), formName.getText(), studentIDs);
                 processSearch(searchClass, username, password, searchField.getText(), gui);
                 JOptionPane.showMessageDialog(add.getFrame(), "The Form " + added.getFormName() + " was successfully added to the database of Forms!", "Form Successfully Added!", JOptionPane.INFORMATION_MESSAGE);
@@ -423,193 +408,5 @@ public class FormManagement {
         System.out.println("New page should be visible.");
     }
 
-    /**
-     * Method used to return a {@link Form} object which the rest of the program is able to use. This method provides the same functionality as the Form Management GUI does, except this method should, in theory provide a returned object upon clicking if the button. <p></p>
-     * WARNING: THIS METHOD MAKES USE OF THE SYNCHRONIZE KEYWORD, AND WILL WAIT ON THE THREAD FOR A RESPONSE FROM THE USER BEFORE CONTINUING. THIS WILL LIKELY HOLD UP THE ENTIRE PROGRAM UNTIL INPUT IS REACHIEVED. <P></P>
-     * Care should be taken to ensure that this does not affect the rest of the program.
-     * @param username The username used to log into 'Homeroom' and the one used to query the database.
-     * @param password The password used to log into 'Homeroom' and the one used to query the database.
-     * @return {@link Form} object that represents the selected Form.
-     */
-    public Form formSelection(String username, String password) {
-        Form searchClass = new Form(username, password);
-        GUIUtils gui = new GUIUtils("Search and Select Forms | Homeroom", 1000, 1220, 300, 0, false);
-        gui.addLabelToFrame("Search:", 200, 10, 100, 25, true, 25);
-        JTextField searchField = gui.addTextField(300, 12, 200, 25, "Enter a term to search for here!");
-        PromptSupport.setPrompt("Search", searchField);
-        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, searchField);
-        JButton searchButton = gui.addButtonToFrame("Search", 40, 100, 500, 0);
-        searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
-        final Object lock = new Object();
-        searchButton.addActionListener(e -> {
-            handleReturnFormSearch(searchClass, searchField.getText(), gui);
-            synchronized (lock) {
-                lock.notifyAll();
-            }
-        });
-        gui.addLabelToFrame("Search Type: ", 630, 10, 170, 30, true, 25);
-        JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Form ID", "Teacher Name", "Form Name"});
-        searchClass.setFormSearchType(FormSearchType.UUID); //Ensures that the default search type is set to form ID.
-        searchChoice.addActionListener(e -> {
-            JComboBox box = (JComboBox) e.getSource();
-            int selected = box.getSelectedIndex();
-            switch(selected) {
-                case 0:
-                    searchClass.setFormSearchType(FormSearchType.UUID);
-                    break;
-                case 1:
-                    searchClass.setFormSearchType(FormSearchType.TEACHER_NAME);
-                    break;
-                case 2:
-                    searchClass.setFormSearchType(FormSearchType.FORM_NAME);
-                    break;
-                default:
-                    searchClass.setFormSearchType(FormSearchType.FORM_NAME);
-                    break;
-            }
-        });
-        searchField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if(e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    handleReturnFormSearch(searchClass, searchField.getText(), gui);
-                    synchronized (lock) {
-                        lock.notifyAll();
-                    }
-                }
-            }
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-        });
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                System.out.println("A stack trace has occurred! Please investigate!");
-                e.printStackTrace();
-            }
-        }
-        return formSelected; //TODO TEST WHERE AND WHEN POSSIBLE
-    }
-
-    /**
-     * Convenience method to handle the searching and returning of a {@link Form}.
-     * @param searchClass {@link Form} class to handle searching of a Form
-     * @param searchText Text to begin querying the database with
-     * @param gui The parent GUI of which said buttons should be displaying on.
-     * @return {@link Form} object represented the selected Form.
-     */
-    private Form handleReturnFormSearch(Form searchClass, String searchText, GUIUtils gui) {
-        List<Form> searches = searchClass.searchForFormGroup(searchText);
-        System.out.println("Working on searching using: " + searchText);
-        if(searches == null) {
-            JOptionPane.showMessageDialog(gui.getFrame(), "No results were found that fit your search query!", "Homeroom | Form Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
-            System.out.println("No results seem to have been found!");
-            return null;
-        }
-        System.out.println(searches.size() + " results found!");
-        return selectForm(searches, gui);
-    }
-
-    private Form formSelected;
-    private void setFormSelected(Form x) {
-        formSelected = x;
-    }
-
-    /**
-     * Method used to return {@link Form} object which the rest of the program is able to use. The method provide the same functionality as the Form Management GUI does, except this method should, in theory provide a returned object upon clicking of the button. <p></p>
-     * WARNING: THIS METHOD MAKES USE OF THE SYNCHRONISE KEYWORD, AND WILL WAIT ON THE THREAD FOR A RESPONSE FROM THE USER BEFORE CONTINUING. THIS WILL LIKELY HOLD UP THE ENTIRE PROGRAM UNTIL INPUT IS RECIEVED. <P></P>
-     * Care should be taken to ensure that this does not affect the rest of the program.
-     * @param searchResults  The List of {@link Form} returned from the search provide by the user.
-     * @param gui The parent GUI to insert buttons into. This GUI should be under a controlled environment, through a controlled size, etc.
-     * @return {@link Form} object representing the form that was selected by the user.
-     */
-    private Form selectForm(List<Form> searchResults, GUIUtils gui) {
-        int xLoc = 0;
-        int yLoc = 100;
-        if (searchButtonsPages != null) {
-            for (List<JButton> x : searchButtonsPages) {
-                for (JButton i : x) {
-                    i.setVisible(false);
-                }
-            }
-        }
-        List<List<JButton>> pages = new ArrayList<>();
-        List<JButton> buttons = new ArrayList<>();
-        final Object lock = new Object();
-        for (Form x : searchResults) {
-            JButton option = gui.addButtonToFrame(x.getFormName(), 50, 150, xLoc, yLoc);
-            option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
-            option.addActionListener(e -> {
-                setFormSelected(x);
-                gui.closeFrame();
-                synchronized (lock) {
-                    lock.notifyAll();
-                }
-            });
-            buttons.add(option);
-            System.out.println("A buttons was added to the list of buttons!");
-            option.setVisible(false);
-            xLoc = xLoc + 150;
-            if (xLoc > 1050) {
-                yLoc = yLoc + 50;
-                xLoc = 0;
-            }
-            if (yLoc > 930) {
-                pages.add(buttons);
-                System.out.println("A list of buttons has been added to the page list!");
-                buttons = new ArrayList<>();
-                yLoc = 100;
-            }
-            System.out.println(searchResults.indexOf(x) + " out of " + searchResults.size());
-        }
-        pages.add(buttons);
-        JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
-        JButton backPage = gui.addButtonToFrame("<<", 30, 60, 920, 65);
-        nextPage.setToolTipText("Go to the next page of search results");
-        backPage.setToolTipText("Go to the previous page of search results");
-        if (!(pages.isEmpty())) {
-            List<JButton> firstPage = pages.get(0);
-            for (JButton i : firstPage) {
-                i.setVisible(true);
-            }
-        } else {
-            for (JButton x : buttons) {
-                x.setVisible(true);
-            }
-        }
-        searchButtonIndex = 0;
-        setSearchButtons(pages);
-        nextPage.addActionListener(e -> {
-            System.out.println("Current index: " + searchButtonIndex);
-            if (pages.isEmpty()) {
-                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
-                System.out.println("Pages list is empty!");
-                return;
-            }
-            shiftPage(searchButtonIndex, 1, gui); //Go forward one page
-        });
-        backPage.addActionListener(e -> {
-            System.out.println("Current index: " + searchButtonIndex);
-            if(pages.isEmpty()) {
-                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move through!");
-                System.out.println("Page is empty!");
-                return;
-            }
-            shiftPage(searchButtonIndex, -1, gui); //Go back one page
-        });
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                System.out.println("An exception was caught! Look at the below stack trace!");
-                e.printStackTrace();
-            }
-        }
-        return formSelected;
-    }
+    //TODO FORM SELECTION NEEDS TO BE IMPLEMENTED ONCE THE STUDENT SELECTION FEATURES WORK AS INTENDED.
 }

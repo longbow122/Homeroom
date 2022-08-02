@@ -332,4 +332,27 @@ After some research, it appears that I have taken the wrong approach to concurre
 
 It is worth noting that the only reason I am choosing to pursue the development of this feature is because it will bring a great amount of utility to Homeroom upon completion.
 
-**P.S:** I've managed to find myself options, but I can't be certain if any of them work, nor am I certain if any of them will actually be a valid choice for me. I've decided to make an entirely seperate branch of code, and work on testing it there. It's become evident to me that there is such a large amount of refactoring and code editing that needs to be done that I no longer feel that the work I am doing belongs on the forms-branch. 
+**P.S:** I've managed to find myself options, but I can't be certain if any of them work, nor am I certain if any of them will actually be a valid choice for me. I've decided to make an entirely separate branch of code, and work on testing it there. It's become evident to me that there is such a large amount of refactoring and code editing that needs to be done that I no longer feel that the work I am doing belongs on the forms-branch.
+
+## 01/08/2022 - Monday
+Unfortunately, I have still failed to find a solution to my original problem. However, I did realise that my original problem was not a good problem to begin what. Due to the way Swing behaves, my entire issue of having a multi-threaded program to work on this task on the side, while freezing everything else was very bad.
+
+Originally, I had done this to ensure that the user did not mess anything up when potentially making use of a bad input, and therefore freezing the main thread until receiving input from what I wanted seemed like a good idea.
+
+I have since realised that this was a very bad idea, since handling the threads in the way I wanted was either not possible, or far too hard for someone who is still trying to learn how to put multi-threaded code into practise.
+
+I realised that I can then resolve my issue by merging a few methods I had written to handle student and form selection, and then, using an additional integer parameter, I could use that to indicate "selection" of how the method would apply itself to the rest of the program. The integer option would indicate the context as to how the method was being used, and it could perform different actions dependent on that.
+I would also need to ensure that any extra GUI that Homeroom opens closes the previous GUI before opening the new one. This way, the user is not able to provide input that could potentially be malicious. although the user did not intend it to be malicious, if Homeroom is incapable of handling multiple forms of input from different GUIs at the same time, then it is clear only one GUI at a time should be used to avoid this problem.
+
+In my second iteration of Homeroom, this extra functionality can be something I work on, but for now, only the core functionality of Homeroom needs to be worked on, and all planned features of my program need to be handled. Anything else can be worked on at a later date.
+
+Since this refactor will be so large, I doubt I will be able to get it finished tomorrow, but I can still try to do so.
+
+## 02/08/2022 - Tuesday
+In theory, the refactoring of code seems to be going well enough. Provided I sort my way through some minor issues, I should be able to finish the entire code rework tonight. I have managed to remove all multi-threaded code from my work, and am working on trying to refactor all my methods to become more event-based. In this way, the methods can achieve the intended functionality in the right context.
+
+The only issue I currently have with this is that I have had to use method overloading to ensure that each task that the selection task needs to do is done correctly and in the right context. This means that large chunks of code have been repeated, and this is obviously not good for many reasons. I need to find a way to rework this once functionality is achieved. It's untidy and hacky, and it should be removed.
+
+I've also found that the rework for this does not contain itself to just one class, since I need to rework other methods within other classes, to ensure that my design now fits the implementation of these particular methods. I have chosen to make it so that all Forms start off with no students, and you can then progressively add Students from the Student Management menu, or through the Form Management menu when editing a specific Form. It is worth noting that a Student can only be a part of one form, so this is something I need to account for in case a user messes up somewhere.
+
+This rework is beginning to look like it will take longer than just this one day, but I'll have to see how fast I can get things done.

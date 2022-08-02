@@ -84,7 +84,7 @@ public class GUIUtils extends JFrame {
     }
 
     /**
-     * Basic method to add buttons to a frame.
+     * Basic method to add buttons to a frame. It is also worth noting that this method does not run on the event dispatch thread. This means that you can add buttons to components in other threads, which has its uses.
      * <p>
      *     Fills the {@link Window} that is attributed with this class.
      * </p>
@@ -98,6 +98,29 @@ public class GUIUtils extends JFrame {
     public JButton addButtonToFrame(String buttonTitle, int buttonHeight, int buttonWidth, int locationX, int locationY) {
         JButton button = new JButton(buttonTitle);
         frame.add(button);
+        button.setSize(buttonWidth, buttonHeight);
+        button.setVisible(true);
+        button.setLocation(locationX, locationY);
+        return button;
+    }
+
+    public void addButtonToFrame(JButton button) {
+        frame.add(button);
+        return;
+    }
+
+    /**
+     * A basic static method to get an instance of a button which contains everything you need to add this {@link JButton} to any frame you might want.
+     * A call of {@link #addButtonToFrame(JButton)} will facilitate the addition of this button to a GUI of your choice.
+     * @param buttonTitle Name of the button, displayed in the middle.
+     * @param buttonHeight How "tall" the button should be.
+     * @param buttonWidth How "wide" the button should be.
+     * @param locationX The X-coordinate where the button is to be located, relative to the top-left corner of the screen.
+     * @param locationY The Y-coordinate where the button is to be located, relative to the top-left corner of the screen.
+     * @return {@link JButton} that the user is able to interact with.
+     */
+    public static JButton getButtonInstance(String buttonTitle, int buttonHeight, int buttonWidth, int locationX, int locationY) {
+        JButton button = new JButton(buttonTitle);
         button.setSize(buttonWidth, buttonHeight);
         button.setVisible(true);
         button.setLocation(locationX, locationY);
