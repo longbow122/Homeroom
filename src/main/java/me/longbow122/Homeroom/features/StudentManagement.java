@@ -1,6 +1,7 @@
 package me.longbow122.Homeroom.features;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import me.longbow122.Homeroom.Form;
 import me.longbow122.Homeroom.Student;
 import me.longbow122.Homeroom.StudentSearchType;
 import me.longbow122.Homeroom.utils.DBUtils;
@@ -29,13 +30,12 @@ import java.util.List;
 public class StudentManagement {
 
     /**
-     * Method which forces the thread to wait for an action to occur before handling anything else. <p></p>
+     * Method which handles {@link Student} selection and addition to a form. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of a Student. <p></p>
      * It is worth noting that a method of this nature should really be written in the {@link Student} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class.
      * @param username The username used to log into 'Homeroom' and the one used to query the database.
      * @param password The password used to log into 'Homeroom' and the one used to query the database.
-     * @return {@link Student} object that represents the selected Student.
      */
-    public Student studentSelection(String username, String password) {
+    public void studentFormAddition(String username, String password, Form form) {
         Student searchClass = new Student(username, password);
         GUIUtils gui = new GUIUtils("Search and Select Students | Homeroom", 1000, 1220 ,300, 0, false);
         gui.addLabelToFrame("Search:", 200, 10, 100, 25, true, 25);
@@ -44,9 +44,7 @@ public class StudentManagement {
         PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, searchField);
         JButton searchButton = gui.addButtonToFrame("Search", 40, 100, 500, 0);
         searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
-        searchButton.addActionListener(e -> {
-            handleStudentReturnSearch(searchClass, searchField.getText(), gui);
-        });
+        searchButton.addActionListener(e -> selectStudent(username, password, searchClass, searchField.getText(), gui, form));
         gui.addLabelToFrame("Search Type: ", 630, 10, 170, 30, true, 25);
         JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Student ID", "Student Name", "Student DOB", "Student Address", "Student Phone"});
         searchClass.setStudentSearchType(StudentSearchType.UUID); //Ensures that default search type actually applies.
@@ -84,7 +82,7 @@ public class StudentManagement {
             @Override
             public void keyTyped(KeyEvent e) {
                 if(e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    handleStudentReturnSearch(searchClass, searchField.getText(), gui);
+                    selectStudent(username, password, searchClass, searchField.getText(), gui, form);
                 }
             }
             @Override
@@ -94,27 +92,7 @@ public class StudentManagement {
             public void keyReleased(KeyEvent e) {
             }
         });
-        return studentSelected;
         //TODO TEST
-    }
-
-    /**
-     * Convenience method to handle the searching and returning of a {@link Student}.
-     * @param searchClass Student class to handle searching of a Student
-     * @param searchText Text to begin querying the database with.
-     * @param gui The parent GUI of which said buttons should be displayed on.
-     * @return {@link Student} object represented the selected Student.
-     */
-    private Student handleStudentReturnSearch(Student searchClass, String searchText, GUIUtils gui) {
-        List<Student> searches = searchClass.searchForStudent(searchText);
-        System.out.println("Working on searching using: " + searchText);
-        if(searches == null) {
-            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
-            System.out.println("No results seem to have been found!");
-            return null;
-        }
-        System.out.println(searches.size() + " results found!");
-        return selectStudent(searches, gui);
     }
 
     /**
@@ -129,7 +107,7 @@ public class StudentManagement {
         List<Student> searches = searchClass.searchForStudent(searchText);
         System.out.println("Working on searching using: " + searchText);
         if(searches == null) {
-            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.infoIcon"));
             System.out.println("No results seem to have been found!");
             return;
         }
@@ -356,7 +334,7 @@ public class StudentManagement {
 
 
 
-    private Student studentSelected;
+    private static Student studentSelected;
 
     private void setStudentSelected(Student x) {
         studentSelected = x;
@@ -365,17 +343,28 @@ public class StudentManagement {
     private Student getStudentSelected() {
         return studentSelected;
     }
-    private final Object lock = new Object();
 
-    /**
-     * Method used to return a {@link Student} object which the rest of the program is able to use. This method provides the same functionality as the Student Management GUI does, except this method should, in theory provide a returned object upon clicking of the button. <p></p>
-     * WARNING: THIS METHOD MAKES USE OF THE SYNCHRONIZE KEYWORD, AND WILL WAIT ON THE THREAD FOR A RESPONSE FROM THE USER BEFORE CONTINUING. THIS WILL LIKELY HOLD UP THE ENTIRE PROGRAM UNTIL INPUT IS RECIEVED. <P></P>
-     * Care should be taken to ensure that this does not affect the rest of the program.
-     * @param searchResults The List of Students returned from the search provided by the user.
+
+    /** TODO THIS METHOD HAS MORE CONTEXTS, IT JUST NEEDS TO BE ADDED AND IMPLEMENTED. COME BACK TO THIS.
+     * A method written to aid in the selection of {@link Student}s in particular context. This method is part of a collection of methods that uses method overloading for QOL.
+     * <p></p>
+     * This method would be used by users to add a {@link Student} to a particular {@link Form}.
+     * @param searchClass {@link Student} class to handle the searching of a Student with.
+     * @param searchText Text to begin querying the database with.
      * @param gui The parent GUI to insert buttons into. This GUI should be under a controlled environment, through a controlled size, etc.
-     * @return {@link Student} object representing the student that was selected by the user.
+     * @param formGroup The {@link Form} to add the {@link Student} to.
+     * @param username The username used to log into Homeroom.
+     * @param password The password used to log into Homeroom.
      */
-    private Student selectStudent(List<Student> searchResults, GUIUtils gui) {
+    private void selectStudent(String username, String password, Student searchClass, String searchText, GUIUtils gui, Form formGroup) {
+        List<Student> searches = searchClass.searchForStudent(searchText);
+        System.out.println("Working on searching using: " + searchText);
+        if(searches == null) {
+            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+            System.out.println("No results seem to have been found!");
+            return;
+        }
+        System.out.println(searches.size() + " results found!");
         int xLoc = 0;
         int yLoc = 100;
         if(searchButtonsPages != null) {
@@ -387,15 +376,13 @@ public class StudentManagement {
         }
         List<List<JButton>> pages = new ArrayList<>();
         List<JButton> buttons = new ArrayList<>();
-        for(Student x : searchResults) {
+        for(Student x : searches) {
             JButton option = gui.addButtonToFrame(x.getStudentName(), 50, 150, xLoc, yLoc);
             option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
             option.addActionListener(e -> {
-                setStudentSelected(x);//TODO THIS NEEDS TO RETURN THE STUDENT OBJECT
+                new Form(username, password).modifyFormStudents(formGroup, 1, x); //Add the student to the form
+                JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getStudentName() + " to " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
                 gui.closeFrame(); //Close the window afterwards, selection is all done now
-                synchronized (lock) {
-                    lock.notifyAll();
-                }
             });
             buttons.add(option);
             System.out.println("The button for " + x.getStudentName() + " has been implemented, but has not been made visible!");
@@ -448,25 +435,8 @@ public class StudentManagement {
             shiftPage(searchButtonIndex, -1, gui); //Go back one page
         });
         System.out.println("Did the button message actually display?");
-        //TODO ENSURE THAT ALL BUTTONS ACTUALLY GET DISPLAYED???
-        synchronized (lock) {
-            try {
-                System.out.println("Thread is about to be locked!");
-                lock.wait(); //TODO BLOCKS EVERYTHING, INCLUDING THE BUTTONS BEING CREATED. THIS IS OKAY TO HAVE, PROVIDED ACTIONS CAN BE PERFORMED THROUGH THE BUTTON
-                System.out.println("Thread should have now been locked!");
-            } catch (InterruptedException e) {
-                System.out.println("An exception was caught! Look at the below stack trace!");
-                e.printStackTrace();
-            }
-        }
-        System.out.println(getStudentSelected().getStudentName());
-        return getStudentSelected();
+        return;
     }
-    //TODO CONSIDER THE BELOW
-    // Use SwingWorkers and concurrency to handle the display of the button. Maybe then, it will allow for the notification to go through??
-    // SwingWorker will handle the display of the button in the background, while the rest of the code executes and freezes the main thread.
-    // Through this, the buttons should be operable? Might need to actually have the page buttons also be moved to another thread, no idea how that's going to work#
-    // Another option might be using thread.interrupt in a special way. either way, using synchronised blocks was not the way to go.
 
     /**
      * A method used to display a certain amount of students within the main Student Management GUI.
@@ -557,7 +527,7 @@ public class StudentManagement {
      * @param permission The level of permission that the user is viewing the information from. Dictates whether student information can be edited or deleted.
      * @param parentGUI The parent GUI to be refreshed and viewed in terms of information.
      * @param option The option to make use of in terms of the GUI to stem from. As multiple GUIs can make use of this same method, there needs to be leeway for this. 0 for Student Management, 1 for Form Management.
-     */
+     */ //TODO THIS METHOD NEEDS TO HAVE INFORMATION STORED IN THE CONTEXT OF FORMS. REFACTORS NEED TO BE DONE TO STORE RELEVANT FORM INFORMATION IF THEY ARE IN ONE.
     public void viewStudentInformation(Student student, int permission, String username, String password, GUIUtils parentGUI, int option) {
         GUIUtils gui = new GUIUtils("Student Management | View Student", 1000, 1700, 0, 0, false);
         gui.addLabelToFrame("Student Name", 100, 0, 150, 25, false, 18);
@@ -610,7 +580,7 @@ public class StudentManagement {
         JTextField guardianName = gui.addTextField(450, 130, 150, 25, "Enter the student's guardian's name.");
         guardianName.setText(student.getGuardianName());
         guardianName.setFont(new Font(gui.getFrame().getName(), Font.PLAIN, 15));
-        JButton deleteStudent = gui.addButtonToFrame("Delete Student", 50, 100, 100, 200);
+        JButton deleteStudent = gui.addButtonToFrame("Delete Student", 50, 150, 100, 200);
         deleteStudent.addActionListener(e -> {
             Object[] options = {"Delete Student", "Cancel"};
             int select = JOptionPane.showOptionDialog(gui.getFrame(), "Please confirm that you wish to delete the information for " + student.getStudentName(), "About to delete " + student.getStudentName() + "!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), options, "Test");

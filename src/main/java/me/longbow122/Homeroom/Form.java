@@ -64,14 +64,6 @@ public class Form {
     A list of all students in that form. (Use the List<Student> object)
      */
 
-    /*TODO How to add a list of student to the database:
-
-    As students will each have a unique ID, get each and every single one of those from your list of Students.
-    Using that list of UUIDs, convert them all into a string, put them into an array and insert that Array into your document.
-     */
-
-    //TODO
-    // IMPLEMENT A SEARCH AND SELECT FOR FORMS
 
     /**
      * Constructor for the Form class. Does not make use of any attributes, as you should be using the methods within this clas to either find Forms or to make new Forms. <p></p>
@@ -150,7 +142,7 @@ public class Form {
         try (MongoCursor<Document> found = forms.find(query).iterator()) {
             while (found.hasNext()) {
                 Document x = found.next();
-                return new Form(x.get("FormID").toString(), x.get("TeacherName").toString(), x.get("FormName").toString(), fromIDArrayToStudents((String[]) x.get("Students")));
+                return new Form(x.get("FormID").toString(), x.get("TeacherName").toString(), x.get("FormName").toString(), fromIDListToStudents((List<String>) x.get("Students")));
             }
             return null;
         }
@@ -165,26 +157,28 @@ public class Form {
      * @param studentIDs The IDs of the {@link Student}s in the form group. This should be stored as an array to ensure that MongoDB can take the data.
      * @return An Object representing the Form group, which can be used within the rest of the program.
      */
-    public Form addFormToDB(String teacherName, String formName, String[] studentIDs) {
+    public Form addFormToDB(String teacherName, String formName, List<String> studentIDs) {
         UUID uuid = UUID.randomUUID();
         while(getFormFromID(uuid.toString()) != null) {
             uuid = UUID.randomUUID();
         }
         MongoCollection<Document> formsDB = db.getHomeroomDB().getCollection("Forms");
         HashMap<String, Object> dataValues = new HashMap<>();
-        dataValues.put("FormID", uuid);
+        dataValues.put("FormID", uuid.toString());
         dataValues.put("TeacherName", teacherName);
         dataValues.put("FormName", formName);
         dataValues.put("Students", studentIDs);
         Document insertInfoDocument = new Document(dataValues);
         formsDB.insertOne(insertInfoDocument);
-        return new Form(uuid.toString(), teacherName, formName, fromIDArrayToStudents(studentIDs));
+        return new Form(uuid.toString(), teacherName, formName, fromIDListToStudents(studentIDs));
     }
 
-    private List<Student> fromIDArrayToStudents(String[] studentIDs) {
+    private List<Student> fromIDListToStudents(List<String> studentIDs) {
         Student util = new Student(connectionUsername, connectionPassword);
         List<Student> studentList = new ArrayList<>();
         for(String x : studentIDs) {
+            System.out.println(x);
+            System.out.println(util.getStudentFromID(x).getStudentName());
             if(util.isStudentValid(util.getStudentFromID(x))) {
                 studentList.add(util.getStudentFromID(x));
             } // This if statement, in a controlled scenario should never fail and should always be TRUE.
@@ -239,7 +233,7 @@ public class Form {
             bar.setString("Searching for Forms: " + roundedPercent + "%");
             bar.setValue(roundedPercent);
             System.out.println(x.get("FormName"));
-            found.add(new Form(x.get("FormID").toString(), x.get("TeacherName").toString(), x.get("FormName").toString(), fromIDArrayToStudents((String[]) x.get("Students"))));
+            found.add(new Form(x.get("FormID").toString(), x.get("TeacherName").toString(), x.get("FormName").toString(), fromIDListToStudents((List<String>) x.get("Students"))));
         }
         progress.closeFrame();
         return found;
@@ -283,7 +277,7 @@ public class Form {
     }
 
     /**
-     * Quick convienince method used to handle modifcation of any students in a Form Group.
+     * Quick convienince method used to handle modification of any students in a Form Group.
      * @param form The form in question that is to be modified.
      * @param option The option to choose from. 1 if you wish to ADD a student to the form group, 2 if you wish to REMOVE a student from the form group.
      * @param student The {@link Student} in question.
@@ -294,27 +288,26 @@ public class Form {
             return false;
         }
         List<Student> studentsInForm = form.getStudents();
+        List<String> allStudentIDs = new ArrayList<>();
         switch(option) {
             case 1: //1 should be passed into the method to ADD a student to the form.
                 if(studentsInForm.contains(student)) {
                     return true; //Already added to the form, nothing needs to be done.
                 }
                 studentsInForm.add(student);
-                String[] studentIDs = new String[studentsInForm.size()];
                 for(Student x : studentsInForm) {
-                    studentIDs[studentsInForm.indexOf(x)] = x.getStudentID();
+                    allStudentIDs.add(x.getStudentID());
                 }
-                return updateForm(form, "students", studentIDs);
+                return updateForm(form, "Students", allStudentIDs);
             case 2: //2 should be passed into the method to REMOVE a student from the form
                 if(!(studentsInForm.contains(student))) {
                     return true; //Does not exist within the form already, no need to remove anything
                 }
                 studentsInForm.remove(student);
-                String[] studentRemove = new String[studentsInForm.size()];
                 for(Student x : studentsInForm) {
-                    studentRemove[studentsInForm.indexOf(x)] = x.getStudentID();
+                    allStudentIDs.add(x.getStudentID());
                 }
-                return updateForm(form, "students", studentRemove);
+                return updateForm(form, "Students", allStudentIDs);
         }
         return false;
     }
