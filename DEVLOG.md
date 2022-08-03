@@ -356,3 +356,17 @@ The only issue I currently have with this is that I have had to use method overl
 I've also found that the rework for this does not contain itself to just one class, since I need to rework other methods within other classes, to ensure that my design now fits the implementation of these particular methods. I have chosen to make it so that all Forms start off with no students, and you can then progressively add Students from the Student Management menu, or through the Form Management menu when editing a specific Form. It is worth noting that a Student can only be a part of one form, so this is something I need to account for in case a user messes up somewhere.
 
 This rework is beginning to look like it will take longer than just this one day, but I'll have to see how fast I can get things done.
+
+## 03/08/2022 - Wednesday
+I believe that I have refactored an adequate amount of code to consider the issue solved, at least for now. As per usual, I still hold the opinion that my code is not up to standard, and can definitely be improved.
+
+In order to ensure that Form Groups becomes seamlessly integrated with the rest of the program, I will need to do some further work on reworking both the Form and Student data structures, ensuring that they are able to store both members of a Form, and what Form the Students are in. This can be done by creating a link between the two features in my databases, and making further code additions to ensure that both GUIs hold information related to the Forms in the correct, robust manner.
+
+Once I am finished with integrating Forms and Students together, to ensure they both work in unison, I will move onto Classes, which will store the actual lessons themselves. These data structures are where admins would create lessons which hold classrooms, teachers and Students.
+
+Unfortunately, I am unable to focus on the quality of my code, and put towards more focus on working further on getting features working to a point where it can be considered "good enough", and start getting documentation out. Once this has been completed, I can start to consider working on a second iteration, which aims to refactor and overhaul most of the program for efficiency and seamlessness.
+
+Since I have considered the concurrency and student selection issue fixed, I will be merging the concurrency-test-branch with the forms-branch, and continuing my work on Form Groups there.
+
+It is likely that I will be working further on Student classes, since Forms need to be completely integrated with Students and the rest of the program before I can consider this safe to move on. 
+

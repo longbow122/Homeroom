@@ -34,9 +34,8 @@ public class StudentManagement {
      * It is worth noting that a method of this nature should really be written in the {@link Student} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class.
      * @param username The username used to log into 'Homeroom' and the one used to query the database.
      * @param password The password used to log into 'Homeroom' and the one used to query the database.
-     */ //TODO THIS METHOD NEEDS TO BE REWORKED TO END RELIANCE ON IT AS WELL! IT NEEDS TO BE REWORKED TO MAKE USE OF THE SELECT STUDENT METHOD.
-    // THIS WILL HAVE TO MAKE USE OF METHOD OVERLOADING AS WELL, FOR THE TIME BEING, SO VARIOUS METHODS OF THE SAME SIGNATURE, JUST WITH DIFFERENT PARAMS WILL NEED TO BE DEVELOPED.
-    public void studentSelection(String username, String password, Form form) {
+     */
+    public void studentFormAddition(String username, String password, Form form) {
         Student searchClass = new Student(username, password);
         GUIUtils gui = new GUIUtils("Search and Select Students | Homeroom", 1000, 1220 ,300, 0, false);
         gui.addLabelToFrame("Search:", 200, 10, 100, 25, true, 25);
@@ -45,9 +44,7 @@ public class StudentManagement {
         PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, searchField);
         JButton searchButton = gui.addButtonToFrame("Search", 40, 100, 500, 0);
         searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
-        searchButton.addActionListener(e -> {
-            selectStudent(username, password, searchClass, searchField.getText(), gui, form);
-        });
+        searchButton.addActionListener(e -> selectStudent(username, password, searchClass, searchField.getText(), gui, form));
         gui.addLabelToFrame("Search Type: ", 630, 10, 170, 30, true, 25);
         JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Student ID", "Student Name", "Student DOB", "Student Address", "Student Phone"});
         searchClass.setStudentSearchType(StudentSearchType.UUID); //Ensures that default search type actually applies.
@@ -110,7 +107,7 @@ public class StudentManagement {
         List<Student> searches = searchClass.searchForStudent(searchText);
         System.out.println("Working on searching using: " + searchText);
         if(searches == null) {
-            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.infoIcon"));
             System.out.println("No results seem to have been found!");
             return;
         }
@@ -384,7 +381,7 @@ public class StudentManagement {
             option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
             option.addActionListener(e -> {
                 new Form(username, password).modifyFormStudents(formGroup, 1, x); //Add the student to the form
-                JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getStudentName() + " to " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+                JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getStudentName() + " to " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
                 gui.closeFrame(); //Close the window afterwards, selection is all done now
             });
             buttons.add(option);
@@ -440,18 +437,6 @@ public class StudentManagement {
         System.out.println("Did the button message actually display?");
         return;
     }
-    //TODO CONSIDER THE BELOW
-    // REWORK THE ENTIRE METHOD TO NOT RELY ON THIS ANYMORE, AND INSTEAD USE THE GUI TO WAIT FOR INPUT THROUGH THE ACTION LISTENER.
-    // THIS WAY THERE IS NO RELIANCE ON MULTI-THREADING, AND NO FREEZING OF THE MAIN THREAD.
-    // THERE ALSO NEEDS TO BE MAJOR REWORKS IN THE SENSE THAT THE OLD GUI SHOULD CLOSE DOWN AGAIN, BEFORE OPENING THE NEW ONE.
-    // THIS WAY, THERE IS NO RISK OF THE USER MAKING MULTIPLE INPUTS FOR SOMETHING THAT SHOULD NOT BE HAPPENING.
-    // ONCE YOU REWORK EVERYTHING TO DO THAT, THAT DECREASES THE RISK OF THE USER MESSING SOMETHING UP BY ENTERING SOMETHING ON AN OLD GUI
-    // AND IT ALSO MEANS THAT THE GUI IS BACK TO BEING ENTIRELY EVENT-BASED, AND WORKS ON THE BASIS OF WHEN THE BUTTONS ARE CLICKED.
-
-    //TODO
-    // DOING STUFF BY USING NUMBERS AS A PARAMETER TO DO STUFF HAS FAILED, SINCE THERE ARE ADDITIONAL PARAMS NEEDED DEPENDING ON THE CONTEXT
-    // IT IS A WASTE TO WORK WITH EXTRA PARAMS IN ONE METHOD, BUT WHAT NOT MIGHT BE A WASTE IS METHOD OVERLOADING. DO THAT INSTEAD.
-    // JUST REWORK THIS METHOD FOR FORMS, THEN METHOD OVERLOAD IF NEED BE.
 
     /**
      * A method used to display a certain amount of students within the main Student Management GUI.
@@ -542,7 +527,7 @@ public class StudentManagement {
      * @param permission The level of permission that the user is viewing the information from. Dictates whether student information can be edited or deleted.
      * @param parentGUI The parent GUI to be refreshed and viewed in terms of information.
      * @param option The option to make use of in terms of the GUI to stem from. As multiple GUIs can make use of this same method, there needs to be leeway for this. 0 for Student Management, 1 for Form Management.
-     */
+     */ //TODO THIS METHOD NEEDS TO HAVE INFORMATION STORED IN THE CONTEXT OF FORMS. REFACTORS NEED TO BE DONE TO STORE RELEVANT FORM INFORMATION IF THEY ARE IN ONE.
     public void viewStudentInformation(Student student, int permission, String username, String password, GUIUtils parentGUI, int option) {
         GUIUtils gui = new GUIUtils("Student Management | View Student", 1000, 1700, 0, 0, false);
         gui.addLabelToFrame("Student Name", 100, 0, 150, 25, false, 18);
@@ -595,7 +580,7 @@ public class StudentManagement {
         JTextField guardianName = gui.addTextField(450, 130, 150, 25, "Enter the student's guardian's name.");
         guardianName.setText(student.getGuardianName());
         guardianName.setFont(new Font(gui.getFrame().getName(), Font.PLAIN, 15));
-        JButton deleteStudent = gui.addButtonToFrame("Delete Student", 50, 100, 100, 200);
+        JButton deleteStudent = gui.addButtonToFrame("Delete Student", 50, 150, 100, 200);
         deleteStudent.addActionListener(e -> {
             Object[] options = {"Delete Student", "Cancel"};
             int select = JOptionPane.showOptionDialog(gui.getFrame(), "Please confirm that you wish to delete the information for " + student.getStudentName(), "About to delete " + student.getStudentName() + "!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), options, "Test");

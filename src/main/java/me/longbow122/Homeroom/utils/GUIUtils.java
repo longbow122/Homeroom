@@ -71,6 +71,13 @@ public class GUIUtils extends JFrame {
     }
 
     /**
+     * Basic method written to easily open {@link JFrame}s.
+     */
+    public void openFrame() {
+        frame.setVisible(true);
+    }
+
+    /**
      * Basic getter for the {@link Window} that all of these methods refer to.
      * <p>
      *     Is useful to have when needing to do things such as {@link JOptionPane#createDialog(Component, String)}, where you do not have a

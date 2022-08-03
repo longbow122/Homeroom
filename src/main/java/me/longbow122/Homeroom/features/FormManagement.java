@@ -92,7 +92,6 @@ public class FormManagement {
             JTextField teacherName = add.addTextField(250, 70, 200, 25, "Enter the name of the teacher that will watch over the form.");
             //TODO THE ABOVE LOGIC FOR TEACHERS NEEDS TO BE RE-WORKED. ACCOMMODATE FOR THIS AT SOME POINT WHEN HANDLING CONFIGURATION. IT NEEDS TO BE DONE IN THE SAME WAY THAT ADDING A STUDENT TO A FORM IS DONE.
             // TODO LOGIC FOR ADDING STUDENTS TO FORMS HAS BEEN REMOVED. THIS NEEDS TO BE RE-WORKED SO THAT YOU CAN ONLY ADD STUDENTS TO A FORM WHEN EDITING THE FORM.
-            //TODO ADD CONFIRM ADDITION BUTTONS
             JButton confirm = add.addButtonToFrame("Add Form", 25, 150, 500, 30);
             confirm.addActionListener(e12 -> {
                 JTextField[] required = new JTextField[]{formName, teacherName};
@@ -112,14 +111,12 @@ public class FormManagement {
                         }
                     }
                 }
-                //TODO FIND OUT IF YOU ARE ABLE TO PASS AN EMPTY ARRAY INTO THIS FIELD, AND HAVE MONGODB SAFELY HANDLE IT!!!
-                String[] studentIDs = new String[0];
+                List<String> studentIDs = new ArrayList<>(); //Pass an empty list into the database first when making the Form. When editing the form, you can add Students accordingly later.
                 Form added = new Form(username, password).addFormToDB(teacherName.getText(), formName.getText(), studentIDs);
                 processSearch(searchClass, username, password, searchField.getText(), gui);
                 JOptionPane.showMessageDialog(add.getFrame(), "The Form " + added.getFormName() + " was successfully added to the database of Forms!", "Form Successfully Added!", JOptionPane.INFORMATION_MESSAGE);
                 add.closeFrame();
             });
-            //TODO TEST FORM ADDITION SYSTEM WITH THE DATABASE
         });
     }
 
@@ -138,10 +135,10 @@ public class FormManagement {
      * @param parentGUI The parent GUI to display the student information buttons inside
      * @param username The username used to log into 'Homeroom' and the one used to query the database.
      * @param password The password used to log into 'Homeroom' and the one used to query the database.
-     */
+     */ // TODO IMPLEMENT PERMISSIONS USING THE USERNAME AND PASSWORD. NON-ADMINS CAN VIEW, BUT THEY SHOULD NOT BE ALLOWED TO EDIT.
     private void displayAllStudentsInInfoGUI(List<Student> students, GUIUtils parentGUI, String username, String password) {
         int xLoc = 0;
-        int yLoc = 280;
+        int yLoc = 180;
         if(studentButtonsPages != null) {
             for(List<JButton> x : studentButtonsPages) {
                 for(JButton i : x) {
@@ -156,7 +153,7 @@ public class FormManagement {
             option.setFont(new Font(parentGUI.getFrame().getFont().getName(), Font.PLAIN, 15));
             option.addActionListener(e -> new StudentManagement().viewStudentInformation(x, new DBUtils(username, password).getPermission(), username, password, parentGUI, 1));
             buttons.add(option);
-            System.out.println("A button was added to the list of buttons!");
+            System.out.println("A button was added to the lit of buttons!");
             option.setVisible(false);
             xLoc = xLoc + 150;
             if(xLoc > 1050) {
@@ -165,42 +162,49 @@ public class FormManagement {
             }
             if(yLoc > 930) {
                 pages.add(buttons); //add it to the list of lits to ensure you know what's being added.
-                JButton nextPage = parentGUI.addButtonToFrame(">>", 30, 60, 980, 65);
-                JButton backPage = parentGUI.addButtonToFrame("<<", 30, 60, 920, 65);
-                nextPage.setToolTipText("Go to the next page of search results.");
-                backPage.setToolTipText("Go to the previous page of search results.");
-                if(!pages.isEmpty()) {
-                    List<JButton> firstPage = pages.get(0);
-                    for(JButton i : firstPage) {
-                        i.setVisible(true);
-                    }
-                } else {
-                    for(JButton y : buttons) {
-                        y.setVisible(true);
-                    }
-                }
-                studentButtonIndex = 0;
-                setStudentButtonsPages(pages);
-                nextPage.addActionListener(e -> {
-                    System.out.println("Current index: " + studentButtonIndex);
-                    if(pages.isEmpty()) {
-                        JOptionPane.showMessageDialog(parentGUI.getFrame(), "There are no further pages for you to move through!");
-                        System.out.println("Pages list is empty!");
-                        return;
-                    }
-                    shiftPageForForms(studentButtonIndex, 1, parentGUI); //Go forward one page
-                });
-                backPage.addActionListener(e -> {
-                    System.out.println("Current index: " + studentButtonIndex);
-                    if(pages.isEmpty()) {
-                        JOptionPane.showMessageDialog(parentGUI.getFrame(), "There are no further pages for you to move through!");
-                        System.out.println("Page is empty!");
-                        return;
-                    }
-                    shiftPageForForms(studentButtonIndex, -1, parentGUI); //Go back one page
-                });
+                System.out.println("A list of buttons has been added to the page list!");
+                buttons = new ArrayList<JButton>();
+                yLoc = 100;
+            }
+            System.out.println(students.indexOf(x) + "out of " + students.size());
+        }
+        pages.add(buttons); //MOVE OUT OF YLOC BLOCK
+        JButton nextPage = parentGUI.addButtonToFrame(">>", 30, 60, 460, 30);
+        JButton backPage = parentGUI.addButtonToFrame("<<", 30, 60, 400, 30);
+        nextPage.setToolTipText("Go to the next page of search results.");
+        backPage.setToolTipText("Go to the previous page of search results.");
+        if(!pages.isEmpty()) {
+            List<JButton> firstPage = pages.get(0);
+            for(JButton i : firstPage) {
+                i.setVisible(true);
+            }
+        } else {
+            for(JButton y : buttons) {
+                y.setVisible(true);
             }
         }
+        studentButtonIndex = 0;
+        setStudentButtonsPages(pages);
+        nextPage.addActionListener(e -> {
+            System.out.println("Current index: " + studentButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(parentGUI.getFrame(), "There are no further pages for you to move through!");
+                System.out.println("Pages list is empty!");
+                return;
+            }
+            shiftPageForForms(studentButtonIndex, 1, parentGUI); //Go forward one page
+        });
+        backPage.addActionListener(e -> {
+            System.out.println("Current index: " + studentButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(parentGUI.getFrame(), "There are no further pages for you to move through!");
+                System.out.println("Page is empty!");
+                return;
+            }
+            shiftPageForForms(studentButtonIndex, -1, parentGUI); //Go back one page
+        });
+        System.out.println("Method has finished calling!");
+        return;
     }
 
     /**
@@ -301,8 +305,20 @@ public class FormManagement {
     }
 
 
+    //TODO IMPLEMENT PERMISSIONS FOR THIS METHOD. THEY SHOULD BE ALLOWED TO VIEW BUT NOT EDIT. THEY CAN BE GRABBED FROM THE DBUTILS CLASS USING THE USERNAME AND PASSWORD
 
-    private void viewFormInformation(Form form, int permission, String username, String password, GUIUtils parentGUI) {
+    /**
+     * Method that allows users to view information about a {@link Form}. This GUI also allows users to edit, view and delete Form information depending on the level of permissions the user has.
+     * This permission level will need to be passed through using parameters within the method. <p></p>
+     * This method seems far too hard-coded for me, and is definitely not a method that is up to standard. Too many operations, that need to be reduced using loops and switch statements where possible.
+     *
+     * @param form       The {@link Form} in question, the Form for which information should be displayed.
+     * @param permission The permission level of the user accessing the form information in question.
+     * @param username   The username of the user accessing the form information in question.
+     * @param password   The password of the user accessing the form information in question.
+     * @param parentGUI  The parent GUI to be refreshed and viewed in terms of information.
+     */
+    public void viewFormInformation(Form form, int permission, String username, String password, GUIUtils parentGUI) {
         GUIUtils gui = new GUIUtils("Form Management | View Form", 1000, 1700, 0, 0, false);
         gui.addLabelToFrame("Form Name", 100, 0, 150, 25, false, 18);
         JTextField nameField = gui.addTextField(100, 30, 120, 30, "Name of the Form");
@@ -316,8 +332,16 @@ public class FormManagement {
         PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT,teacherField);
         teacherField.setText(form.getTeacherName());
         teacherField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
-        displayAllStudentsInInfoGUI(form.getStudents(), gui, username, password);
-        //TODO HANDLE DISPLAY OF STUDENTS THROUGH BUTTONS AS IS STANDARD, BUT IN THE CONTEXT OF FORMS.
+        displayAllStudentsInInfoGUI(form.getStudents(), gui, username, password); //TODO PERMISSIONS NEED TO BE INVOLVED HERE!
+        JButton addStudent = gui.addButtonToFrame("Add Student", 30, 150, 530, 30);
+        addStudent.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 15));
+        addStudent.addActionListener(e -> {
+            gui.closeFrame();
+            new StudentManagement().studentFormAddition(username, password, form);
+
+        });
+        //TODO DELETE FORMS BUTTON NEEDS TO BE ADDED. THIS BUTTON ALSO NEEDS TO REMOVE INFORMATION ABOUT THE FORM FROM THE STUDENTS THEMSELVES.
+        //TODO EDITING SAVE AND CONFIRM BUTTONS NEED TO BE ADDED
     }
     private List<List<JButton>> searchButtonsPages;
 
