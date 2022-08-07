@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class StudentManagement {
 
-    /**
+    /** TODO THIS METHOD WORKS AS INTENDED, BUT IMPROVEMENTS NEED TO BE MADE TO ALLOW FOR STUDENTS TO BE ADDED TO A FORM ON CREATION
      * Method which handles {@link Student} selection and addition to a form. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of a Student. <p></p>
      * It is worth noting that a method of this nature should really be written in the {@link Student} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class.
      * @param username The username used to log into 'Homeroom' and the one used to query the database.
@@ -44,7 +44,7 @@ public class StudentManagement {
         PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, searchField);
         JButton searchButton = gui.addButtonToFrame("Search", 40, 100, 500, 0);
         searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
-        searchButton.addActionListener(e -> selectStudent(username, password, searchClass, searchField.getText(), gui, form));
+        searchButton.addActionListener(e -> new FormManagement().selectStudent(username, password, searchClass, searchField.getText(), gui, form));
         gui.addLabelToFrame("Search Type: ", 630, 10, 170, 30, true, 25);
         JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Student ID", "Student Name", "Student DOB", "Student Address", "Student Phone"});
         searchClass.setStudentSearchType(StudentSearchType.UUID); //Ensures that default search type actually applies.
@@ -82,7 +82,7 @@ public class StudentManagement {
             @Override
             public void keyTyped(KeyEvent e) {
                 if(e.getKeyChar() == KeyEvent.VK_ENTER) {
-                    selectStudent(username, password, searchClass, searchField.getText(), gui, form);
+                    new FormManagement().selectStudent(username, password, searchClass, searchField.getText(), gui, form);
                 }
             }
             @Override
@@ -92,7 +92,6 @@ public class StudentManagement {
             public void keyReleased(KeyEvent e) {
             }
         });
-        //TODO TEST
     }
 
     /**
@@ -117,7 +116,7 @@ public class StudentManagement {
 
     public void openManageStudentsGUI(String username, String password) {
         Student searchClass = new Student(username, password);
-        GUIUtils gui = new GUIUtils("Manage Students | Homeroom", 1000, 1220, 300, 0, false);
+        GUIUtils gui = new GUIUtils("Manage Students | Homeroom", 1000, 1220, 300, 0, true);
         JButton addStudent = gui.addButtonToFrame("New Student", 60, 200, 0,0);
         addStudent.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
         gui.addLabelToFrame("Search:", 200, 10, 100, 25, true, 25);
@@ -208,23 +207,18 @@ public class StudentManagement {
                 String convertedDate = month + "/" + day + "/" + event.getNewDate().getYear();
                 DOB.setText(convertedDate);
             });
-            JLabel studentAddressLabel = add.addLabelToFrame("Student Address:", 25, 100, 200, 20,false);
-            studentAddressLabel.setFont(new Font(add.getFrame().getFont().getName(), Font.BOLD, 20));
+            JLabel studentAddressLabel = add.addLabelToFrame("Student Address:", 25, 100, 200, 20,true, 20);
             studentAddressLabel.setForeground(Color.RED);
             JTextArea studentAddress = add.addTextArea(25, 130, 200, 75, "Enter the address of the Student here!");
-            JLabel studentMedicalLabel = add.addLabelToFrame("Student Medical:", 250, 100, 200, 20, false);
-            studentMedicalLabel.setFont(new Font(add.getFrame().getFont().getName(), Font.BOLD, 20));
+            JLabel studentMedicalLabel = add.addLabelToFrame("Student Medical:", 250, 100, 200, 20, true, 20);
             JTextArea studentMedical = add.addTextArea(250, 130, 200, 75,"Enter the medical information of the Student here!");
-            JLabel guardianNameLabel = add.addLabelToFrame("Guardian Name:", 475, 100,200, 20,false);
-            guardianNameLabel.setFont(new Font(add.getFrame().getFont().getName(), Font.BOLD, 20));
+            JLabel guardianNameLabel = add.addLabelToFrame("Guardian Name:", 475, 100,200, 20,true, 20);
             guardianNameLabel.setForeground(Color.RED);
             JTextField guardianName = add.addTextField(475, 130, 150, 25, "Enter the student's guardians name here! REQUIRED FIELD");
-            JLabel guardianPhoneLabel = add.addLabelToFrame("Guardian Phone:", 475, 160, 200, 20, false);
-            guardianPhoneLabel.setFont(new Font(add.getFrame().getFont().getName(), Font.BOLD, 20));
+            JLabel guardianPhoneLabel = add.addLabelToFrame("Guardian Phone:", 475, 160, 200, 20, true, 20);
             guardianPhoneLabel.setForeground(Color.RED);
             JTextField guardianPhone = add.addTextField(475, 180, 150, 25, "Enter the guardian's phone number here! REQUIRED FIELD!");
-            JLabel guardianAddressLabel = add.addLabelToFrame("Guardian Address:", 25, 210, 200, 20, false);
-            guardianAddressLabel.setFont(new Font(add.getFrame().getFont().getName(), Font.BOLD, 20));
+            JLabel guardianAddressLabel = add.addLabelToFrame("Guardian Address:", 25, 210, 200, 20, true, 20);
             guardianAddressLabel.setForeground(Color.RED);
             JTextArea guardianAddress = add.addTextArea(25, 240, 150, 75, "Enter the student's guardians address here!");
             JTextComponent[] requiredFields = {studentName, studentPhone, DOB, studentAddress, guardianName, guardianPhone, guardianAddress};
@@ -265,7 +259,7 @@ public class StudentManagement {
                         }
                     }
                 }
-                Student added = new Student(username, password).addStudentToDB(studentName.getText(), DOB.getText(), studentAddress.getText(), studentPhone.getText(), studentMedical.getText(), guardianName.getText(), guardianAddress.getText(), guardianPhone.getText());
+                Student added = new Student(username, password).addStudentToDB(studentName.getText(), DOB.getText(), studentAddress.getText(), studentPhone.getText(), studentMedical.getText(), guardianName.getText(), guardianAddress.getText(), guardianPhone.getText(), null);
                 processSearches(searchClass, username, password, searchField.getText(), gui);
                 JOptionPane.showMessageDialog(add.getFrame(), "The student " + added.getStudentName() + " was successfully added to the database of Students!", "Student Successfully Added!", JOptionPane.INFORMATION_MESSAGE);
                 add.closeFrame();
@@ -342,100 +336,6 @@ public class StudentManagement {
 
     private Student getStudentSelected() {
         return studentSelected;
-    }
-
-
-    /** TODO THIS METHOD HAS MORE CONTEXTS, IT JUST NEEDS TO BE ADDED AND IMPLEMENTED. COME BACK TO THIS.
-     * A method written to aid in the selection of {@link Student}s in particular context. This method is part of a collection of methods that uses method overloading for QOL.
-     * <p></p>
-     * This method would be used by users to add a {@link Student} to a particular {@link Form}.
-     * @param searchClass {@link Student} class to handle the searching of a Student with.
-     * @param searchText Text to begin querying the database with.
-     * @param gui The parent GUI to insert buttons into. This GUI should be under a controlled environment, through a controlled size, etc.
-     * @param formGroup The {@link Form} to add the {@link Student} to.
-     * @param username The username used to log into Homeroom.
-     * @param password The password used to log into Homeroom.
-     */
-    private void selectStudent(String username, String password, Student searchClass, String searchText, GUIUtils gui, Form formGroup) {
-        List<Student> searches = searchClass.searchForStudent(searchText);
-        System.out.println("Working on searching using: " + searchText);
-        if(searches == null) {
-            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Student Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
-            System.out.println("No results seem to have been found!");
-            return;
-        }
-        System.out.println(searches.size() + " results found!");
-        int xLoc = 0;
-        int yLoc = 100;
-        if(searchButtonsPages != null) {
-            for(List<JButton> x : searchButtonsPages) {
-                for(JButton i : x) {
-                    i.setVisible(false);
-                }
-            }
-        }
-        List<List<JButton>> pages = new ArrayList<>();
-        List<JButton> buttons = new ArrayList<>();
-        for(Student x : searches) {
-            JButton option = gui.addButtonToFrame(x.getStudentName(), 50, 150, xLoc, yLoc);
-            option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
-            option.addActionListener(e -> {
-                new Form(username, password).modifyFormStudents(formGroup, 1, x); //Add the student to the form
-                JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getStudentName() + " to " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
-                gui.closeFrame(); //Close the window afterwards, selection is all done now
-            });
-            buttons.add(option);
-            System.out.println("The button for " + x.getStudentName() + " has been implemented, but has not been made visible!");
-            option.setVisible(false);
-            xLoc = xLoc + 150;
-            if(xLoc > 1050) {
-                yLoc = yLoc + 50;
-                xLoc = 0;
-            }
-            if(yLoc > 930) {
-                pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
-                System.out.println("A list of buttons has been added to the page list!");
-                buttons = new ArrayList<JButton>();
-                yLoc = 100; //Reset to y= 100
-            }
-        }
-        pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
-        JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
-        JButton backPage = gui.addButtonToFrame("<<", 30, 60, 920, 65);
-        nextPage.setToolTipText("Go to the next page of search results.");
-        backPage.setToolTipText("Go to the previous page of search results.");
-        if(!pages.isEmpty()) {
-            List<JButton> firstPage = pages.get(0);
-            for(JButton i : firstPage) {
-                i.setVisible(true);
-            }
-        } else {
-            for(JButton x : buttons) {
-                x.setVisible(true);
-            }
-        }
-        searchButtonIndex = 0;
-        setSearchButtons(pages);
-        nextPage.addActionListener(e -> {
-            System.out.println("Current index: " + searchButtonIndex);
-            if(pages.isEmpty()) {
-                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
-                System.out.println("Pages list is empty!");
-                return;
-            }
-            shiftPage(searchButtonIndex, 1, gui); //Go forward one page
-        });
-        backPage.addActionListener(e -> {
-            System.out.println("Current index: " + searchButtonIndex);
-            if(pages.isEmpty()) {
-                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
-                System.out.println("Page is empty!");
-                return;
-            }
-            shiftPage(searchButtonIndex, -1, gui); //Go back one page
-        });
-        System.out.println("Did the button message actually display?");
-        return;
     }
 
     /**
@@ -527,7 +427,7 @@ public class StudentManagement {
      * @param permission The level of permission that the user is viewing the information from. Dictates whether student information can be edited or deleted.
      * @param parentGUI The parent GUI to be refreshed and viewed in terms of information.
      * @param option The option to make use of in terms of the GUI to stem from. As multiple GUIs can make use of this same method, there needs to be leeway for this. 0 for Student Management, 1 for Form Management.
-     */ //TODO THIS METHOD NEEDS TO HAVE INFORMATION STORED IN THE CONTEXT OF FORMS. REFACTORS NEED TO BE DONE TO STORE RELEVANT FORM INFORMATION IF THEY ARE IN ONE.
+     */
     public void viewStudentInformation(Student student, int permission, String username, String password, GUIUtils parentGUI, int option) {
         GUIUtils gui = new GUIUtils("Student Management | View Student", 1000, 1700, 0, 0, false);
         gui.addLabelToFrame("Student Name", 100, 0, 150, 25, false, 18);
@@ -580,6 +480,17 @@ public class StudentManagement {
         JTextField guardianName = gui.addTextField(450, 130, 150, 25, "Enter the student's guardian's name.");
         guardianName.setText(student.getGuardianName());
         guardianName.setFont(new Font(gui.getFrame().getName(), Font.PLAIN, 15));
+        gui.addLabelToFrame("Form Group", 675, 105, 200, 25, false, 18);
+        JTextField formGroupField = gui.addTextField(675, 130, 150, 25, "Form Group of the Student");
+        formGroupField.setEditable(false);
+        formGroupField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));;
+        Form f = new Form(username, password);
+        formGroupField.setText(f.getFormFromID(student.getFormID()).getFormName());
+        JButton formGroupPicker = gui.addButtonToFrame("<html>" + "Select" + "<br>" + "Form" + "</html>", 30, 50, 810, 130);
+        formGroupPicker.addActionListener(e -> {
+            gui.closeFrame();
+            new FormManagement().formStudentAddition(username, password, student);
+        });
         JButton deleteStudent = gui.addButtonToFrame("Delete Student", 50, 150, 100, 200);
         deleteStudent.addActionListener(e -> {
             Object[] options = {"Delete Student", "Cancel"};
@@ -607,6 +518,7 @@ public class StudentManagement {
         if(permission != 2) {
             dp.setVisible(false);
             deleteStudent.setVisible(false);
+            formGroupPicker.setVisible(false);
             for(JTextComponent x : entryFields) {
                 x.setEditable(false);
             }
@@ -615,17 +527,15 @@ public class StudentManagement {
             x.getDocument().addDocumentListener(new DocumentListener() {
                 @Override //When a character is inserted into the field, this event will be fired.
                 public void insertUpdate(DocumentEvent e) {
-                    setEntryFields(new JTextComponent[]{nameField, dateField, addressField, phoneField, guardianPhone, guardianAddress, guardianName, medicField});
                     if(!(getIsEditMade())) {
-                        displayEditedButtons(gui, student, username, password);
+                        displayEditedButtons(gui, student, username, password, entryFields);
                     }
                 }
 
                 @Override //When a character is removed from the field, this event will be fired.
                 public void removeUpdate(DocumentEvent e) {
-                    setEntryFields(new JTextComponent[]{nameField, dateField, addressField, phoneField, guardianPhone, guardianAddress, guardianName, medicField});
                     if(!(getIsEditMade())) {
-                        displayEditedButtons(gui, student, username, password);
+                        displayEditedButtons(gui, student, username, password, entryFields);
                     }
                 }
 
@@ -646,16 +556,6 @@ public class StudentManagement {
         return isEditMade;
     }
 
-    private JTextComponent[] entryFields;
-
-    private void setEntryFields(JTextComponent[] fields) {
-        entryFields = fields;
-    }
-
-    private JTextComponent[] getFields() {
-        return entryFields;
-    }
-
 
     /**
      * Method that handles the displaying of special buttons that will only be shown to administrative users to ensure that they have a way of saving, discarding and reverting their changes.
@@ -663,8 +563,9 @@ public class StudentManagement {
      * @param student The Student that you are viewing and editing the information for.
      * @param username The username used to log into Homeroom.
      * @param password The password used to log into Homeroom.
+     * @param fields The fields using by the Student GUI to enter, view and edit data.
      */
-    private void displayEditedButtons(GUIUtils gui, Student student, String username, String password) {
+    private void displayEditedButtons(GUIUtils gui, Student student, String username, String password, JTextComponent[] fields) {
         setEditMade(true);
         JFrame frame = (JFrame) gui.getFrame();
         JButton saveEdit = gui.addButtonToFrame("Save Edits", 50, 200, 500, 600);
@@ -673,35 +574,35 @@ public class StudentManagement {
         JButton saveChangesExit = gui.addButtonToFrame("Save Changes and Exit", 50, 200, 300, 600);
         JButton[] buttons = {saveEdit, revertChanges, discardChangesExit, saveChangesExit};
         Student update = new Student(username, password);
-        for(JTextComponent x : getFields()) {
+        for(JTextComponent x : fields) {
             System.out.println(x.getText());
         }
         saveEdit.addActionListener(e -> {
-            update.updateStudent(student, "StudentName", getFields()[0].getText());
-            update.updateStudent(student, "StudentDOB", getFields()[1].getText());
-            update.updateStudent(student, "StudentAddress", getFields()[2].getText());
-            update.updateStudent(student, "StudentPhone", getFields()[3].getText());
-            update.updateStudent(student, "GuardianPhone", getFields()[4].getText());
-            update.updateStudent(student, "GuardianAddress", getFields()[5].getText());
-            update.updateStudent(student, "GuardianName", getFields()[6].getText());
-            update.updateStudent(student, "StudentMedical", getFields()[7].getText());
+            update.updateStudent(student, "StudentName", fields[0].getText());
+            update.updateStudent(student, "StudentDOB", fields[1].getText());
+            update.updateStudent(student, "StudentAddress", fields[2].getText());
+            update.updateStudent(student, "StudentPhone", fields[3].getText());
+            update.updateStudent(student, "GuardianPhone", fields[4].getText());
+            update.updateStudent(student, "GuardianAddress", fields[5].getText());
+            update.updateStudent(student, "GuardianName", fields[6].getText());
+            update.updateStudent(student, "StudentMedical", fields[7].getText());
             setEditMade(false);
             for(JButton x : buttons) {
                 x.setVisible(false);
             }
         });
         revertChanges.addActionListener(e -> {
-            for(JTextComponent x : getFields()) {
+            for(JTextComponent x : fields) {
                 x.setText("");
             }
-            getFields()[0].setText(student.getStudentName());
-            getFields()[1].setText(student.getStudentDOB());
-            getFields()[2].setText(student.getStudentAddress());
-            getFields()[3].setText(student.getStudentPhone());
-            getFields()[4].setText(student.getGuardianPhone());
-            getFields()[5].setText(student.getGuardianAddress());
-            getFields()[6].setText(student.getGuardianName());
-            getFields()[7].setText(student.getStudentMedical());
+            fields[0].setText(student.getStudentName());
+            fields[1].setText(student.getStudentDOB());
+            fields[2].setText(student.getStudentAddress());
+            fields[3].setText(student.getStudentPhone());
+            fields[4].setText(student.getGuardianPhone());
+            fields[5].setText(student.getGuardianAddress());
+            fields[6].setText(student.getGuardianName());
+            fields[7].setText(student.getStudentMedical());
             setEditMade(false);
             for(JButton x : buttons) {
                 x.setVisible(false);
@@ -712,17 +613,138 @@ public class StudentManagement {
             setEditMade(false);
         });
         saveChangesExit.addActionListener(e -> {
-            update.updateStudent(student, "StudentName", getFields()[0].getText());
-            update.updateStudent(student, "StudentDOB", getFields()[1].getText());
-            update.updateStudent(student, "StudentAddress", getFields()[2].getText());
-            update.updateStudent(student, "StudentPhone", getFields()[3].getText());
-            update.updateStudent(student, "GuardianPhone", getFields()[4].getText());
-            update.updateStudent(student, "GuardianAddress", getFields()[5].getText());
-            update.updateStudent(student, "GuardianName", getFields()[6].getText());
-            update.updateStudent(student, "StudentMedical", getFields()[7].getText());
+            update.updateStudent(student, "StudentName", fields[0].getText());
+            update.updateStudent(student, "StudentDOB", fields[1].getText());
+            update.updateStudent(student, "StudentAddress", fields[2].getText());
+            update.updateStudent(student, "StudentPhone", fields[3].getText());
+            update.updateStudent(student, "GuardianPhone", fields[4].getText());
+            update.updateStudent(student, "GuardianAddress", fields[5].getText());
+            update.updateStudent(student, "GuardianName", fields[6].getText());
+            update.updateStudent(student, "StudentMedical", fields[7].getText());
             System.out.println("Fields should have successfully been updated. Exiting!");
             setEditMade(false);
             frame.dispose();
         });
+    }
+
+    /** TODO THIS METHOD MAY HAVE MORE CONTEXT. LOOK AT THE METHOD AND REFER BACK TO IT WHEN YOU NEED TO.
+     * A method written to aid in the selection of {@link Form}s in particular contexts. This method is part of a collection of methods that uses method overloading for QOL. <p></p>
+     * This method would be used by users to add a {@link Form} to a particular {@link Student}. It would be used when editing the information of a Student, to ensure that you add the ID of the form to their data.
+     * It will also take the form group in question and add the student's ID to their data.
+     * @param username The username used to log into 'Homeroom'.
+     * @param password The password used to log into 'Homeroom'.
+     * @param searchClass {@link Form} class to handle the searching for a Form ID.
+     * @param searchText Text to begin querying the database with.
+     * @param gui The parent GUI to insert buttons into. This GUI should be under a controlled environment, through a controlled size, etc.
+     * @param student The {@link Student} to add the {@link Form} to, and in this case, vice versa.
+     */
+    protected void selectForm(String username, String password, Form searchClass, String searchText, GUIUtils gui, Student student) {
+        List<Form> searches = searchClass.searchForFormGroup(searchText);
+        System.out.println("Working on searching using " + searchText);
+        if(searches == null) {
+            JOptionPane.showMessageDialog(gui.getFrame(), "No result found that fit your search query!", "Homeroom | Form Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+            System.out.println("No results seem to have been found!");
+            return;
+        }
+        System.out.println(searches.size() + " results found!");
+        int xLoc = 0;
+        int yLoc = 100;
+        if(searchButtonsPages != null) {
+            for(List<JButton> x : searchButtonsPages) {
+                for(JButton i : x) {
+                    i.setVisible(false);
+                }
+            }
+        }
+        List<List<JButton>> pages = new ArrayList<>();
+        List<JButton> buttons = new ArrayList<>();
+        for(Form x : searches) {
+            JButton option = gui.addButtonToFrame(x.getFormName(), 50, 150, xLoc, yLoc);
+            option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
+            Student s = new Student(username, password);
+            option.addActionListener(e -> {
+                if(x.getStudentsInFormID().contains(student.getStudentID())) {
+                    System.out.println("The student was already in the form and as such, no database operations need to happen!");
+                    JOptionPane.showMessageDialog(gui.getFrame(), "The Student was already in " + x.getFormName() + "! Nothing needs to happen!", "Homeroom | Student Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                if(s.isStudentInForm(student)) {
+                    Object[] options = {"Yes", "No"};
+                    System.out.println("Student is in a form, but it is not the same form that has been selected! Give the user a choice!");
+                    int option1 = JOptionPane.showOptionDialog(gui.getFrame(), student.getStudentName() + " is already in the form " + searchClass.getFormFromID(student.getFormID()).getFormName() + "! Would you like to change their current form to " + x.getFormName() + "?", "Homeroom | Student Management", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.questionIcon"), options, "Test");
+                    System.out.println(option1);
+                    switch (option1) {
+                        case 0: //Should be "yes", which means the user does want the form switched
+                            System.out.println("Student's form will be switched to the new one!");
+                            searchClass.modifyFormStudents(searchClass.getFormFromID(student.getFormID()), 2, student); //Remove from old form first in terms of form
+                            s.updateStudent(student, "FormID", x.getFormID()); //Both remove old form and add new form in terms of Students
+                            searchClass.modifyFormStudents(x, 1, student); //Add to new form in terms of form
+                            JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + student.getStudentName() + " to the form " + x.getFormName() + "!", "Homeroom | Student Management", JOptionPane.INFORMATION_MESSAGE);
+                            gui.closeFrame(); //Close down the selection window, we're done with it
+                            //TODO REFRESHING FOR THE MANAGE STUDENTS GUI NEEDS TO GO HERE WHERE POSSIBLE
+                            return;
+                        case 1: //Should be "no", meaning the user does not want the form switched to the old one.
+                            System.out.println("Student's form will not be switched to the new one, instead, nothing will happen");
+                            return;
+                    }
+                }
+                // All checks run through, the Student in this case should not be in any forms.
+                searchClass.modifyFormStudents(x, 1, student); //Add the student to the form in terms of FORMDB
+                s.updateStudent(student, "FormID", x.getFormID()); //Add the student to the form in the studentDB, so the student has the ID of their form group
+                JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + student.getStudentName() + " to " + x.getFormName() + "!", "Homeroom | Student Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.informationIcon"));
+                gui.closeFrame(); //Close the window afterwards, selection is all done now
+                //TODO REFRESHING FOR THE MANAGE STUDENTS GUI NEEDS TO GO HERE WHERE POSSIBLE
+            });
+            buttons.add(option);
+            System.out.println("The button for " + x.getFormName() + " has been implemented, but has not been made visible!");
+            option.setVisible(false);
+            xLoc = xLoc + 150;
+            if(xLoc > 1050) {
+                yLoc = yLoc + 50;
+                xLoc = 0;
+            }
+            if(yLoc > 930) {
+                pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
+                System.out.println("A list of buttons has been added to the page list!");
+                buttons = new ArrayList<JButton>();
+                yLoc = 100;
+            }
+        }
+        pages.add(buttons);
+        JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
+        JButton backPage = gui.addButtonToFrame("<<", 30, 60, 920, 65);
+        nextPage.setToolTipText("Go to the next page of search results.");
+        backPage.setToolTipText("go to the previous page of search results.");
+        if(!(pages.isEmpty())) {
+            List<JButton> firstPage = pages.get(0);
+            for(JButton i :firstPage) {
+                i.setVisible(true);
+            }
+        } else {
+            for(JButton x : buttons) {
+                x.setVisible(true);
+            }
+        }
+        searchButtonIndex = 0;
+        setSearchButtons(pages);
+        nextPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Pages list is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, 1, gui); //Go forward one page
+        });
+        backPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Pages list is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, -1, gui); //Go back one page
+        });
+        System.out.println("Did the button message actually display?");
     }
 }

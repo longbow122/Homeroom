@@ -71,7 +71,7 @@ public class Main {
                             switch (connection) {
                                 case 1: //Timed out or failed connection
                                     System.out.println("Connection timed out, failed connection!");
-                                    Object[] options = new Object[]{"Reconnect", "Cancel, exit Homeroom"};
+                                    Object[] options = new Object[]{"Reconnect", "Cancel, Exit Homeroom"};
                                     int reconnectOption = JOptionPane.showOptionDialog(loginGUI.getFrame(), "Failed to connect due to a timeout! Would you like to reconnect?", "Homeroom failed to connect!", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"), options, "Test");
                                     System.out.println(reconnectOption);
                                     switch (reconnectOption) {

@@ -111,8 +111,6 @@ The following students to be deleted are as follows:
 | Abby Donnelly | 02/16/2004   | Flat 10, Bevan House, 1 Rookery Lane, Barnet, EN4 0BW | +44 7911 29759  | Student has dyslexia | +44 7457 918162 | Flat 10, 1 Bevan House, 1 Rookery Lane, Barnet, EN4 0BW | Reggie Fisher  | Yes!                  |
 | Bill Gordon   | 05/12/1998   | 55 Farman Street, Hove, BN3 1AL                       | +44 7911 242243 | N/A                  | +44 7457 331599 | 99 Farman Street, Hove, BN3 1AL                         | Juan Gordon    | Yes!                  |
 
-
-
 ## Student Data Addition
 When a Student joins the institution, the school must add their data to the database to ensure that they can make use of this data within the school as and when is needed.
 
@@ -188,12 +186,23 @@ Each field of information which the document can be edited and updated. This nee
 
 Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Form information. This aspect of testing was **successful**.
 
+| Type of Edit | Original Data Value | New Data Value  | Expected Result | Achieved Result? |
+|--------------|---------------------|-----------------|-----------------|------------------|
+| Teacher Name | Mr Abby Dawson      | Mrs Abby Dawson | Mrs Abby Dawson | Yes!             |
+| Form Name    | 7 Air               | 8 Air           | 8 Air           | Yes!             |
+
 ## Form Deletion
 When a Form no longer needs to be in the system, presumably because the Form has left school as a whole, the school (as per data protection law, and as is good practise) are required to delete all relevant data on their alumni after a certain amount of time.
 
 This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to tested as much, but should be tested somewhat extensively.
 
 Permissions are also involved in this section of the program and as such, only users granted administrative permissions should be able to delete permissions. This aspect of testing was **successful**.
+
+| Form Name | Teacher Name | Students                                       | Deletion Successful? |
+|-----------|--------------|------------------------------------------------|----------------------|
+| 11 Water  | Mr Raniga    | Angelika Novak, Akaash Clements, Arnav Emerson | Yes!                 |
+| 12 Air    | Mr Patel     | Zander Tucker, Zunaira Gough                   | Yes!                 |
+| 9 Planet  | Mr Gilligan  | Zayyan Avila                                   | Yes!                 |
 
 ## Form Data Addition
 When a Form needs to be created, the school must add their data to the database to ensure that they can make use of this data within the school as and when needed.
@@ -219,4 +228,7 @@ Once the ArrayList was used, the problem was solved.
 ## Student Data Editing through Form Management GUI
 As Students can be found and associated through their Forms, this is something that Homeroom needs to account for in the form of Student Management. Users should be able to view the information of a Student in a Form, and edit their information through that same GUI.
 
-It is worth noting that permissions were also involved in this section of the program, but they will not be tested here, since they should have been tested already in previous blocks of code and previous tests.
+It is worth noting that permissions were also involved in this section of the program, but they will not be tested here, since they should have been tested already in previous blocks of code and previous tests. Additionally, due to the behaviour of this feature and the code behind it, there is no such table required for testing. If one instance of testing this feature works, then it is more than safe to assume that this feature if robust enough under most cases.
+
+This aspect of testing was **successful**.
+

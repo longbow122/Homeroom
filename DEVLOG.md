@@ -368,5 +368,66 @@ Unfortunately, I am unable to focus on the quality of my code, and put towards m
 
 Since I have considered the concurrency and student selection issue fixed, I will be merging the concurrency-test-branch with the forms-branch, and continuing my work on Form Groups there.
 
-It is likely that I will be working further on Student classes, since Forms need to be completely integrated with Students and the rest of the program before I can consider this safe to move on. 
+It is likely that I will be working further on Student classes, since Forms need to be completely integrated with Students and the rest of the program before I can consider this safe to move on.
 
+**P.S:** Finished testing the last and final pieces of FormManagement that does not directly integrate Students with Forms. Tomorrow, I will likely be spending a good part of the day working on forming a relation within my entire program between Students and Forms, ensuring that Students know which form they're in directly from their database object, and ensuring that Forms know which Students they have directly from their database object. I will also need to ensure that Students can only be in one form, to avoid any collisions.
+
+Provided I can pass an empty String object through the MongoDB documents to indicate that a Student is not currently associated with a form, I should be okay. I'm not exactly sure how this would be implemented within the "Add a Student" GUI, but I'm sure this is a problem I can solve for later, considering it is a design issue, not an implementation issue.
+
+I don't foresee the association between Forms and Students to be too much of an issue in terms of difficulty, just might take a good amount of time given the strenuous testing involved.
+
+## 04/08/2022 - Thursday
+I have finished all work related to the association between Students and Forms. Each Form now holds an array of version 4 UUIDs, which will indicate which Students are in what Form and each Student now holds the form's ID as a version 4 UUID. All of these measures also mean that checks can be made while adding or changing the form of the Student, to ensure that the Student cannot be in more than one form.
+
+This now means that Students and Forms are entirely linked together, and can be used to find and interact with each other. All that is left to do is test this feature and its functionality. Due to the time in which it took me to fully refactor methods accordingly and the time it took me to write any additional code for these methods, I will likely have to test these changes tomorrow, but I will simply postscript them onto this day's devlog, since it is work that should have ideally been done yesterday.
+
+**P.S:** I've encountered an issue where MongoDB will end up either closing the socket or timing out due to the excessive amount of database-editing calls I'm making, which is opening an excessive amount of connections. This will need to be resolved before I continue. I've also noticed a minor mistake in the order in which I've entered my parameters for a method which creates button, which led to the dimensions being distorted. I have also encountered an issue where a method call is made within the Student class that shouldn't be called in this context. This is because the method makes use of database operations, but cannot access said database since there are no credentials being passed through the object it is calling in, within this context. Also experienced an issue where if a Student was already in a form, and they were to be moved to a new one, they would still be added to the new one just fine, but the old form would still retain their data. This will need to be fixed.
+
+**P.P.S:** Due to the sheer volume of issues I've encountered, I will need to approach these issues tomorrow, and work on them one-by-one, until the feature is solid. After that, I will move onto the finishing touches of viewing Form Information, and modifying Students in relation to Forms. Once that is done, I should be able to move onto handling Classes.
+
+It is worth noting that Classes might have a more complex structure in terms of storing information, since not only do they need to hold Students, and the person managing the Class, but they will also need to somehow store the times at which the lessons will be held, and then a system will need to be put in place to ensure that 'Homeroom' is able to accordingly sort the Classes out in order of time, and in relation to each user that is managing the class.
+
+To ensure that the feature is robust, I may have to implement teacher accounts before this, which will definitely be more complex, since it directly interacts with the permissions of the MongoDB cluster.
+
+## 05/08/2022 - Friday
+Resolved the following issues, using the following techniques:
+
+#### Excessive Database Calls
+Methods within my Database-handling class would make a connection to my database when needed, but this also included constructors that were being used. A fix for this was simply refactoring code to avoid the excessive use of connection methods.
+This would ensure I don't reach Mongo Atlas's upper limit of 500 connections active at any one time. Some code was also refactored to rely on the data held within the Objects, and less on the databsse itself. This would also make things easier on the bandwidth consumption for the user.
+
+#### Contextual Method Calls within the Student Class
+Some constructors within the Student object can be used to interact with the database, since they hold the username and password used to connect to it, but others do not. The constructors which do not have any access to the database (since they hold only data about the Student), were calling methods that interacted with the database. This led to errors claiming that particular objects were null, because they were. Database-handling methods regularly access the username and password, which the constructors which work with data-only do not have.
+This caused issues, since in this case, the username and password would be null. The fix for this was relatively simple, and did not require much refactoring. All that needed to be done was change out classes that did not interact with the database for classes that were, and ensure that the right methods were being called.
+In cases where such constructors were not seen as the best option to use, a "resource object" was instantiated, for use within the method only, and the objects that held data passed into the methods that were called from the resource object, allowing any database modifications to happen.
+
+#### Duplicates in the Students Array of the Form DB
+Previously, a universal method was being used to modify the Forms database. This means that all data within all fields was being modified using the same method, and some logic. When it came to removing an instance of an element from an array, the universal modification method would not have been able to do this. 
+
+As such, all that needed to be done was a basic refactor of the method which targeted the modification of the Students within a Form. This allowed for Students to be removed from the FormDB successfully, using MongoDBs pull method. This method would pull all instances of a particular element out of the array.
+
+Now that I have managed to find and fix the above issues with changing the Student's form through Student Management, I need to ensure that the same can be done through Form Management, and selection of Forms through the Student Management menu.
+I am assuming that it should be the same either way, since any refactor that I made to one method would apply across the whole program (as is an attribute of OOP and procedural programming), but it never hurts to actually test the feature, and find any issues
+
+Additionally, due to the extensive amount of time it took me to resolve the last issue, I will have to leave the testing and fixing of any issues with the Student Management method for tomorrow.
+
+**P.S:** It is worth noting that I still need to work on properly "refreshing" the GUI once the changes have been made to the Form to ensure that changes apply in a seamless manner, but due to the complexity of that issue, I am going to leave that until after I test the changing of Forms through the Student Management GUI since that is probably easier.
+
+## 06/08/2022 - Saturday
+It seems I failed to copy over the fixes from yesterday over to Student Management, since a large number of these mistakes are within the code for Form Management. These will need to be fixed before I can finish testing. Considering the fact that these are all issues I've fixed before, I should be able to finish that in no time.
+
+**P.S:** It was much quicker to fix the issues than expected. Will now move onto handling the refreshing of the GUIs before moving onto another feature. I believe I also need to weave permissions into everything before I can start work on Classes and Lessons. That feature may get slightly complex, since times and days are brought into the mix, since it is to be assumed that the same lessons will be scheduled multiple times in a week. I also need to plan on how I could have multiple week schedules.
+
+***P.P.S:*** It seems that handling refreshing was much harder than expected. Since I don't have much time until this project needs to be completed, this is a challenge I will likely be leaving for a later time, since the automatic refreshing of the GUI, while is technically needed, is fundamentally a design issue in my work. This can be, and should have been prevented by simply using a single Window to handle the entire program where possible. This is something that is feasible, but does not need to be done right now, since I should be focusing on the priority features.
+
+As a result of that, I have decided to leave a todo comment where the code should be added onto, in case I ever find the time to rework it, and I will move onto something that is more important, and will likely be done regardless. These would be the finishing touches of the Forms feature, such as allowing for Teacher accounts (which will likely go in a separate branch) and allowing for permissions when adding students to the form, and further modifying the Form's students.
+
+As a side note, permissions have been implemented, and I am now going to begin the merging of code process for Forms, where I can then get started on Teacher accounts, which will likely take a lot more effort, since they need to directly interact with the database, and the authenticated users.
+
+## 07/08/2022 - Sunday
+### Pre-Script
+Forgot to implement deletion of Forms, so that is something I will be doing today. I don't expect it to be too hard, since it is a simple extension on previous functionality, that literally works the same.
+
+I am now able to declare the Forms and Forms Management feature of 'Homeroom' entirely finished. There are some minor refactors and feature reworks that need to be done regarding Teachers and Teacher accounts, but since these reworks will be behind a myriad of other features, I deemed it appropriate to do it that way. As such, I will now be merging forms-branch into the main branch to update the project, and will now make a start on teachers-branch, which will bring these additions, and more to 'Homeroom'. It is worth noting that Teacher accounts are a needed addition to the Classes feature, and as such, need to be developed before anything else.
+
+## 08/08/2022 - Monday

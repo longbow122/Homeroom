@@ -100,7 +100,7 @@ public class Form {
         return teacherName;
     }
 
-    public List<Student> getStudents() {
+    private List<Student> getStudents() {
         return students;
     }
 
@@ -177,13 +177,10 @@ public class Form {
         Student util = new Student(connectionUsername, connectionPassword);
         List<Student> studentList = new ArrayList<>();
         for(String x : studentIDs) {
-            System.out.println(x);
-            System.out.println(util.getStudentFromID(x).getStudentName());
             if(util.isStudentValid(util.getStudentFromID(x))) {
                 studentList.add(util.getStudentFromID(x));
             } // This if statement, in a controlled scenario should never fail and should always be TRUE.
               // Continue along the for loop if false, which shouldn't really happen.
-            continue;
         }
         return studentList;
     }
@@ -289,28 +286,50 @@ public class Form {
         }
         List<Student> studentsInForm = form.getStudents();
         List<String> allStudentIDs = new ArrayList<>();
+        for(Student x : studentsInForm) {
+            System.out.println(x.getStudentName());
+        }
+        System.out.println("This is who is currently in form!");
         switch(option) {
             case 1: //1 should be passed into the method to ADD a student to the form.
-                if(studentsInForm.contains(student)) {
+                if(form.getStudentsInFormID().contains(student.getStudentID())) {
+                    System.out.println("CASE 1 FOR MODIFY IS CLAIMING THAT THE LIST OF STUDENTS ALREADY CONTAINS THE STUDENT IN QUESTION, SO NOTHING NEEDS TO BE DONE");
                     return true; //Already added to the form, nothing needs to be done.
                 }
                 studentsInForm.add(student);
                 for(Student x : studentsInForm) {
                     allStudentIDs.add(x.getStudentID());
+                    System.out.println(x.getStudentName());
                 }
+                System.out.println("This is who is NOW in the form after ADDING a student, supposedly");
                 return updateForm(form, "Students", allStudentIDs);
             case 2: //2 should be passed into the method to REMOVE a student from the form
-                if(!(studentsInForm.contains(student))) {
+                if(!(form.getStudentsInFormID().contains(student.getStudentID()))) {
+                    System.out.println("CASE 2 FOR MODIFY IS CLAIMING THAT THE LIST OF STUDENTS DOES NOT CONTAIN STUDENT IN QUESTION");
                     return true; //Does not exist within the form already, no need to remove anything
                 }
-                studentsInForm.remove(student);
-                for(Student x : studentsInForm) {
-                    allStudentIDs.add(x.getStudentID());
-                }
-                return updateForm(form, "Students", allStudentIDs);
+                System.out.println("This is who is NOW in the form after removing a student, supposedly");
+                MongoDatabase homeroom = db.getHomeroomDB();
+                MongoCollection<Document> forms = homeroom.getCollection("Forms");
+                Document queryDoc = new Document("FormID", form.getFormID());
+                Bson update = Updates.pull("Students", student.getStudentID());
+                UpdateOptions options = new UpdateOptions().upsert(false);
+                forms.updateOne(queryDoc, update, options);
+                return true; //What would happen if anything were to fail along this line?
         }
         return false;
     }
 
+    /**
+     * Basic convenience method to check whether the form object you have gotten is valid. This method is normally called everywhere, and should be to ensure safety.
+     * @param form The {@link Form} object you are checking for, to ensure that it is valid.
+     * @return {@link Boolean} representing whether the Form is present within the database or not using the exact attributes provided.
+     */
+    public boolean isFormValid(Form form) {
+        if(form == null) return false;
+        String checkID = form.getFormID();
+        Form found = getFormFromID(checkID);
+        return found != null;
+    }
 
 }
