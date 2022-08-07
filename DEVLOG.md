@@ -4,6 +4,8 @@ NEA Programming Project Devlog
 # First Iteration - Initial Development
 This document will entail the development log for ‘Homeroom’. If any challenges are encountered, the solutions will also be documented. Documentation will be done every day that some form of relevant progress has been made.
 
+This main section of the devlog details the main development process for 'Homeroom'.
+
 ### 19/01/2022 - Wednesday
 Some progress was made. Main documentation for ‘Homeroom’ was done through the use of a GitHub repository. Main wiki for a user manual will be held there as will the software licensing. GitHub repository will also be used to store source code (obviously!) for ‘Homeroom’. A Trello board will serve as the main form of task tracking and should ensure I see what needs to be done first and soonest. Only thing I need to be aware of is falling behind on that and accidentally missing deadlines. 
 
@@ -276,7 +278,7 @@ The quality and overall readability of my code is a major concern, and is someth
 
 Currently, my code focuses purely on functionality. The programs works and nothing else. The code is by all means not clean and easy to read, and is definitely not efficient.
 
-I feel my reliance on the ArrayList data type is far too much. This, technically would be okay, but if it is beginning to affect my code with the excessive use of private fields, excessive use of if statements and general bad code practise, then it needs to stop. I will likely be spending an entire iteration's worth of work trying to figure out how to clean up each class.
+I feel my reliance on the ArrayList data structure is far too much. This, technically would be okay, but if it is beginning to affect my code with the excessive use of private fields, excessive use of if statements and general bad code practise, then it needs to stop. I will likely be spending an entire iteration's worth of work trying to figure out how to clean up each class.
 
 While the code may not consume many resources computationally, it is able to take significantly less, which is the best solution that is needed. Once I finish testing the new pagination solution, I will be ready to move on, and begin merging the student branch.
 
@@ -298,3 +300,134 @@ Not sure what the issue is exactly, but I'll work on figuring it out. I'm sure t
 *I will now begin to make a move on the Form Management section of Homeroom, allowing me to temporarily finish Student Management until form group functionality needs to be implemented within Student Management.*
 
 ## 22/06/2022 - Wednesday
+Made a major start on Form Management, but have not managed to come anywhere near a stage where I can actually begin testing the feature and see how it's shaping up in terms of the GUI. As the feature (fortunately!) works incredibly similarly to Student Management, I currently plan on being able to implement this very quickly, and with general ease. Currently the process of implementing Forms seems to be a glorified copy and paste job, handling variable names and method signatures as the only real change in the code.
+
+Due to this point, I have come to the realisation that a better way of implementing this would likely be through handing a basic "Entities" object, which can hold all of the template information that may be needed. This might even be applicable to become an abstract class, as all Homeroom objects will hold some form of information. This, I feel would likely be a better way of making use of Object-Oriented Programming. This is something I have managed to plan, but I have not managed to implement.
+
+I am not sure what I plan on implementing after this, but once I finish working on a barebones implementation of Form Management, a large testing process will likely be underway, and as a result of that, I will likely need to make a large addition to the testing document to ensure that every feature has been appropriately documented and tested. I am also yet to document the uses of Homeroom and every feature that Homeroom has to offer. This has been planned, but will likely be a rush job that is done straight after implementation.
+
+I am also growing increasingly worried that I will not be able to make multiple iterations over my program to ensure improvement and updates (as is standard with the Agile model of development). This is something I need to plan carefully and think about.
+
+## 23/06/2022 - Thursday
+Still continuing to make major progress, but due to the linked nature of all the classes (in as, every method tends to call code from another method, which still needs to be written), it seems that the easiest way of going about writing the Forms feature is to write the logic for the entire feature (bar a few minor touches) and then test in one go.
+
+My only concern in doing this is that I may end up with a large amount of bugs which will just be harder to fix due to the larger amount of code to trace through. This makes things much harder to handle. I have also written a few extra convenience methods that are being called throughout the program, but I am yet to test them. As they involve stopping the thread of logic and waiting for a response, I do have my concerns as to how that might affect the rest of the program, but we will likely just have to wait and see.
+
+## 27/06/2022 - Tuesday
+Made major progress, and managed to implement a fair majority of the Form Management logic. The finishing touches will be a large amount of document addition and testing, which needs to be done at speed.
+
+My concerns have also been justified, and I have begun to experience issues with the way I am freezing the thread to allow for the program to wait for input from the user for selecting a Student to be added to the form. This issue simply lies in where I make my method calls and how I go about freezing the thread, which needs to be fixed somehow. I'm not sure how to go about doing this, but I'll need to find a way quickly.
+
+My ability to test, debug and write code has also seriously been harmed by the fact that I have run out of mobile data. This means I cannot test my product on the go, and will need to do so at home, if I am able to find the time.
+
+## 08/07/2022 - Friday
+Failed to make any relevant progress in the time that has elapsed. The issue seems to lie where the thread freezes over due to the call on the wait method. I'm entirely unsure as to how to resolve the issue, but I'm sure there'll be a solution.
+
+I believe the issue lies in where the method call actually is, but I'll have to see.
+
+## 31/07/2022 - Sunday
+I have essentially 3 weeks to finish the entire project, which is a deadline I may just about hit if I manage to fix this issue within a day and am lucky enough to encounter no issues.
+
+After some research, it appears that I have taken the wrong approach to concurrency then I think I have, and as such, will need to work on refactoring the entire selection method to ensure that a user can search for and select a student to add to a form, and to perform other general tasks.
+
+It is worth noting that the only reason I am choosing to pursue the development of this feature is because it will bring a great amount of utility to Homeroom upon completion.
+
+**P.S:** I've managed to find myself options, but I can't be certain if any of them work, nor am I certain if any of them will actually be a valid choice for me. I've decided to make an entirely separate branch of code, and work on testing it there. It's become evident to me that there is such a large amount of refactoring and code editing that needs to be done that I no longer feel that the work I am doing belongs on the forms-branch.
+
+## 01/08/2022 - Monday
+Unfortunately, I have still failed to find a solution to my original problem. However, I did realise that my original problem was not a good problem to begin what. Due to the way Swing behaves, my entire issue of having a multi-threaded program to work on this task on the side, while freezing everything else was very bad.
+
+Originally, I had done this to ensure that the user did not mess anything up when potentially making use of a bad input, and therefore freezing the main thread until receiving input from what I wanted seemed like a good idea.
+
+I have since realised that this was a very bad idea, since handling the threads in the way I wanted was either not possible, or far too hard for someone who is still trying to learn how to put multi-threaded code into practise.
+
+I realised that I can then resolve my issue by merging a few methods I had written to handle student and form selection, and then, using an additional integer parameter, I could use that to indicate "selection" of how the method would apply itself to the rest of the program. The integer option would indicate the context as to how the method was being used, and it could perform different actions dependent on that.
+I would also need to ensure that any extra GUI that Homeroom opens closes the previous GUI before opening the new one. This way, the user is not able to provide input that could potentially be malicious. although the user did not intend it to be malicious, if Homeroom is incapable of handling multiple forms of input from different GUIs at the same time, then it is clear only one GUI at a time should be used to avoid this problem.
+
+In my second iteration of Homeroom, this extra functionality can be something I work on, but for now, only the core functionality of Homeroom needs to be worked on, and all planned features of my program need to be handled. Anything else can be worked on at a later date.
+
+Since this refactor will be so large, I doubt I will be able to get it finished tomorrow, but I can still try to do so.
+
+## 02/08/2022 - Tuesday
+In theory, the refactoring of code seems to be going well enough. Provided I sort my way through some minor issues, I should be able to finish the entire code rework tonight. I have managed to remove all multi-threaded code from my work, and am working on trying to refactor all my methods to become more event-based. In this way, the methods can achieve the intended functionality in the right context.
+
+The only issue I currently have with this is that I have had to use method overloading to ensure that each task that the selection task needs to do is done correctly and in the right context. This means that large chunks of code have been repeated, and this is obviously not good for many reasons. I need to find a way to rework this once functionality is achieved. It's untidy and hacky, and it should be removed.
+
+I've also found that the rework for this does not contain itself to just one class, since I need to rework other methods within other classes, to ensure that my design now fits the implementation of these particular methods. I have chosen to make it so that all Forms start off with no students, and you can then progressively add Students from the Student Management menu, or through the Form Management menu when editing a specific Form. It is worth noting that a Student can only be a part of one form, so this is something I need to account for in case a user messes up somewhere.
+
+This rework is beginning to look like it will take longer than just this one day, but I'll have to see how fast I can get things done.
+
+## 03/08/2022 - Wednesday
+I believe that I have refactored an adequate amount of code to consider the issue solved, at least for now. As per usual, I still hold the opinion that my code is not up to standard, and can definitely be improved.
+
+In order to ensure that Form Groups becomes seamlessly integrated with the rest of the program, I will need to do some further work on reworking both the Form and Student data structures, ensuring that they are able to store both members of a Form, and what Form the Students are in. This can be done by creating a link between the two features in my databases, and making further code additions to ensure that both GUIs hold information related to the Forms in the correct, robust manner.
+
+Once I am finished with integrating Forms and Students together, to ensure they both work in unison, I will move onto Classes, which will store the actual lessons themselves. These data structures are where admins would create lessons which hold classrooms, teachers and Students.
+
+Unfortunately, I am unable to focus on the quality of my code, and put towards more focus on working further on getting features working to a point where it can be considered "good enough", and start getting documentation out. Once this has been completed, I can start to consider working on a second iteration, which aims to refactor and overhaul most of the program for efficiency and seamlessness.
+
+Since I have considered the concurrency and student selection issue fixed, I will be merging the concurrency-test-branch with the forms-branch, and continuing my work on Form Groups there.
+
+It is likely that I will be working further on Student classes, since Forms need to be completely integrated with Students and the rest of the program before I can consider this safe to move on.
+
+**P.S:** Finished testing the last and final pieces of FormManagement that does not directly integrate Students with Forms. Tomorrow, I will likely be spending a good part of the day working on forming a relation within my entire program between Students and Forms, ensuring that Students know which form they're in directly from their database object, and ensuring that Forms know which Students they have directly from their database object. I will also need to ensure that Students can only be in one form, to avoid any collisions.
+
+Provided I can pass an empty String object through the MongoDB documents to indicate that a Student is not currently associated with a form, I should be okay. I'm not exactly sure how this would be implemented within the "Add a Student" GUI, but I'm sure this is a problem I can solve for later, considering it is a design issue, not an implementation issue.
+
+I don't foresee the association between Forms and Students to be too much of an issue in terms of difficulty, just might take a good amount of time given the strenuous testing involved.
+
+## 04/08/2022 - Thursday
+I have finished all work related to the association between Students and Forms. Each Form now holds an array of version 4 UUIDs, which will indicate which Students are in what Form and each Student now holds the form's ID as a version 4 UUID. All of these measures also mean that checks can be made while adding or changing the form of the Student, to ensure that the Student cannot be in more than one form.
+
+This now means that Students and Forms are entirely linked together, and can be used to find and interact with each other. All that is left to do is test this feature and its functionality. Due to the time in which it took me to fully refactor methods accordingly and the time it took me to write any additional code for these methods, I will likely have to test these changes tomorrow, but I will simply postscript them onto this day's devlog, since it is work that should have ideally been done yesterday.
+
+**P.S:** I've encountered an issue where MongoDB will end up either closing the socket or timing out due to the excessive amount of database-editing calls I'm making, which is opening an excessive amount of connections. This will need to be resolved before I continue. I've also noticed a minor mistake in the order in which I've entered my parameters for a method which creates button, which led to the dimensions being distorted. I have also encountered an issue where a method call is made within the Student class that shouldn't be called in this context. This is because the method makes use of database operations, but cannot access said database since there are no credentials being passed through the object it is calling in, within this context. Also experienced an issue where if a Student was already in a form, and they were to be moved to a new one, they would still be added to the new one just fine, but the old form would still retain their data. This will need to be fixed.
+
+**P.P.S:** Due to the sheer volume of issues I've encountered, I will need to approach these issues tomorrow, and work on them one-by-one, until the feature is solid. After that, I will move onto the finishing touches of viewing Form Information, and modifying Students in relation to Forms. Once that is done, I should be able to move onto handling Classes.
+
+It is worth noting that Classes might have a more complex structure in terms of storing information, since not only do they need to hold Students, and the person managing the Class, but they will also need to somehow store the times at which the lessons will be held, and then a system will need to be put in place to ensure that 'Homeroom' is able to accordingly sort the Classes out in order of time, and in relation to each user that is managing the class.
+
+To ensure that the feature is robust, I may have to implement teacher accounts before this, which will definitely be more complex, since it directly interacts with the permissions of the MongoDB cluster.
+
+## 05/08/2022 - Friday
+Resolved the following issues, using the following techniques:
+
+#### Excessive Database Calls
+Methods within my Database-handling class would make a connection to my database when needed, but this also included constructors that were being used. A fix for this was simply refactoring code to avoid the excessive use of connection methods.
+This would ensure I don't reach Mongo Atlas's upper limit of 500 connections active at any one time. Some code was also refactored to rely on the data held within the Objects, and less on the databsse itself. This would also make things easier on the bandwidth consumption for the user.
+
+#### Contextual Method Calls within the Student Class
+Some constructors within the Student object can be used to interact with the database, since they hold the username and password used to connect to it, but others do not. The constructors which do not have any access to the database (since they hold only data about the Student), were calling methods that interacted with the database. This led to errors claiming that particular objects were null, because they were. Database-handling methods regularly access the username and password, which the constructors which work with data-only do not have.
+This caused issues, since in this case, the username and password would be null. The fix for this was relatively simple, and did not require much refactoring. All that needed to be done was change out classes that did not interact with the database for classes that were, and ensure that the right methods were being called.
+In cases where such constructors were not seen as the best option to use, a "resource object" was instantiated, for use within the method only, and the objects that held data passed into the methods that were called from the resource object, allowing any database modifications to happen.
+
+#### Duplicates in the Students Array of the Form DB
+Previously, a universal method was being used to modify the Forms database. This means that all data within all fields was being modified using the same method, and some logic. When it came to removing an instance of an element from an array, the universal modification method would not have been able to do this. 
+
+As such, all that needed to be done was a basic refactor of the method which targeted the modification of the Students within a Form. This allowed for Students to be removed from the FormDB successfully, using MongoDBs pull method. This method would pull all instances of a particular element out of the array.
+
+Now that I have managed to find and fix the above issues with changing the Student's form through Student Management, I need to ensure that the same can be done through Form Management, and selection of Forms through the Student Management menu.
+I am assuming that it should be the same either way, since any refactor that I made to one method would apply across the whole program (as is an attribute of OOP and procedural programming), but it never hurts to actually test the feature, and find any issues
+
+Additionally, due to the extensive amount of time it took me to resolve the last issue, I will have to leave the testing and fixing of any issues with the Student Management method for tomorrow.
+
+**P.S:** It is worth noting that I still need to work on properly "refreshing" the GUI once the changes have been made to the Form to ensure that changes apply in a seamless manner, but due to the complexity of that issue, I am going to leave that until after I test the changing of Forms through the Student Management GUI since that is probably easier.
+
+## 06/08/2022 - Saturday
+It seems I failed to copy over the fixes from yesterday over to Student Management, since a large number of these mistakes are within the code for Form Management. These will need to be fixed before I can finish testing. Considering the fact that these are all issues I've fixed before, I should be able to finish that in no time.
+
+**P.S:** It was much quicker to fix the issues than expected. Will now move onto handling the refreshing of the GUIs before moving onto another feature. I believe I also need to weave permissions into everything before I can start work on Classes and Lessons. That feature may get slightly complex, since times and days are brought into the mix, since it is to be assumed that the same lessons will be scheduled multiple times in a week. I also need to plan on how I could have multiple week schedules.
+
+***P.P.S:*** It seems that handling refreshing was much harder than expected. Since I don't have much time until this project needs to be completed, this is a challenge I will likely be leaving for a later time, since the automatic refreshing of the GUI, while is technically needed, is fundamentally a design issue in my work. This can be, and should have been prevented by simply using a single Window to handle the entire program where possible. This is something that is feasible, but does not need to be done right now, since I should be focusing on the priority features.
+
+As a result of that, I have decided to leave a todo comment where the code should be added onto, in case I ever find the time to rework it, and I will move onto something that is more important, and will likely be done regardless. These would be the finishing touches of the Forms feature, such as allowing for Teacher accounts (which will likely go in a separate branch) and allowing for permissions when adding students to the form, and further modifying the Form's students.
+
+As a side note, permissions have been implemented, and I am now going to begin the merging of code process for Forms, where I can then get started on Teacher accounts, which will likely take a lot more effort, since they need to directly interact with the database, and the authenticated users.
+
+## 07/08/2022 - Sunday
+### Pre-Script
+Forgot to implement deletion of Forms, so that is something I will be doing today. I don't expect it to be too hard, since it is a simple extension on previous functionality, that literally works the same.
+
+I am now able to declare the Forms and Forms Management feature of 'Homeroom' entirely finished. There are some minor refactors and feature reworks that need to be done regarding Teachers and Teacher accounts, but since these reworks will be behind a myriad of other features, I deemed it appropriate to do it that way. As such, I will now be merging forms-branch into the main branch to update the project, and will now make a start on teachers-branch, which will bring these additions, and more to 'Homeroom'. It is worth noting that Teacher accounts are a needed addition to the Classes feature, and as such, need to be developed before anything else.
+
+## 08/08/2022 - Monday

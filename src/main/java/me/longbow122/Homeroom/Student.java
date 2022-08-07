@@ -37,10 +37,7 @@ public class Student {
     private String connectionPassword;
     private DBUtils db;
     private StudentSearchType searchType;
-
-    private StudentSearchType getStudentSearchType() {
-        return searchType;
-    }
+    private String formID;
 
     public void setStudentSearchType(StudentSearchType type) {
         searchType = type;
@@ -71,8 +68,9 @@ public class Student {
      * @param guardianName - The name of the guardian of the Student.
      * @param guardianAddress - The address of the guardian. Will normally be the same as the Student's address, but just in case, it is stored seperately.
      * @param guardianPhone - The phone number of the guardian. Stored as a {@link String} to allow for international country codes.
+     * @param formID The {@link Form} the {@link Student} belongs to as a UUID. This is stored directly as the object for direct interaction, which can be used for whatever it needs to be used for. Some Students may have a null {@link Form}, since they may not be a part of one, this should be something worth accounting for.
      */
-    private Student(String studentID, String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
+    private Student(String studentID, String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone, String formID) {
         this.studentID = studentID;
         this.studentName = studentName;
         this.studentDOB = studentDOB;
@@ -82,6 +80,7 @@ public class Student {
         this.guardianName = guardianName;
         this.guardianPhone = guardianPhone;
         this.guardianAddress = guardianAddress;
+        this.formID = formID;
     }
 
     public DBUtils connect(String connectionUsername, String connectionPassword) {
@@ -100,10 +99,13 @@ public class Student {
     public String getGuardianName() { return guardianName; }
     public String getGuardianPhone() { return guardianPhone; }
     public String getGuardianAddress() { return guardianAddress; }
+    public String getFormID() {
+        return formID;
+    }
 
 
     /**
-     * Convienience method to check whether the student object you have gotten is valid. This method is normally called everywhere, and should be to ensure safety.
+     * Convenience method to check whether the student object you have gotten is valid. This method is normally called everywhere, and should be to ensure safety.
      * @param student - The Student object you are checking for, to ensure that it is valid.
      * @return Boolean representing whether the Student is present within the database or not using the exact attributes provided.
      */
@@ -111,8 +113,6 @@ public class Student {
         if(student == null) return false;
         String checkID = student.getStudentID();
         Student found = getStudentFromID(checkID);
-        System.out.println(checkID);
-        System.out.println(found.getStudentID());
         return found != null;
     }
 
@@ -133,7 +133,11 @@ public class Student {
         try (MongoCursor<Document> found = students.find(query).iterator()) {
             while (found.hasNext()) {
                 Document x = found.next();
-                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString());
+                String formID;
+                if(!x.containsKey("FormID") || x.get("FormID") == null) {
+                    formID = "";
+                } else formID = x.get("FormID").toString();
+                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID);
             }
             return null;
         }
@@ -176,8 +180,6 @@ public class Student {
         return true;
     }
 
-    //TODO IMPLEMENT THE ADD STUDENT METHOD FOR THE DATABASE AND TEST IT!!
-
     /**
      * Basic method written to add students to the database of Homeroom. This method also generates a version 4 UUID for the user to make use of when working within the program and when handling data.
      * Checks are already made to ensure that the UUID will be valid within the database and will not be wrong. <br>
@@ -190,9 +192,10 @@ public class Student {
      * @param guardianName The name of the guardian of the Student in question.
      * @param guardianAddress The address of the guardian of the Student in question.
      * @param guardianPhone The phone number of the guardian of the address in question.
+     * @param formID The {@link Form} that the Student belongs to represented as a version 4 UUID. It is worth noting that the form may be null in the case that the Student is not part of a fom. In this case, null-handling has been used to ensure that nothing malicious is passed through.
      * @return A representation of the Student in Object form. Can be used to pull and handle information throughout the rest of the program.
      */
-    public Student addStudentToDB(String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone) {
+    public Student addStudentToDB(String studentName, String studentDOB, String studentAddress, String studentPhone, String studentMedical, String guardianName, String guardianAddress, String guardianPhone, String formID) {
         UUID uuid = UUID.randomUUID();
         while(getStudentFromID(uuid.toString()) != null) { //Make sure that the UUID generated does not point to another student already.
             uuid = UUID.randomUUID();
@@ -208,9 +211,15 @@ public class Student {
         dataValues.put("GuardianName", guardianName);
         dataValues.put("GuardianAddress", guardianAddress);
         dataValues.put("GuardianPhone", guardianPhone);
+
+        if(new Form(connectionUsername, connectionPassword).getFormFromID(formID) != null) { //Make sure the form is also valid
+            dataValues.put("FormID", formID);
+        } else {
+            dataValues.put("FormID", ""); //Form was not valid, not safe to pass that ID in!
+        }
         Document insertInfoDocument = new Document(dataValues);
         studentsDB.insertOne(insertInfoDocument);
-        return new Student(uuid.toString(), studentName, studentDOB, studentAddress, studentPhone, studentMedical, guardianName, guardianAddress, guardianPhone);
+        return new Student(uuid.toString(), studentName, studentDOB, studentAddress, studentPhone, studentMedical, guardianName, guardianAddress, guardianPhone, formID);
     }
 
     //TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
@@ -226,6 +235,7 @@ public class Student {
         if(db.isConnected() != 0) { //Connection has failed for some reason, fail handling needs to go here.
             return null;
         }
+        Form form = new Form(connectionUsername, connectionPassword);
         MongoDatabase homeroom = db.getHomeroomDB();
         MongoCollection students = homeroom.getCollection("Students");
         List<Document> matches;
@@ -267,10 +277,25 @@ public class Student {
             if(!x.containsKey("StudentMedical") || x.get("StudentMedical") == null) { //Problem line, needs to have it be null somewhere if there is no medical value
                 medicalInfo = "N/A"; //Doesn't seem to contain a key
             } else medicalInfo = x.get("StudentMedical").toString();
+            String formID;
+            if(!x.containsKey("FormID") || x.get("FormID") == null) {
+                formID = "";
+            } else formID = x.get("FormID").toString();
             System.out.println(x.get("StudentName"));
-            found.add(new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString()));
+            found.add(new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID));
         }
         progress.closeFrame();
         return found;
+    }
+
+    /**
+     * Basic method used to check whether a Student is <i>in</i> a {@link Form}. Used within the program to ensure that the Student does not join multiple forms, and if they do so, they can be removed from one, and put in the other.
+     * The result of this method can be used to determine that. For extra security, this methid also does a check to ensure that the Student is valid, using {@link #isStudentValid(Student)}.
+     * @param student The {@link Student} object you are checking for, to determine whether they are in a {@link Form} group or not.
+     * @return {@link Boolean} representing whether the Student is in a form or not.
+     */
+    public boolean isStudentInForm(Student student) {
+        Form form = new Form(connectionUsername, connectionPassword);
+        return form.getFormFromID(student.formID) != null;
     }
 }

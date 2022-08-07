@@ -37,15 +37,11 @@ public class DBUtils {
      * @return 0 if successful. 1 if timed out connection or failed connection. 2 if bad credentials passed through.
      */
     public int isConnected() {
-        System.out.println("Testing connection");
         Bson document = new Document("connectionStatus", 1);
         try {
             Document connection = db.runCommand(document);
-            System.out.println(connection);
             List authUserRoles = ((Document) connection.get("authInfo")).get("authenticatedUserRoles", List.class);
             if (!(authUserRoles.isEmpty())) {
-                System.out.println(authUserRoles);
-                System.out.println("connection seen as valid");
                 return 0;
             }
         } catch (MongoTimeoutException e ) { //Connection timed out, no point trying to connect again!
@@ -70,7 +66,6 @@ public class DBUtils {
         Bson document = new Document("connectionStatus", 1);
         Document connection = db.runCommand(document);
         Document authUserRoles = ((Document) connection.get("authInfo"));
-        System.out.println(authUserRoles);
         String role = ((ArrayList<Document>) authUserRoles.get("authenticatedUserRoles")).get(0).get("role").toString();
         switch(role) {
             case "readWriteAnyDatabase":
