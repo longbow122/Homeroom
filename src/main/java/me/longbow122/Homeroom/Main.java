@@ -187,7 +187,7 @@ public class Main {
         JLabel permissionField = mainGUI.addLabelToFrame("Permissions: ", 300, 0, 300, 30, false);
         switch(new DBUtils(username, password).getPermission()) { //Should be a better way of converting permissions. Is it worth just using an Enum here, like I've done with search type?
             case 1: //Using ENUMS would mean I can just directly get the enum and convert it to a string instead of working on a switch statement to handle showing permissions.
-                permissionField.setText("Permissions: USER");
+                permissionField.setText("Permissions: TEACHER");
                 break;
             case 2:
                 permissionField.setText("Permissions: ADMIN");

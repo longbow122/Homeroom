@@ -3,6 +3,7 @@ package me.longbow122.Homeroom.features;
 import me.longbow122.Homeroom.Form;
 import me.longbow122.Homeroom.FormSearchType;
 import me.longbow122.Homeroom.Student;
+import me.longbow122.Homeroom.Teacher;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.jdesktop.swingx.prompt.PromptSupport;
@@ -12,8 +13,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -562,6 +561,19 @@ public class FormManagement {
     }
 
     /**
+     * Method which handles {@link Form} selection and addition of {@link Teacher} to a {@link Form}. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of Teachers, to be added to a Form group.
+     * It is worth noting that a method of this nature should really be written in the {@link Form} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class. <p></p>
+     * It is also worth nothing that in some cases, a {@link Teacher} may already be in a {@link Form}. In this case, logic will be in place to ask for user confirmation, before moving the Teacher to the newer form, and removing them from the older form.
+     * @param username The username used to log into 'Homeroom' and the one used to query the database.
+     * @param password The password used to log into 'Homeroom' and the one used to query the database
+     * @param teacher The {@link Teacher} you will be adding to the Form.
+     */
+    public void formTeacherAddition(String username, String password, Teacher teacher) {
+        //TODO SELECT TEACHER METHOD NEEDS TO BE IMPLEMENTED SOMEWHERE!!!
+
+    }
+
+    /**
      * Method which handles {@link Form} selection and addition to a {@link Form}. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of Form Groups.
      * It is worth noting that a method of this nature should really be written in the {@link Form} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class. <p></p>
      * It is also worth noting that in some cases, a Student may already be in a Form. In this case, logic will be in place to ask for user confirmation, before moving the Student to the newer form, and removing them from the older one.
@@ -578,12 +590,7 @@ public class FormManagement {
         PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, searchField);
         JButton searchButton = gui.addButtonToFrame("Search", 40, 100, 500, 0);
         searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new StudentManagement().selectForm(username, password, searchClass, searchField.getText(), gui, student);
-            }
-        });
+        searchButton.addActionListener(e -> new StudentManagement().selectForm(username, password, searchClass, searchField.getText(), gui, student));
         gui.addLabelToFrame("Search Type:", 630, 10, 170, 30, true, 25);
         JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Form ID", "Form Name", "Teacher Name"});
         searchClass.setFormSearchType(FormSearchType.UUID); //Ensures that default search type actually applies.

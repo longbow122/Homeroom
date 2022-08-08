@@ -13,12 +13,12 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 
     // MongoDB API, can be used to connect to the Database Cluster
     // https://mongodb.github.io/mongo-java-driver/4.5/apidocs/mongodb-driver-core/index.html
-    implementation 'org.mongodb:mongodb-driver-sync:4.6.0'
+    implementation 'org.mongodb:mongodb-driver-sync:4.7.1'
 
     // Google GSON, being used to read from the configuration file.
     // School system administrators would edit the config file to throw in their MongoDB

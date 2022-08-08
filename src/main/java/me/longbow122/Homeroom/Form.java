@@ -79,7 +79,7 @@ public class Form {
 
     /**
      * Private constructor for use within this class. As there will be multiple methods which need to return Student objects. <p></p>
-     * WARNING: DOES NOT MAKE A CONNECTION TO THE DATABASE. YOU SHOULD USE A "PLAIN CONSTRUCTOR" to connect to the database if neded. The {@link #connect(String, String)} method can also be used to do this too.
+     * WARNING: DOES NOT MAKE A CONNECTION TO THE DATABASE. YOU SHOULD USE A "PLAIN CONSTRUCTOR" to connect to the database if needed. The {@link #connect(String, String)} method can also be used to do this too.
      * @param formID The ID of the Form. Should be a version 4 UUID in a String. Should be entirely unique.
      * @param teacherName The name of the Teacher. Could, in theory be used as a secondary key, but isn't really worth the risk.
      * @param formName The name of the Form. Could also, in theory, but used as a secondary key, but is not the best thing to do as the formID will be entirely reliable and can be used as a primary key just fine.

@@ -211,7 +211,6 @@ public class Student {
         dataValues.put("GuardianName", guardianName);
         dataValues.put("GuardianAddress", guardianAddress);
         dataValues.put("GuardianPhone", guardianPhone);
-
         if(new Form(connectionUsername, connectionPassword).getFormFromID(formID) != null) { //Make sure the form is also valid
             dataValues.put("FormID", formID);
         } else {
@@ -221,8 +220,6 @@ public class Student {
         studentsDB.insertOne(insertInfoDocument);
         return new Student(uuid.toString(), studentName, studentDOB, studentAddress, studentPhone, studentMedical, guardianName, guardianAddress, guardianPhone, formID);
     }
-
-    //TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
 
     /**
      * Method that returns a list of all students depending on the {@link StudentSearchType}. The parameter string will look for an exact match or a similar match.
@@ -235,7 +232,6 @@ public class Student {
         if(db.isConnected() != 0) { //Connection has failed for some reason, fail handling needs to go here.
             return null;
         }
-        Form form = new Form(connectionUsername, connectionPassword);
         MongoDatabase homeroom = db.getHomeroomDB();
         MongoCollection students = homeroom.getCollection("Students");
         List<Document> matches;
@@ -281,7 +277,6 @@ public class Student {
             if(!x.containsKey("FormID") || x.get("FormID") == null) {
                 formID = "";
             } else formID = x.get("FormID").toString();
-            System.out.println(x.get("StudentName"));
             found.add(new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID));
         }
         progress.closeFrame();
