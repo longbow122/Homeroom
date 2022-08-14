@@ -5,9 +5,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -32,28 +35,23 @@ public class Teacher {
     //TODO TEACHER DATABASE SCHEME:
     // CONNECTION USERNAME
     // TEACHER NAME
-    // FORM ID?
+    // FORM ID
 
     //TODO
-    // ENSURE THAT TEACHERS CANNOT BE IN MORE THAN ONE FORM, AS WITH STUDENTS.
-    // IMPLEMENT TEACHER SELECTION WITH CONTEXT
-    // MAKE SURE THAT ON JOIN, THE DATABASE IS CHECKED FOR THE CONNECTION USERNAME TO MAKE SURE THE TEACHER EXISTS
-    // IF THE TEACHER DOES NOT EXIST, THEN HAVE THE USER MAKE A NEW TEACHER ACCOUNT AND LOG IN.
-    // IMPLEMENT TEACHER MANAGEMENT, WHERE ADMINS CAN ACCESS AND EDIT DATA ABOUT TEACHER ACCOUNTS.
-    // SEARCHING AND EDITING LIKE NORMAL, ALONG WITH THE STANDARD BUTTON WORK SHOULD BE DONE IN ANOTHER CLASS.
-    //
+    // IMPLEMENT TEACHER DELETIONS THROUGH THE GUI AND DB, AND THE REST OF THE ACCOUNT CAN BE REMOVED THROUGH ATLAS. WOULD NEED TO BE DOCUMENTED.
 
     private String teacherName;
     private DBUtils db;
     private String connectionUsername;
     private String connectionPassword;
     private TeacherSearchType searchType;
-    private void setSearchType(TeacherSearchType s) {
+    public void setSearchType(TeacherSearchType s) {
         searchType = s;
     }
     private String formID;
     public String getTeacherName() { return teacherName; }
     public String getConnectionUsername() { return connectionUsername; }
+    public String getFormID() { return formID; }
 
     /**
      * Constructor for the Teacher class. Does not make use of any attributes, as you should be using the methods within this class to either find Teachers or to make and delete Forms. <p></p>
@@ -68,8 +66,6 @@ public class Teacher {
         connect(connectionUsername, connectionPassword);
     }
 
-    // TODO REWORK TO ALLOW FOR FORM ID TO BE STORED
-    // TODO ALLOW TEACHER CONNECTION USERNAME TO BE STORED WITHIN FORM DB
     /**
      * Constructor for the Teacher class which stores all possible information that the class might use, along with an option to connect to the database or not. <p></p>
      * Methods within this class will return {@link Teacher} objects for you to use within the rest of the program.
@@ -123,7 +119,7 @@ public class Teacher {
         MongoDatabase homeroom = db.getHomeroomDB();
         MongoCollection<Document> teachers = homeroom.getCollection("Teachers");
         BasicDBObject query = new BasicDBObject();
-        query.put("connectionUsername", connectionUsername);
+        query.put("ConnectionUsername", connectionUsername);
         try (MongoCursor<Document> found = teachers.find(query).iterator()) {
             while(found.hasNext()) {
                 Document x = found.next();
@@ -151,7 +147,7 @@ public class Teacher {
         switch (searchType) {
             case MONGO_CONNECTION_NAME:
                 System.out.println("Searching for teachers using their Homeroom usernames!");
-                matches = (List<Document>) teachers.find(Filters.regex("ConnectionName", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
+                matches = (List<Document>) teachers.find(Filters.regex("ConnectionUsername", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;
             default:
                 System.out.println("Searching for teachers using their names!");
@@ -173,7 +169,8 @@ public class Teacher {
             if(!x.containsKey("FormID") || x.get("FormID") == null) {
                 formID = "";
             } else formID = x.get("FormID").toString();
-            found.add(new Teacher(x.get("ConnectionName").toString(), x.get("TeacherName").toString(), x.get("FormID").toString()));
+            found.add(new Teacher(x.get("ConnectionUsername").toString(), x.get("TeacherName").toString(), formID));
+            
         }
         progress.closeFrame();
         return found;
@@ -201,5 +198,54 @@ public class Teacher {
         return new Teacher(connectionUsername, teacherName, formID);
     }
 
-    //TODO TEACHER DELETIONS WOULD LIKELY NEED TO GO HERE ONCE PROPERLY IMPLEMENTED.
+    /**
+     * Method that updated a specified field of a {@link Teacher} that has been specified. Any field can be updated provided the right field name has been given.
+     * The specified string is the string that the field will be updated to. There is no input validation being done on the string.
+     * @param teacher The {@link Teacher} to update.
+     * @param fieldToUpdate The field to be updated. Should be a valid field name.
+     * @param updateObj The object that the field will be updated to. Should be a valid object, storing valid information that an admin user should use. There is no input validation done on this object.
+     * @return {@link Boolean} that represents the success or failure of this operation.
+     */
+    public boolean updateTeacher(Teacher teacher, String fieldToUpdate, Object updateObj) {
+        if(db.isConnected() != 0) { //Something has gone wrong with the database connection!
+            return false;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection<Document> teachers = homeroom.getCollection("Teachers");
+        Document queryDoc = new Document("ConnectionUsername", teacher.getConnectionUsername());
+        Bson update = Updates.set(fieldToUpdate, updateObj);
+        UpdateOptions options = new UpdateOptions().upsert(false);
+        teachers.updateOne(queryDoc, update, options);
+        return true;
+    }
+
+    /**
+     * Basic method used to check whether a {@link Teacher} is <i>in</i> a {@link Form}. Used within the program to ensure that the Teacher does not join multiple forms, and if they do so, they can be removed from one and put in the other.
+     * The result of this method can be used to determine that.
+     * @param teacher The {@link Teacher} object you are checking for, to determine whether they are in a {@link Form} group or not.
+     * @return {@link Boolean} representing whether the Teacher is in a form or not.
+     */
+    public boolean isTeacherInForm(Teacher teacher) {
+        Form form = new Form(connectionUsername, connectionPassword);
+        return form.getFormFromID(teacher.getFormID()) != null;
+    }
+
+    /**
+     * Method that deleted a specific record of a {@link Teacher} that has been specified. This is done by getting the Teacher's connection name, and associated form where applicable. <p></p>
+     * It is also worth noting that this method handles the deletion of information from relevant Form Groups where needed. This means that the "Forms" collection is also accessed, and the connection name is removed from there.
+     * @param teacher The {@link Teacher} you wish to delete.
+     * @return {@link Boolean} that represents the success or failure of this operation.
+     */
+    public boolean deleteTeacher(Teacher teacher) {
+        Form f = new Form(connectionUsername, connectionPassword);
+        if(isTeacherInForm(teacher)) { // Teacher is in a form, they need to be deleted from that form as well
+            Form form = f.getFormFromID(teacher.getFormID());
+            f.updateForm(form, "TeacherConnectionName", ""); // Remove the teacher from the form as well
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection<Document> forms = homeroom.getCollection("Teachers");
+        Document queryDoc = new Document("ConnectionUsername", teacher.getConnectionUsername());
+        forms.deleteOne(queryDoc); // Delete the teacher from the TEACHER DB
+        return true;
+    }
 }

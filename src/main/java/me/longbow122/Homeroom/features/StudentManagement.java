@@ -485,7 +485,11 @@ public class StudentManagement {
         formGroupField.setEditable(false);
         formGroupField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));;
         Form f = new Form(username, password);
-        formGroupField.setText(f.getFormFromID(student.getFormID()).getFormName());
+        String formName = "";
+        if(f.getFormFromID(student.getFormID()) != null) {
+            formName = f.getFormFromID(student.getFormID()).getFormName();
+        }
+        formGroupField.setText(formName);
         JButton formGroupPicker = gui.addButtonToFrame("<html>" + "Select" + "<br>" + "Form" + "</html>", 30, 50, 810, 130);
         formGroupPicker.addActionListener(e -> {
             gui.closeFrame();

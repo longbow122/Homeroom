@@ -1,9 +1,6 @@
 package me.longbow122.Homeroom.features;
 
-import me.longbow122.Homeroom.Form;
-import me.longbow122.Homeroom.FormSearchType;
-import me.longbow122.Homeroom.Student;
-import me.longbow122.Homeroom.Teacher;
+import me.longbow122.Homeroom.*;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
 import org.jdesktop.swingx.prompt.PromptSupport;
@@ -42,7 +39,7 @@ public class FormManagement {
         searchButton.addActionListener(e -> processSearch(searchClass, username, password, searchField.getText(), gui));
         JButton exitButton = gui.addButtonToFrame("Exit Form Management", 60, 300, 920, 0);
         gui.addLabelToFrame("Search Type: ", 630, 10, 170, 30, true, 25);
-        JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Form ID", "Teacher Name", "Form Name"});
+        JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Form ID", "Form Name"});
         searchClass.setFormSearchType(FormSearchType.UUID); // Ensures that the default search type is set to form ID.
         searchChoice.addActionListener(e -> {
             JComboBox box = (JComboBox) e.getSource();
@@ -51,14 +48,6 @@ public class FormManagement {
                 case 0:
                     searchClass.setFormSearchType(FormSearchType.UUID);
                     System.out.println("Search Type has been set to UUID!");
-                    break;
-                case 1:
-                    searchClass.setFormSearchType(FormSearchType.TEACHER_NAME);
-                    System.out.println("Search Type has been set to Teacher Name!");
-                    break;
-                case 2:
-                    searchClass.setFormSearchType(FormSearchType.FORM_NAME);
-                    System.out.println("Search Type has been set to Form Name!");
                     break;
                 default:
                     searchClass.setFormSearchType(FormSearchType.FORM_NAME);
@@ -92,13 +81,10 @@ public class FormManagement {
             JLabel formNameLabel = add.addLabelToFrame("Form Name:", 25, 30, 150, 20, true, 20);
             formNameLabel.setForeground(Color.RED);
             JTextField formName = add.addTextField(25, 70, 200, 25, "Enter the name of the Form here! REQUIRED FIELD!");
-            JLabel teacherNameLabel = add.addLabelToFrame("Teacher Name:", 250, 30, 200, 20, true, 20);
-            teacherNameLabel.setForeground(Color.RED);
-            JTextField teacherName = add.addTextField(250, 70, 200, 25, "Enter the name of the teacher that will watch over the form.");
             //TODO THE ABOVE LOGIC FOR TEACHERS NEEDS TO BE RE-WORKED. ACCOMMODATE FOR THIS AT SOME POINT WHEN HANDLING CONFIGURATION. IT NEEDS TO BE DONE IN THE SAME WAY THAT ADDING A STUDENT TO A FORM IS DONE.
             JButton confirm = add.addButtonToFrame("Add Form", 25, 150, 500, 30);
             confirm.addActionListener(e12 -> {
-                JTextField[] required = new JTextField[]{formName, teacherName};
+                JTextField[] required = new JTextField[]{formName};
                 for(JTextField x : required) {
                     if(x.getText().isEmpty()) {
                         Object[] options = new Object[]{"Continue Adding Data", "Cancel"};
@@ -116,7 +102,9 @@ public class FormManagement {
                     }
                 }
                 List<String> studentIDs = new ArrayList<>(); //Pass an empty list into the database first when making the Form. When editing the form, you can add Students accordingly later.
-                Form added = new Form(username, password).addFormToDB(teacherName.getText(), formName.getText(), studentIDs);
+                Form added = new Form(username, password).addFormToDB("", formName.getText(), studentIDs);
+                // ? An empty String is passed into the database to ensure that no Teacher is assigned at the start. Better database practises (to be added) need to be in place before this system can be reworked in terms of design.
+                // ? As such, a teacher needs to be assigned to the form on edit.
                 processSearch(searchClass, username, password, searchField.getText(), gui);
                 JOptionPane.showMessageDialog(add.getFrame(), "The Form " + added.getFormName() + " was successfully added to the database of Forms!", "Form Successfully Added!", JOptionPane.INFORMATION_MESSAGE);
                 add.closeFrame();
@@ -213,7 +201,7 @@ public class FormManagement {
 
     /**
      * A basic method used to process the search logic for the main forms GUI. Used to display forms which can be selected and returned.
-     * @param searchClass An instance of {@link Form} used to handle searching. Passed through to save resources and avoid instantiated a new object.
+     * @param searchClass An instance of {@link Form} used to handle searching. Passed through to save resources and avoid instantiating a new object.
      * @param username Username used to query the database
      * @param password Password used to query the database
      * @param searchText The search parameter for the search text to be processed
@@ -329,12 +317,13 @@ public class FormManagement {
      * @param fields The fields being used by the Form GUI to enter, view and edit data.
      */
     private void displayEditedButtons(GUIUtils gui, Form form, String username, String password, JTextComponent[] fields) {
+        Teacher t = new Teacher(username, password);
         setEditMade(true);
         JFrame frame = (JFrame) gui.getFrame();
-        JButton saveEdit = gui.addButtonToFrame("Save Edits", 50, 200, 1100, 30);
-        JButton revertChanges = gui.addButtonToFrame("Revert Changes", 50, 200, 1300, 30);
-        JButton discardChangesExit = gui.addButtonToFrame("Discard Changes and Exit", 50, 200, 700, 30);
-        JButton saveChangesExit = gui.addButtonToFrame("Save Changes and Exit", 50, 200, 900, 30);
+        JButton saveEdit = gui.addButtonToFrame("Save Edits", 50, 200, 1100, 80);
+        JButton revertChanges = gui.addButtonToFrame("Revert Changes", 50, 200, 1300, 80);
+        JButton discardChangesExit = gui.addButtonToFrame("Discard Changes and Exit", 50, 200, 700, 80);
+        JButton saveChangesExit = gui.addButtonToFrame("Save Changes and Exit", 50, 200, 900, 80);
         Form update = new Form(username, password);
         JButton[] buttons = {saveEdit, revertChanges, discardChangesExit, saveChangesExit};
         for(JTextComponent x : fields) {
@@ -342,7 +331,6 @@ public class FormManagement {
         }
         saveEdit.addActionListener(e -> {
             update.updateForm(form, "FormName", fields[0].getText());
-            update.updateForm(form, "TeacherName", fields[1].getText());
             setEditMade(false);
             for(JButton x : buttons) {
                 x.setVisible(false);
@@ -353,7 +341,11 @@ public class FormManagement {
                 x.setText("");
             }
             fields[0].setText(form.getFormName());
-            fields[1].setText(form.getTeacherName());
+            String teacherName = "";
+            if(t.getTeacherFromConnectionUsername(form.getTeacherConnectionName()) != null) {
+                teacherName = t.getTeacherFromConnectionUsername(form.getTeacherConnectionName()).getTeacherName();
+            }
+            fields[1].setText(teacherName);
             setEditMade(false);
             for(JButton x : buttons) {
                 x.setVisible(false);
@@ -365,7 +357,6 @@ public class FormManagement {
         });
         saveChangesExit.addActionListener(e -> {
             update.updateForm(form, "FormName", fields[0].getText());
-            update.updateForm(form, "TeacherName", fields[1].getText());
             System.out.println("Fields should have successfully been updated. Exiting!");
             setEditMade(false);
             frame.dispose();
@@ -388,6 +379,8 @@ public class FormManagement {
      */
     public void viewFormInformation(Form form, int permission, String username, String password, GUIUtils parentGUI, int contextOption) {
         GUIUtils gui = new GUIUtils("Form Management | View Form", 1000, 1700, 0, 0, false);
+        Form f = new Form(username, password);
+        Teacher t = new Teacher(username, password);
         gui.addLabelToFrame("Form Name", 100, 0, 150, 25, false, 18);
         JTextField nameField = gui.addTextField(100, 30, 120, 30, "Name of the Form");
         PromptSupport.setPrompt("Form Name", nameField);
@@ -396,13 +389,18 @@ public class FormManagement {
         nameField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
         gui.addLabelToFrame("Teacher Name", 275, 0, 150, 25, false, 18);
         JTextField teacherField = gui.addTextField(275, 30, 100, 30, "Name of the teacher of the form");
-        PromptSupport.setPrompt("Teacher Name", teacherField);
-        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT,teacherField);
-        teacherField.setText(form.getTeacherName());
+        teacherField.setEditable(false);
+        String teacherName = "";
+        if(t.getTeacherFromConnectionUsername(form.getTeacherConnectionName()) != null) {
+            teacherName = t.getTeacherFromConnectionUsername(form.getTeacherConnectionName()).getTeacherName();
+        } // ? The way this is done to avoid NPEs is temporary. When the database rework fully goes through, the entire system will be a lot cleaner and will allow for further functionality.
+        teacherField.setText(teacherName);
         teacherField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
+        JButton selectTeacher = gui.addButtonToFrame("Select Teacher", 30, 150, 275, 60);
+        selectTeacher.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 15));
+        selectTeacher.addActionListener(e -> formTeacherAddition(username, password, form));//TODO TEST
         List<Student> studentsInForm = new ArrayList<>();
         Student s = new Student(username, password);
-        Form f = new Form(username, password);
         for(String x : form.getStudentsInFormID()) {
             studentsInForm.add(s.getStudentFromID(x));
         }
@@ -429,7 +427,7 @@ public class FormManagement {
                     JOptionPane.showMessageDialog(gui.getFrame(), form.getFormName() + " has successfully been deleted from Homeroom!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
                     gui.closeFrame();
                     parentGUI.closeFrame();
-                    switch(contextOption) {
+                    switch(contextOption) { //Closes the GUI and re-opens the according GUI to give off the impression that the GUI was "refreshed"
                         case 0:
                             openManageFormsGUI(username, password);
                             break;
@@ -480,7 +478,7 @@ public class FormManagement {
     }
 
     /**
-     * * Method which emulates the "shifting" of pages, all current buttons are made invisible, and the new pages are made visible.
+     * Method which emulates the "shifting" of pages, all current buttons are made invisible, and the new pages are made visible.
      * <p></p>
      * Hard-coded numerical values are used for the shift amount as there is a specified amount of shifts that can be made per button press.
      * @param currentIndex The current numbered index that the page is currently on.
@@ -523,7 +521,7 @@ public class FormManagement {
      * <p></p>
      * * Method which emulates the "shifting" of pages, all current buttons are made invisible, and the new pages are made visible.
      * <p></p>
-     * Hard-coded numerical values are used for the shift amount as there is a specified amount of shifts that can be made per button press.
+     * Hard-coded numerical values are used for the shift amount as there is a specified amount of shifts that can be made per button press.From what I remembe
      * @param currentIndex The current numbered index that the page is currently on.
      * @param shiftAmount The amount to shift the index by. The index number should be positive if you want to move up a page and index number should be negative if you want to move down a page.
      * @param gui The parent GUI to make use of within the page menu.
@@ -564,24 +562,64 @@ public class FormManagement {
      * Method which handles {@link Form} selection and addition of {@link Teacher} to a {@link Form}. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of Teachers, to be added to a Form group.
      * It is worth noting that a method of this nature should really be written in the {@link Form} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class. <p></p>
      * It is also worth nothing that in some cases, a {@link Teacher} may already be in a {@link Form}. In this case, logic will be in place to ask for user confirmation, before moving the Teacher to the newer form, and removing them from the older form.
+     * <p></p>
+     * It is worth noting that in this context, a teacher is being added to a particular form. This means that this method would be called within Form Management, to ensure that the user can select a teacher to run the form.
      * @param username The username used to log into 'Homeroom' and the one used to query the database.
      * @param password The password used to log into 'Homeroom' and the one used to query the database
-     * @param teacher The {@link Teacher} you will be adding to the Form.
+     * @param formGroup The {@link Form} you will be adding to the {@link Teacher}.
      */
-    public void formTeacherAddition(String username, String password, Teacher teacher) {
-        //TODO SELECT TEACHER METHOD NEEDS TO BE IMPLEMENTED SOMEWHERE!!!
+    protected void formTeacherAddition(String username, String password, Form formGroup) {
+        Teacher searchClass = new Teacher(username, password);
+        GUIUtils gui = new GUIUtils("Search and Select Teachers | Homeroom", 1000, 1220, 300, 0, false);
+        gui.addLabelToFrame("Search:", 200, 10, 100, 25, true, 25);
+        JTextField searchField = gui.addTextField(300, 12, 200, 25, "Enter a term to search for here!");
+        PromptSupport.setPrompt("Search", searchField);
+        PromptSupport.setFocusBehavior(PromptSupport.FocusBehavior.HIDE_PROMPT, searchField);
+        JButton searchButton = gui.addButtonToFrame("Search", 40, 100, 500, 0);
+        searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
+        searchButton.addActionListener(e -> selectTeacher(username, password, searchClass, searchField.getText(), gui, formGroup));
+        gui.addLabelToFrame("Search Type:", 630, 10, 170, 30, true, 25);
+        JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Connection Name", "Teacher Name"});
+         searchClass.setSearchType(TeacherSearchType.TEACHER_NAME); //Ensures that default search type actually applies.
+        searchChoice.addActionListener(e -> {
+            JComboBox box = (JComboBox) e.getSource();
+            int selected = box.getSelectedIndex();
+            switch (selected) {
+                case 0:
+                    searchClass.setSearchType(TeacherSearchType.MONGO_CONNECTION_NAME);
+                    System.out.println("Search Type has been set to Mongo Name!!");
+                    break;
+                case 1:
+                    searchClass.setSearchType(TeacherSearchType.TEACHER_NAME);
+                    System.out.println("Search Type has been set to Name!");
+            }
+        });
+        searchField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                selectTeacher(username, password, searchClass, searchField.getText(), gui, formGroup);
+            }
 
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
     }
 
     /**
      * Method which handles {@link Form} selection and addition to a {@link Form}. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of Form Groups.
      * It is worth noting that a method of this nature should really be written in the {@link Form} class, but due to the higher amount of GUI-based lines it holds, I opted to keep it within this class. <p></p>
      * It is also worth noting that in some cases, a Student may already be in a Form. In this case, logic will be in place to ask for user confirmation, before moving the Student to the newer form, and removing them from the older one.
+     * <p></p>
+     * It is worth noting that in this context, a Form is being added to a Student. This meamns that this method would be called within Student Management, to ensure that the user can select a Form for the Student to go in.
      * @param username The username used to log into 'Homeroom' and the one used to query the database.
      * @param password The password used to log into 'Homeroom' and the one used to query the database.
      * @param student The {@link Student} you will be adding to the Form.
      */
-    public void formStudentAddition(String username, String password, Student student) {
+    protected void formStudentAddition(String username, String password, Student student) {
         Form searchClass = new Form(username, password);
         GUIUtils gui = new GUIUtils("Search and Select Forms | Homeroom", 1000, 1220, 300, 0, false);
         gui.addLabelToFrame("Search:", 200, 10, 100, 25, true, 25);
@@ -592,7 +630,7 @@ public class FormManagement {
         searchButton.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 20));
         searchButton.addActionListener(e -> new StudentManagement().selectForm(username, password, searchClass, searchField.getText(), gui, student));
         gui.addLabelToFrame("Search Type:", 630, 10, 170, 30, true, 25);
-        JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Form ID", "Form Name", "Teacher Name"});
+        JComboBox searchChoice = gui.addComboBox(800, 13, 100, 25, new String[]{"Form ID", "Form Name"});
         searchClass.setFormSearchType(FormSearchType.UUID); //Ensures that default search type actually applies.
         searchChoice.addActionListener(e -> {
             JComboBox box = (JComboBox) e.getSource();
@@ -605,9 +643,6 @@ public class FormManagement {
                 case 1:
                     searchClass.setFormSearchType(FormSearchType.FORM_NAME);
                     System.out.println("Search Type has been set to Name!");
-                case 2:
-                    searchClass.setFormSearchType(FormSearchType.TEACHER_NAME);
-                    System.out.println("Search Type has been to Teacher Name!");
             }
         });
         searchField.addKeyListener(new KeyListener() {
@@ -666,7 +701,6 @@ public class FormManagement {
                     JOptionPane.showMessageDialog(gui.getFrame(), "The Student is already in " + formGroup.getFormName() + "! Nothing needs to happen!");
                     return;
                 }
-
                 if(searchClass.isStudentInForm(x)) {
                     System.out.println("Student is in a form, but it is not the same form that has been selected! Give the user a choice!");
                     Object[] options = {"Yes", "No"};
@@ -682,6 +716,7 @@ public class FormManagement {
                             JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getStudentName() + " to the form " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
                             gui.closeFrame(); //Close down the selection window, we're done with it
                             //TODO REFRESHING FOR MANAGE FORMS GUI NEEDS TO GO HERE WHERE POSSIBLE.
+                            //TODO VIEW FORM INFORMATION GUI NEEDS TO BE CLOSED HERE
                             return;
                         case 1: //Should be "no", meaning the user does not want the form to be switched to the old one,
                             System.out.println("Student's form will not be switched to the new one, instead, nothing will happen");
@@ -695,6 +730,7 @@ public class FormManagement {
                 JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getStudentName() + " to " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.informationIcon"));
                 gui.closeFrame(); //Close the window afterwards, selection is all done now
                 //TODO REFRESHING FOR MANAGE FORMS GUI NEEDS TO GO HERE WHERE POSSIBLE
+                //TODO VIEW FORM INFORMATION GUI NEEDS TO BE CLOSED HERE
             });
             buttons.add(option);
             System.out.println("The button for " + x.getStudentName() + " has been implemented, but has not been made visible!");
@@ -709,6 +745,153 @@ public class FormManagement {
                 System.out.println("A list of buttons has been added to the page list!");
                 buttons = new ArrayList<JButton>();
                 yLoc = 100; //Reset to y= 100
+            }
+        }
+        pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
+        JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
+        JButton backPage = gui.addButtonToFrame("<<", 30, 60, 920, 65);
+        nextPage.setToolTipText("Go to the next page of search results.");
+        backPage.setToolTipText("Go to the previous page of search results.");
+        if(!pages.isEmpty()) {
+            List<JButton> firstPage = pages.get(0);
+            for(JButton i : firstPage) {
+                i.setVisible(true);
+            }
+        } else {
+            for(JButton x : buttons) {
+                x.setVisible(true);
+            }
+        }
+        searchButtonIndex = 0;
+        setSearchButtons(pages);
+        nextPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Pages list is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, 1, gui); //Go forward one page
+        });
+        backPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Page is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, -1, gui); //Go back one page
+        });
+        System.out.println("Did the button message actually display?");
+        return;
+    }
+
+    /**
+     * A method written to aid in the selection of a {@link Teacher} in particulat context. This method is part of a collection of methods that uses method overloading for QOL. <p></p>
+     * This method would be used by users to add a {@link Teacher} to a particular {@link Form}.
+     * @param username The username used to log into Homeroom.
+     * @param password The password used to log into Homeroom.
+     * @param searchClass  {@link Teacher} class to handle the searching of a Teacher with.
+     * @param searchText Text to begin querying the database with.
+     * @param gui The parent GUI to insert buttons into. This GUI should be under a controlled environment, through a controlled size, etc.
+     * @param formGroup The {@link Form} to add the {@link Teacher} to.
+     */
+    protected void selectTeacher(String username, String password, Teacher searchClass, String searchText, GUIUtils gui, Form formGroup) {
+        List<Teacher> searches = searchClass.searchForTeacher(searchText);
+        System.out.println("Working on searching using: " + searchText);
+        if(searches == null) {
+            JOptionPane.showMessageDialog(gui.getFrame(), "No results found that fit your search query!", "Homeroom | Teacher Management", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+            System.out.println("No results seem to have been found!");
+            return;
+        }
+        System.out.println(searches.size() + " results found!");
+        int xLoc = 0;
+        int yLoc = 100;
+        if(searchButtonsPages != null) {
+            for(List<JButton> x : searchButtonsPages) {
+                for(JButton i : x) {
+                    i.setVisible(false);
+                }
+            }
+        }
+        List<List<JButton>> pages = new ArrayList<>();
+        List<JButton> buttons = new ArrayList<>();
+        for(Teacher x : searches) {
+            JButton option = gui.addButtonToFrame(x.getTeacherName(), 50, 150, xLoc, yLoc);
+            option.setFont(new Font((gui.getFrame().getFont().getName()), Font.PLAIN, 15));
+            Form form = new Form(username, password);
+            option.addActionListener(e -> {
+                if(formGroup.getTeacherConnectionName().equals(x.getConnectionUsername())) { // ? Should check for if the form group currently assigned is equal to the
+                    // ? teacher that is currently being selected. AKA, is the teacher in the same form?
+                    System.out.println("The teacher was already in the form and as such, no database operations need to happen!");
+                    JOptionPane.showMessageDialog(gui.getFrame(), "The Teacher is already in " + formGroup.getFormName() + "! Nothing needs to happen!");
+                    return;
+                }
+                if(searchClass.isTeacherInForm(x)) {
+                    System.out.println("Teacher is in a form, but it is not the same form that has been selected! Give the user a choice!");
+                    Object[] options = {"Yes", "No"};
+                    int option1 = JOptionPane.showOptionDialog(gui.getFrame(), x.getTeacherName() + " is already in the form " + form.getFormFromID(x.getFormID()).getFormName() + "! Would you like to change their current form to " + formGroup.getFormName() + "?", "Homeroom | Form Management", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.questionIcon"), options, "TEST");
+                    System.out.println(option1);
+                    switch(option1) {
+                        case 0: //Should be "yes", which means the user does want the form switches.
+                            System.out.println("Teacher's form will be switched to the new one!");
+                            System.out.println(form.getFormFromID(x.getFormID()).getFormName() + " is losing their teacher!");
+                            searchClass.updateTeacher(searchClass.getTeacherFromConnectionUsername(formGroup.getTeacherConnectionName()), "FormID", ""); // ? Remove the old teacher from the old form in the TEACHER DB, since they no longer teach that form
+                            form.updateForm(form.getFormFromID(x.getFormID()), "TeacherConnectionName", ""); // ? Remove the new teacher from the old form, in the FORM DB
+                            searchClass.updateTeacher(x, "FormID", formGroup.getFormID()); // ? Add the FORM to the TEACHER in the TEACHER DB, if they are in one, it will be switched
+                            form.updateForm(formGroup, "TeacherConnectionName", x.getConnectionUsername()); // ? Add the TEACHER to the FORM in the FORMDB, if they are in one, it will be switched.
+                            JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getTeacherName() + " to the form " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
+                            gui.closeFrame();
+                            //TODO REFRESHING FOR MANAGE FORMS GUI NEEDS TO GO HERE WHERE POSSIBLE
+                            //TODO VIEWFORMINFORMATION GUI ALSO NEEDS TO BE CLOSED DOWN
+                            return;
+                        case 1:
+                            System.out.println("Teachers form will not be switched to the new one, instead, nothing will happen!");
+                            return;
+                    }
+                }
+                if(searchClass.getTeacherFromConnectionUsername(formGroup.getTeacherConnectionName()) != null) { // ? The form group already has a teacher, but the teacher selected is a newbie, switch needs to be made.
+                    System.out.println("Selected teacher might not be in a form, but the form currently has a teacher. A switch choice must be made.");
+                    Object[] options = {"Yes", "No"};
+                    int option1 = JOptionPane.showOptionDialog(gui.getFrame(), formGroup.getFormName() + " already has a teacher assigned to it! Would you like to assign " + x.getTeacherName() + " to this form, and remove the old one?", "Homeroom | Form Management", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.questionIcon"), options, "TEST");
+                    System.out.println(option1);
+                    switch(option1) {
+                        case 0: //Should be "yes", which means the user does want the form switches.
+                            searchClass.updateTeacher(searchClass.getTeacherFromConnectionUsername(formGroup.getTeacherConnectionName()), "FormID", ""); // ? Teacher in the current form loses their form ID, in FORM DB
+                            form.updateForm(formGroup, "TeacherConnectionName", x.getConnectionUsername()); // ? Teacher in the current form goes away, to be replaced by the new teacher, in FORM DB
+                            searchClass.updateTeacher(x, "FormID", formGroup.getFormID()); // ? New teacher gets their form id added to them in TEACHER DB
+                            JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getTeacherName() + " to the form " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
+                            gui.closeFrame();
+                            //TODO REFRESHING FOR MANAGE FORMS GUI NEEDS TO GO HERE WHERE POSSIBLE
+                            //TODO VIEWFORMINFORMATION GUI ALSO NEEDS TO BE CLOSED DOWN
+                            return;
+                        case 1:
+                            System.out.println("Teachers form will not be switched to the new one, instead, nothing will happen!");
+                            return;
+                    }
+                }
+                // All checks run through, the Teacher in this case, should not be in any forms, so can just add them straight
+                System.out.println("About to execute the default branch, where newbies are added");
+                form.updateForm(formGroup, "TeacherConnectionName", x.getConnectionUsername()); // ? Add the teacher to the form DB
+                searchClass.updateTeacher(x, "FormID", formGroup.getFormID()); // ? Add the form group to the teacher DB
+                JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully added " + x.getTeacherName() + " to " + formGroup.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
+                gui.closeFrame();
+                //TODO REFRESHING FOR MANAGE FORMS GUI NEEDS TO GO HERE WHERE POSSIBLE!!!
+            });
+            buttons.add(option);
+            System.out.println("The buttons for " + x.getTeacherName() + " has been implemented, but has not been made visible!");
+            option.setVisible(false);
+            xLoc = xLoc + 150;
+            if(xLoc > 1050) {
+                yLoc = yLoc + 50;
+                xLoc = 0;
+            }
+            if(yLoc > 930) {
+                pages.add(buttons); //Add it to the list of lists to ensure that you know what goes within each page
+                System.out.println("A list of buttons has been added to the page list!");
+                buttons = new ArrayList<JButton>();
+                yLoc = 100;
+
             }
         }
         pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page

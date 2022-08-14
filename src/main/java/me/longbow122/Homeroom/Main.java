@@ -2,6 +2,7 @@ package me.longbow122.Homeroom;
 
 import me.longbow122.Homeroom.features.FormManagement;
 import me.longbow122.Homeroom.features.StudentManagement;
+import me.longbow122.Homeroom.features.TeacherManagement;
 import me.longbow122.Homeroom.utils.ConfigReader;
 import me.longbow122.Homeroom.utils.DBUtils;
 import me.longbow122.Homeroom.utils.GUIUtils;
@@ -153,10 +154,12 @@ public class Main {
         });
     }
 
+
+
     /*
-    Got to be a cleaner way of writing the below code. This just seems messy and outright untidy.
-    Open to worded suggestions if anyone had any. (As in, you tell me what you think would work, but try to avoid directly
-    spoonfeeding the answer where possible. Thank you!)
+     * Got to be a cleaner way of writing the below code. This just seems messy and outright untidy.
+     * Open to worded suggestions if anyone had any. (As in, you tell me what you think would work, but try to avoid directly
+     * spoonfeeding the answer where possible. Thank you!)
      */
     private void openMainGUI(String username, String password) {
         GUIUtils mainGUI = new GUIUtils("Homeroom", 1000, 1220, 300, 0, true);
@@ -170,7 +173,7 @@ public class Main {
         timetable.setFont(new Font(mainGUI.getFrame().getFont().getName(), Font.BOLD, 40));
         timetable.setToolTipText("Manage the timetable and scheduling of your school here.");
         JButton admin = mainGUI.addButtonToFrame("Configure Homeroom", 300, 400, 0, 350);
-        admin.setText("<html>" + "Configure " + "<br>" + "Homeroom" + "</html>"); //<br> is an empty HTML tag, no need to close that one!
+        admin.setText("<html>" + "Configure " + "<br>" + "Homeroom" + "</html>"); // ? <br> is an empty HTML tag, no need to close that one!
         admin.setFont(new Font(mainGUI.getFrame().getFont().getName(), Font.BOLD, 40));
         admin.setToolTipText("Configure Homeroom here.");
         JButton manageForms = mainGUI.addButtonToFrame("Manage Forms", 300, 400, 400, 350);
@@ -185,8 +188,9 @@ public class Main {
         JLabel usernameField = mainGUI.addLabelToFrame("Username: " + username, 0, 0, 300, 30, false);
         usernameField.setFont(new Font(mainGUI.getFrame().getFont().getName(), Font.PLAIN, 25));
         JLabel permissionField = mainGUI.addLabelToFrame("Permissions: ", 300, 0, 300, 30, false);
-        switch(new DBUtils(username, password).getPermission()) { //Should be a better way of converting permissions. Is it worth just using an Enum here, like I've done with search type?
-            case 1: //Using ENUMS would mean I can just directly get the enum and convert it to a string instead of working on a switch statement to handle showing permissions.
+        int permission = new DBUtils(username, password).getPermission();
+        switch(permission) { // ! Should be a better way of converting permissions. Is it worth just using an Enum here, like I've done with search type?
+            case 1: // ! Using ENUMS would mean I can just directly get the enum and convert it to a string instead of working on a switch statement to handle showing permissions.
                 permissionField.setText("Permissions: TEACHER");
                 break;
             case 2:
@@ -202,8 +206,30 @@ public class Main {
         });
         manageStudents.addActionListener(e -> new StudentManagement().openManageStudentsGUI(username, password));
         manageForms.addActionListener(e -> new FormManagement().openManageFormsGUI(username, password));
+        admin.addActionListener(e -> {
+            //TODO MAKE GUI THAT OPENS FOR THE CONFIGURE SECTION
+            // HAVE A SECTION WITHIN THAT CONFIGURE SECTION WHICH OPENS MANAGE TEACHERS
+            if(permission != 2) {
+                System.out.println("User cannot access this GUI, since they are not an admin!");
+                JOptionPane.showMessageDialog(mainGUI, "You are not allowed to access this section of Homeroom, since you are not an Admin!", "Homeroom | Admin Configuration", JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"));
+                return;
+            }
+            openConfigureGUI(username, password);
+        });
         //TODO
         // BUTTON LISTENERS FOR EVERY BUTTON.
+    }
+
+    private void openConfigureGUI(String username, String password) {
+        GUIUtils gui = new GUIUtils("Homeroom | Configure Homeroom", 1000, 1220, 300, 0, false);
+        JButton manageTeachers = gui.addButtonToFrame("Manage Teachers", 300, 400, 0, 50);
+        manageTeachers.addActionListener(e -> new TeacherManagement().openManageTeacherGUI(username, password));
+        manageTeachers.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 40));
+        JButton exit = gui.addButtonToFrame("Exit Teacher Management", 50, 150, 1050, 0);
+        exit.addActionListener(e -> {
+            System.out.println("Exiting Configure GUI!");
+            gui.closeFrame();
+        });
     }
 
     /**

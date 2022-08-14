@@ -441,3 +441,71 @@ It is worth noting that there is no need for a "teacher management" GUI as there
 Additionally, I still don't know as to how I intend on deleting Teachers within the database, since I have no way of getting authenticated users from the Atlas page, nor do I have a way of detecting whether they have been removed as a user from the Atlas page. This is seeming to be a problem I will have to ignore, since any solution I can think of right now isn't clean enough to be good enough. I'll keep a note of it and make a decision later on. 
 
 ## 08/08/2022 - Monday
+Made a major start on the Teachers feature, which should be fully integrated by Thursday. Having them work in a somewhat clean way that also fits with design along with working with Forms and keeping room for Classes is easy enough, but since they also need to have their own Management section somewhere to ensure that Admins can delete Teacher accounts, and edit any information that they might need to edit.
+
+Since it's more or less a basic port of code over to the new entity, I don't expect it to take me too much time. What might take some amount of time is making sure the code is actually functional, and testing the feature to ensure that it's robust and can work around edge-cases where needed.
+
+Once I finish this feature, I can move onto Classes, and handling Classes. After that, it's Schedules, which is likely the biggest challenge I face when developing this plugin, and might even take me around 2 weeks to properly finish.
+
+## 09/08/2022 - Tuesday
+Made good progress on the Teachers feature, and have managed to more or less finish the Teacher Management feature. All that needs to be done is proper integration with the rest of the system, and ensuring that a username can be checked within the database and logic run accordingly.
+
+Fortunately, I see ways of handling both of these, it's just a matter of testing them in practise, and ironing out any final bugs along with last minute touches to the general design of the program. Once this has been done, I can move onto creating the Classes data structure, and handling the dates and times that accordingly go with that. I am currently unsure how I would handle the scheduling, along with the backend work needed to make sure the logic behind modifying these actually work.
+
+Fortunately, I am able to properly regulate the input for times and dates, so I know having properly regulated input is something I can rely on. The question of storing and arranging the data in such a way that it is able to be easily understood and read is another matter entirely.
+
+This will be an issue for me, and is definitely a problem I need to solve. For now, I should put as much focus into properly finishing up the Teachers branch and everything behind it. I am yet to implement the automatic addition of Teachers to the database, the half-deletion of Teachers from the database, and the full integration of Teachers into the Forms feature.
+
+Once all of these features have been finished, all I need to do is move onto the Classes and the scheduling work. This will take a while, but will be work that is ultimately essential to Homeroom.
+
+## 10/08/2022 - Wednesday
+A key feature of my Teachers system turned out to have a fundamental design flaw. **Teachers cannot write to the database.** Since I don't want to expose anyone's username or password within the source code itself (since that's a worrying security risk), I'll have to make it so that admins can create Teacher accounts through the Manage Teachers GUI. From this GUI, they will be able to match the Mongo connection name to the real teacher name, and that should work just fine. 
+
+Although, I do worry about what would happen should an admin get the details of any of that wrong, but it shouldn't be too much of an issue, since an administrative user should have more than two brain cells, otherwise they would not be setting up or managing the system. I feel that this solution is not as clean, and there is a great amount of reworking to be done before the system can handle adding a Teacher or a Student straight to a Form Group on creation. This is definitely a feature that will need to be included in the first update of the program.
+
+In terms of actual progress in development, I didn't get to make much today owing to the fact that I was rather distracted, and am slowly beginning to feel the effects of burn-out. I managed to re-adjust the current design of my program and have managed to successfully implement this feature with no issues in theory. All that needs to be done is to test this, to ensure that the current system will tie in well with the current schema of the database.
+
+I've also taken note of a way I'm able to improve the standard and general cleanliness of my code. Right now, everything is packed into a few classes, meaning I need to be rather careful about how I work with my constructors, ensuring I call the right methods in the right contexts using the right parameters. While this should technically handle what I need to work with just fine, it's not the best solution. A better solution can be devised by writing a class which holds all database modifying methods, and making each of those methods a static call. For the sake of general code quality and efficiency, I would also make the connection objects I reference within my code on a regular basis static.
+
+This way, the connection objects that are used in every class can be assigned their respective connection values, to ensure that they all lead to the right Connection. This way, everything can be handled using just the method reference through the class itself, meaning less Objects are created and handled by the program, making things more efficient overall.
+
+This rework will have to come later though, since I will be doing these refactors in one go, for all appropriate data structures.
+
+Once I'm done handling Teacher Management, I need to work on better integrating Teachers with Form Groups, then I can move onto the real challenge. Classes and Schedules.
+
+**P.S:** I am growing increasingly worried that I won't meet the timeframe to finish this product, since we were told it had to be finished by Summer. My problem is that I'm very close, and also very far due to the incredibly extensive testing and debugging process I use. I fear I won't be able to finish the product in time for exam revision, and other assignments that I need to handle.
+
+At the worst case scenario, since the absolute final hand-in in is right after exams, I will have to miss it by potentially a few weeks, and work as hard as I can during school to catch up on the implementation of the final product. On the plus side, writing the report will be generally quick, so I can use the time I gain back from writing the report to work on the second iteration of development, where the majority of cosmetic reworks and code refactors will come in.
+
+This is something I should make preparations for, and ensure that I am able to handle this event, at the very worst case. Since meeting the deadline is simply something I cannot do given my circumstances, I will have to meet the deadline slightly late by a few weeks. By my estimates, to allow for the appropriate amount of revision time, I will be handing in the project approximately 2 weeks late, provided I get everything done on time.   
+
+## 11/08/2022 - Thursday
+Managed to finish off Teacher Addition as per the current design (although that will likely be improved upon in the second iteration), and managed to fix a few minor bugs and frontend issues within Teacher Management itself, but apart from that, I did not manage to make any progress with anything else. 
+
+This is a slight issue, since it only leaves me this weekend and potentially tomorrow to finish off the entire feature, and then I move onto Classes before I start exam revision. I'll have to finish off the integration between Teachers and Form Groups before then (hopefully), so I can move on to finishing off any potential bugs and anything else that may need to be finished.
+
+Documentation isn't an issue, since I can write that at the speed of light once I have a feeling for how the system works, and how the design behind it would work. I know my thoughts on the process. Actually testing the program and generating result data is the strenuous part, but it shouldn't take me too ling. At the worst case scenario, I can write all my documentation last minute, and then finish off the program before the deadline.
+
+Right now my only focus is meeting the deadline, but I also need to focus on exams. To the best of my knowledge, the exams finish the day before the deadline, so I'm hoping that my timetable isn't so rough, so I can take the well-scheduled days off to work on the project.
+
+## 12/08/2022 - Friday
+Begin integrating Teachers with Form Groups. This rework will be slightly harder, since I'm modifying the Teacher class on the fly to do what I need to do right now, to ensure the feature fully works. I also haven't managed to properly cross-associate them, ensuring that you can change the Form Group the Teacher belongs to from both Teacher Management and Form Management. This is something that needs to happen.
+
+I've also riddled most of my program with errors on purpose. This is to allow for the Form data structure to start holding mongo connection name of the Teachers. This will allow for the Teacher to be retrieved safely from a search class, using whatever logic there needs to be done. The refactoring process to ensure that Forms fully integrate with Teachers will be tough, but hopefully I'll never need to do such a large refactor for functionality again.
+
+Once I'm finished with the refactor, the code I will write to allow for proper integration will be very similar to what has already been written, making my job incredibly easy. As such, as long as I stay focused, I don't expect this to be very difficult at all.
+
+**P.S:** The deadline is definitely something I will not be meeting at all, but I'm hoping I can sneak by with the rest of the functionality, and finish everything without anyone noticing. This is what I'll have to due, due to the bad timing for exams and the project deadline. The report will be finished very quickly, and this is something I will need to rely on. 
+
+## 13/05/2022 - Saturday
+Managed to more or less finish the integration between Teachers and Form Groups. The data structure itself is fully capable of making use of the Teacher object and the connectionName within its database, and all relevant management GUIs have been appropriately edited to ensure that the Teacher data structure can be interacted with fully within the rest of the program.
+
+Since I finished this earlier than expected, I will need to spend some time producing testing documentation (which takes a while due to data entry and the creation of tables) before I can begin planning the Classes feature. 
+
+It is also worth noting that there are still incredibly MAJOR changes that need to be made to the program in general to allow for the Management GUIs to have the reworks they so desperately need. Right now, the refreshing of a GUI is rather tedious, and needs to be done manually, I'm hoping with the use of some static methods, some new classes and other potentially dangerous pieces of code, I can greatly improve the UX behind my program. Refreshing would be automatic, data addition will be much faster, since extra editing would not be required and much more. 
+
+All of these changes stem from a singular idea behind the way I currently handle my database collections and the way I currently handle the opening of my GUIs. This is something that will need to be rigorously tested, and will likely happen in the second iteration. Tomorrow, I plan on making a very minor start on Classes and the classes data structure, but I likely won't be able to go any further than this in terms of development, due to concerns about the exams.
+
+**P.S:** My concerns about the deadline for finishing the project are still valid, and are still something I am concerned about, as to how I plan on fixing this issue, I'm unsure. I will have to see how everything goes.
+
+## 14/05/2022 - Sunday

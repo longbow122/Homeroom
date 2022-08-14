@@ -284,8 +284,8 @@ public class Student {
     }
 
     /**
-     * Basic method used to check whether a Student is <i>in</i> a {@link Form}. Used within the program to ensure that the Student does not join multiple forms, and if they do so, they can be removed from one, and put in the other.
-     * The result of this method can be used to determine that. For extra security, this methid also does a check to ensure that the Student is valid, using {@link #isStudentValid(Student)}.
+     * Basic method used to check whether a {@link Student} is <i>in</i> a {@link Form}. Used within the program to ensure that the Student does not join multiple forms, and if they do so, they can be removed from one, and put in the other.
+     * The result of this method can be used to determine that.
      * @param student The {@link Student} object you are checking for, to determine whether they are in a {@link Form} group or not.
      * @return {@link Boolean} representing whether the Student is in a form or not.
      */

@@ -7,7 +7,5 @@ public enum FormSearchType {
 
     UUID,
 
-    TEACHER_NAME,
-
     FORM_NAME
 }
