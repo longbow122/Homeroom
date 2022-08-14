@@ -211,7 +211,6 @@ public class Student {
         dataValues.put("GuardianName", guardianName);
         dataValues.put("GuardianAddress", guardianAddress);
         dataValues.put("GuardianPhone", guardianPhone);
-
         if(new Form(connectionUsername, connectionPassword).getFormFromID(formID) != null) { //Make sure the form is also valid
             dataValues.put("FormID", formID);
         } else {
@@ -221,8 +220,6 @@ public class Student {
         studentsDB.insertOne(insertInfoDocument);
         return new Student(uuid.toString(), studentName, studentDOB, studentAddress, studentPhone, studentMedical, guardianName, guardianAddress, guardianPhone, formID);
     }
-
-    //TODO ALLOW SEARCHING BY FORM GROUP WHEN FORM GROUPS HAVE BEEN IMPLEMENTED.
 
     /**
      * Method that returns a list of all students depending on the {@link StudentSearchType}. The parameter string will look for an exact match or a similar match.
@@ -235,7 +232,6 @@ public class Student {
         if(db.isConnected() != 0) { //Connection has failed for some reason, fail handling needs to go here.
             return null;
         }
-        Form form = new Form(connectionUsername, connectionPassword);
         MongoDatabase homeroom = db.getHomeroomDB();
         MongoCollection students = homeroom.getCollection("Students");
         List<Document> matches;
@@ -281,7 +277,6 @@ public class Student {
             if(!x.containsKey("FormID") || x.get("FormID") == null) {
                 formID = "";
             } else formID = x.get("FormID").toString();
-            System.out.println(x.get("StudentName"));
             found.add(new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medicalInfo, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID));
         }
         progress.closeFrame();
@@ -289,8 +284,8 @@ public class Student {
     }
 
     /**
-     * Basic method used to check whether a Student is <i>in</i> a {@link Form}. Used within the program to ensure that the Student does not join multiple forms, and if they do so, they can be removed from one, and put in the other.
-     * The result of this method can be used to determine that. For extra security, this methid also does a check to ensure that the Student is valid, using {@link #isStudentValid(Student)}.
+     * Basic method used to check whether a {@link Student} is <i>in</i> a {@link Form}. Used within the program to ensure that the Student does not join multiple forms, and if they do so, they can be removed from one, and put in the other.
+     * The result of this method can be used to determine that.
      * @param student The {@link Student} object you are checking for, to determine whether they are in a {@link Form} group or not.
      * @return {@link Boolean} representing whether the Student is in a form or not.
      */

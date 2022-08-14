@@ -6,6 +6,10 @@ Testing will be shown through the use of this document, with a title, minimal ex
 
 [Markdown Table Generator was used to quickly handle the creation of tables.](https://www.tablesgenerator.com/markdown_tables)
 
+# First Iteration
+
+The below pieces of text were written during the first iteration of development for this program. Further iterations may occur, but this depends on whether a deadline is met.
+
 
 ## Logins
 The login system involves passing two strings through a Swing GUI, where these arguments are then passed into a connection string which is used to facilitate the connection to an external NoSQL database cluster. There are several different events that should occur upon different inputs.
@@ -232,3 +236,105 @@ It is worth noting that permissions were also involved in this section of the pr
 
 This aspect of testing was **successful**.
 
+| Type of Edit     | Original Data Value                                                    | New Data Value                  | Expected Result                 | Achieved Result? |
+|------------------|------------------------------------------------------------------------|---------------------------------|---------------------------------|------------------|
+| Student Name     | Dave Gordon                                                            | Bill Gordon                     | Bill Gordon                     | Yes!             |
+| Student DOB      | 09/08/2002                                                             | 05/12/1998                      | 05/12/1998                      | Yes!             |
+| Student Address  | 9 Farman Street, Hove, HN3 1AL                                         | 55 Farman Street, Hove, HN3 1AL | 55 Farman Street, Hove, HN3 1AL | Yes!             |
+| Student Phone    | +44 7911 242246                                                        | +44 7911 242243                 | +44 7911 242243                 | Yes!             |
+| Student Medical  | Student has ADHD, student gets restless and loses concentration easily | N/A                             | N/A                             | Yes!             |
+| Guardian Phone   | +44 7457 331582                                                        | +44 7457 331599                 | +44 7457 331599                 | Yes!             |
+| Guardian Address | 9 Farman Street, Hove, HN3 1AL                                         | 99 Farman Street, Hove, HN3 1AL | 99 Farman Street, Hove, HN3 1AL | Yes!             |
+| Guardian Name    | Jerry Gordon                                                           | Juan Gordon                     | Juan Gordon                     | Yes!             |
+
+## Teacher Addition
+When a Teacher joins the institution, the school must add their data to the database to ensure that they can make use of this data within the school as and when is needed.
+
+This is a feature that Homeroom is able to handle through a basic GUI-based form. The user can enter data through this form, then either close the form or press a button within the form to send the data and add the data for the Teacher to the database.
+
+Certain fields of information also MUST not be empty, and certain fields of text within the form are forced to follow a certain format due to being uneditable, and only editable through a GUI.
+
+It is also worth noting that some fields of information (such as the Teacher's form and form name) cannot be added to the database, since this must be done on edit, as part of a seperate process. It is worth noting that all logic behind that feature was found to be successful in testing.
+
+| Mongo Connection Name | Teacher Name | Addition Successful? |
+|-----------------------|--------------|----------------------|
+| arnell                | Mr Arnell    | Yes!                 |
+| thunder               | Mr Thunder   | Yes!                 |
+| rasool                | Mr Rasool    | Yes!                 |
+
+## Teacher Deletion
+When a Teacher leaves the institution, the school (as per data protection laws, and as is good practise) are required to delete all relevant data on their staff after a certain amount of time. It is also worth noting that deletion of data, in this case, also handles some Form Group data, since the connection name of the Teacher is stored in that Collection. To ensure that deletion within the local Homeroom system and the database cluster goes well, this information needs to be removed.
+
+This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to be tested as much, but should be tested somewhat extensively.
+
+There were no permissions involved in this entire category, since any relevant permissions work was already handled in another section of the program.
+
+It is also worth noting that the deletion system I currently have in place is not as clean as it could be, due to API limitations. Previously, the Java driver for MongoDB allowed you to directly interact with the authorised users of the database. Using these methods, you could both create, edit and delete information regarding the authorised users of the database within the application itself, meaning that there would be no need to access MongoDB Atlas at all.
+However, the latest version of the API saw these methods removed, making possible only through Atlas. This means that the account information needs to be deleted on Atlas first, to ensure that it becomes inaccessible, and it needs to be removed from the Homeroom system, to ensure that the data is removed properly, and any relevant records are sanitised.
+
+| Mongo Connection Name | Teacher Name | Deletion Successful? |
+|-----------------------|--------------|----------------------|
+| arnell                | Mr Arnell    | Yes!                 |
+| thunder               | Mr Thunder   | Yes!                 |
+| rasool                | Mr Rasool    | Yes!                 |
+
+## Teacher Data Editing
+Each Teacher will hold fields of information that can be edited through the use of Homeroom's GUI.
+
+Each field of information within the document can be edited and updated. This needs to be tested thoroughly to ensure that the system is robust.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Teacher Information. This aspect of testing was **successful.**
+
+**P.S:** An issue occurred where getting the teacher name from the connection name of the teacher from the form group would result in an NPE when attempting to display this to the user. This was because the Form Group would not have a connection name associated with it to start, since all Forms start off with having no Teachers.
+
+| Type of Edit | Original Data Value | New Data Value | Addition Successful? |
+|--------------|---------------------|----------------|----------------------|
+| Teacher Name | Mr Arnell           | Mrs Arnell     | Yes!                 |
+| Teacher Name | Mr Thunder          | Mrs Thunder    | Yes!                 |
+| Teacher Name | Mr Rasool           | Mrs Rasool     | Yes!                 |
+| Form Name    | 8 Air               | 9 Air          | Yes!                 |
+| Form Name    | 12 Planet           | 11 Planet      | Yes!                 |
+| Form Name    | 10 Fire             | 7 Fire         | Yes!                 |
+
+## Bulk Teacher Searching
+This system was implemented to allow for searching for Teachers by names. This is where a string is passed through a text entry field within a GUI, which can then be passed through a method written to search through the Collection of Documents for names containing any instance of the String to be searched for anywhere in the name.
+
+| Type of Search        | Type of Data    | Inputted Data | Expected Result     | Achieved Result? |
+|-----------------------|-----------------|---------------|---------------------|------------------|
+| Mongo Connection Name | Expected/Normal | arnell        | One Teacher Found!  | Yes!             |
+| Mongo Connection Name | Edge-Case       | a             | One Teacher Found!  | Yes!             |
+| Mongo Connection Name | Erroneous       | 2231          | No Teachers Found!  | Yes!             |
+| Teacher Name          | Expected/Normal | Mr Gill       | One Teacher Found!  | Yes!             |
+| Teacher Name          | Edge-Case       | M             | Two Teachers Found! | Yes!             |
+| Teacher Name          | Erroneous       | 234422323     | No Teachers Found!  | Yes!             |
+
+## Exact Teacher Searching through Primary Key
+Each Teacher is automatically assigned a primary key (thanks to MongoDB Atlas not allowing for identical usernames) within Homeroom.
+
+In this section, a method was written to test for searching of specific forms using their unique user ID. This can be passed through a method and can be used to retrieve information of any Teacher, no matter what field is identical.
+
+Data that was passed through in this test were connection names and random strings. In the case of a random string being passed through, a message should be returned. Later down the line, some other form of error handling will have to be written to account for the rest of it.
+
+| Type of Search        | Type of Data    | Inputted Data | Expected Result     | Achieved Result? |
+|-----------------------|-----------------|---------------|---------------------|------------------|
+| Mongo Connection Name | Expected/Normal | arnell        | One Teacher Found!  | Yes!             |
+| Mongo Connection Name | Edge-Case       | a             | One Teacher Found!  | Yes!             |
+| Mongo Connection Name | Erroneous       | 2231          | No Teachers Found!  | Yes!             |
+
+## Teacher Searching through Search Parameters
+Each Teacher will obviously hold certain sets of information that they can also be identified with. This means that Homeroom can make use of these pieces of information to identify Teachers.
+
+These fields of information can now be used to search for Teachers within Homeroom's database, using many different types of parameters. Users would enter in a search string, and the system would check each field to see whether the search term started with that field. If this is a match, then it will identify it as a found search result. This is something that needs to be tested for each field, and each potential type of input.
+
+Null-Handling has already been accounted for, and it should ensure that when a null list (AKA, nothing has been found that matches the search) is returned, the program is able to cope with this data being fed through and can adjust to it while providing a different output.
+
+| Type of Search        | Type of Data    | Inputted Data | Expected Result     | Achieved Result? |
+|-----------------------|-----------------|---------------|---------------------|------------------|
+| Mongo Connection Name | Expected/Normal | arnell        | One Teacher Found!  | Yes!             |
+| Mongo Connection Name | Edge-Case       | a             | One Teacher Found!  | Yes!             |
+| Mongo Connection Name | Erroneous       | 2231          | No Teachers Found!  | Yes!             |
+| Teacher Name          | Expected/Normal | Mr Gill       | One Teacher Found!  | Yes!             |
+| Teacher Name          | Edge-Case       | M             | Two Teachers Found! | Yes!             |
+| Teacher Name          | Erroneous       | 234422323     | No Teachers Found!  | Yes!             |
+
+ 

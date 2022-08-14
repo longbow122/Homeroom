@@ -25,6 +25,12 @@ import java.util.regex.Pattern;
  */
 public class Form {
 
+    //TODO
+    // THIS CLASS (AND OTHER DATA OBJECTS LIKE IT) NEED TO BE SEPERATED FROM DATA OBJECT-RELATED METHODS, AND DATABASE METHODS.
+    // ONCE YOU HAVE BEEN ABLE TO SPLIT UP THE METHODS, MOVE THE DATABASE METHODS TO A "HANDLER" CLASS, WHICH WILL HOLD ALL OF THESE METHODS.
+    // HAVE THE NEEDED CONNECTION INFO (LINE 171) STATIC WITHIN THIS HANDLER CLASS, AND DECLARE THESE OBJECTS WITH THEIR RESPECTIVE CONNECTIONS UPON LOGIN.
+    // THIS WAY YOU CAN JUST MAKE A STATIC CALL TO A METHOD WHICH RETURNS A FORM, USING A DATABASE OPERATION THAT DOES WHATEVER YOU NEED IT TO DO.
+
     /*
     FORM DATABASE STRUCTURE:
     String FormID
@@ -35,7 +41,7 @@ public class Form {
 
     private String formID;
 
-    private String teacherName;
+    private String teacherConnectionName;
 
     private String formName;
 
@@ -53,12 +59,11 @@ public class Form {
         searchType = type;
     }
 
-    //TODO TEST ENTIRE CLASS LOGIC IN THE CONTEXT OF THE PROGRAM AND ITS GUIs
 
     /*
     Forms should hold the following information:
 
-    The name of the teacher, as a string.
+    The mongo connection name of the teacher, as a string.
     The name of the form, as a String
     The ID of the form, as a String.
     A list of all students in that form. (Use the List<Student> object)
@@ -79,15 +84,15 @@ public class Form {
 
     /**
      * Private constructor for use within this class. As there will be multiple methods which need to return Student objects. <p></p>
-     * WARNING: DOES NOT MAKE A CONNECTION TO THE DATABASE. YOU SHOULD USE A "PLAIN CONSTRUCTOR" to connect to the database if neded. The {@link #connect(String, String)} method can also be used to do this too.
+     * WARNING: DOES NOT MAKE A CONNECTION TO THE DATABASE. YOU SHOULD USE A "PLAIN CONSTRUCTOR" to connect to the database if needed. The {@link #connect(String, String)} method can also be used to do this too.
      * @param formID The ID of the Form. Should be a version 4 UUID in a String. Should be entirely unique.
-     * @param teacherName The name of the Teacher. Could, in theory be used as a secondary key, but isn't really worth the risk.
+     * @param teacherName The mongo connection name of the teacher. Used as a foreign key within this DB.
      * @param formName The name of the Form. Could also, in theory, but used as a secondary key, but is not the best thing to do as the formID will be entirely reliable and can be used as a primary key just fine.
      * @param students A list of {@link Student}s within the form as a Student object. Each Student object will have their respective ID which can uniquely point to their respective database records.
      */
     private Form(String formID, String teacherName, String formName, List<Student> students) {
         this.formID = formID;
-        this.teacherName = teacherName;
+        this.teacherConnectionName = teacherName;
         this.formName = formName;
         this.students = students;
     }
@@ -96,8 +101,8 @@ public class Form {
         return formID;
     }
 
-    public String getTeacherName() {
-        return teacherName;
+    public String getTeacherConnectionName() {
+        return teacherConnectionName;
     }
 
     private List<Student> getStudents() {
@@ -142,7 +147,7 @@ public class Form {
         try (MongoCursor<Document> found = forms.find(query).iterator()) {
             while (found.hasNext()) {
                 Document x = found.next();
-                return new Form(x.get("FormID").toString(), x.get("TeacherName").toString(), x.get("FormName").toString(), fromIDListToStudents((List<String>) x.get("Students")));
+                return new Form(x.get("FormID").toString(), x.get("TeacherConnectionName").toString(), x.get("FormName").toString(), fromIDListToStudents((List<String>) x.get("Students")));
             }
             return null;
         }
@@ -152,25 +157,27 @@ public class Form {
      * Basic method written to add students to the database of Homeroom. This method also generates a version 4 UUID for the user to make of when working within the program and when handling data.
      * Checks are already made to ensure that the UUID will be valid within the database and will not be wrong. <br>
      * This method should generally be used with an instance of {@link Form} class that is able to make connections. If this method is not possible, then the developer should make use of the {@link #connect(String, String)} method.
-     * @param teacherName The name of the teacher who is under control of the form class.
+     * @param teacherConnectionName The name of the teacher who is under control of the form class.
      * @param formName The name of the form in question. Forms can be given an identifying name which should be unique where posssible.
      * @param studentIDs The IDs of the {@link Student}s in the form group. This should be stored as an array to ensure that MongoDB can take the data.
      * @return An Object representing the Form group, which can be used within the rest of the program.
      */
-    public Form addFormToDB(String teacherName, String formName, List<String> studentIDs) {
+    public Form addFormToDB(String teacherConnectionName, String formName, List<String> studentIDs) {
         UUID uuid = UUID.randomUUID();
         while(getFormFromID(uuid.toString()) != null) {
             uuid = UUID.randomUUID();
         }
         MongoCollection<Document> formsDB = db.getHomeroomDB().getCollection("Forms");
+        //TODO THE ABOVE CAN BE STATIC, AND NOTED DOWN AS A FIELD WITHIN THE CLASS. YOU CAN THEN CALL THIS ON LOGIN TO ENSURE THAT EVERYTHING IS UP AND RUNNING AND IT SHOULD WORK JUST FINE.
+        // The same can be sent for db#getHomeroomDB(), this can be called on login, along with every other Object,
         HashMap<String, Object> dataValues = new HashMap<>();
         dataValues.put("FormID", uuid.toString());
-        dataValues.put("TeacherName", teacherName);
+        dataValues.put("TeacherConnectionName", teacherConnectionName);
         dataValues.put("FormName", formName);
         dataValues.put("Students", studentIDs);
         Document insertInfoDocument = new Document(dataValues);
         formsDB.insertOne(insertInfoDocument);
-        return new Form(uuid.toString(), teacherName, formName, fromIDListToStudents(studentIDs));
+        return new Form(uuid.toString(), teacherConnectionName, formName, fromIDListToStudents(studentIDs));
     }
 
     private List<Student> fromIDListToStudents(List<String> studentIDs) {
@@ -209,10 +216,6 @@ public class Form {
                 System.out.println("Searching for a form using their form name!");
                 matches = (List<Document>) forms.find(Filters.regex("FormName", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
                 break;
-            case TEACHER_NAME:
-                System.out.println("Searching for a form using their teacher name!");
-                matches = (List<Document>) forms.find(Filters.regex("TeacherName", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
-                break;
             default:
                 System.out.println("Searching for a form using their name!");
                 matches = (List<Document>) forms.find(Filters.regex("FormName", Pattern.compile("(?i)^(" + searchString + ")", Pattern.CASE_INSENSITIVE))).into(new ArrayList<Document>());
@@ -229,8 +232,7 @@ public class Form {
             int roundedPercent = Math.round((matches.indexOf(x) / matches.size() - 1) * 100);
             bar.setString("Searching for Forms: " + roundedPercent + "%");
             bar.setValue(roundedPercent);
-            System.out.println(x.get("FormName"));
-            found.add(new Form(x.get("FormID").toString(), x.get("TeacherName").toString(), x.get("FormName").toString(), fromIDListToStudents((List<String>) x.get("Students"))));
+            found.add(new Form(x.get("FormID").toString(), x.get("TeacherConnectionName").toString(), x.get("FormName").toString(), fromIDListToStudents((List<String>) x.get("Students"))));
         }
         progress.closeFrame();
         return found;
@@ -253,7 +255,7 @@ public class Form {
     }
 
     /**
-     * Method that updates a specified filed of a {@link Form} that has been specified. Any filed can be updated provided the the right field name has been given.
+     * Method that updates a specified field of a {@link Form} that has been specified. Any field can be updated provided the the right field name has been given.
      * The specified string is the string that the field will be updated to. There is no input validation done on the string.
      * @param form The {@link Form} to update.
      * @param fieldToUpdate The field to be updated. Should be a valid field name.
