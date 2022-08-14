@@ -509,3 +509,10 @@ All of these changes stem from a singular idea behind the way I currently handle
 **P.S:** My concerns about the deadline for finishing the project are still valid, and are still something I am concerned about, as to how I plan on fixing this issue, I'm unsure. I will have to see how everything goes.
 
 ## 14/05/2022 - Sunday
+Got to make a start on Classes in terms of the data structure, and laid out the framework for the class itself and it's database methods. Apart from that, nothing has been done in terms of the management system, and how the object would interact with the rest of the system yet.
+
+This will have to be done after the exams, and just before the deadline, since I need a bit more time to focus on the system and its implementation.
+
+I am still concerned about myself not being able to meet the deadline, since it's right after exams, and there will likely be not enough time to meet said deadline. I'll have to see.
+As of right now, the current plan is to implement as much as possible, and hopefully get away with not implementing the main feature behind Homeroom, which is register taking and class scheduling. This is a system which will take an incredibly long time to develop, so I'm not completely sure as to where I'm going to find the time to handle this.
+

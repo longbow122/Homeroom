@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 /**
  * The class representing the Student object. This class makes use of the {@link me.longbow122.Homeroom.utils.DBUtils} class to make database queries, and edit information about particular students.
  * This class holds several constructors which can be used to get instances of the class, depending on the case of what needs to be used where.
+ *
+ * @author Dhruvil Patel
  */
 public class Student {
     private String studentID;
