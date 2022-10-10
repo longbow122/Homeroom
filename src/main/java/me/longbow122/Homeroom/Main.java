@@ -1,5 +1,6 @@
 package me.longbow122.Homeroom;
 
+import me.longbow122.Homeroom.features.ClassManagement;
 import me.longbow122.Homeroom.features.FormManagement;
 import me.longbow122.Homeroom.features.StudentManagement;
 import me.longbow122.Homeroom.features.TeacherManagement;
@@ -189,6 +190,13 @@ public class Main {
         usernameField.setFont(new Font(mainGUI.getFrame().getFont().getName(), Font.PLAIN, 25));
         JLabel permissionField = mainGUI.addLabelToFrame("Permissions: ", 300, 0, 300, 30, false);
         int permission = new DBUtils(username, password).getPermission();
+        //TODO ADD THE FUNCTIONALITY FOR THE BUTTONS THAT HAVE BEEN REMOVED
+        // ! Ensure that impossible buttons get added in terms of functionality
+        JButton[] hide = {timetable, classes};
+        for(JButton x : hide) {
+            x.setVisible(false); //TODO GET RID OF THIS ASAP!!! ONCE THE MAIN CLASSES CONNECTION FEATURE IS DONE
+            // TODO MAKE A START ON BOTH OF THESE BUTTONS AS SOON AS THE MAIN PROGRAM IS DONE
+        }
         switch(permission) { // ! Should be a better way of converting permissions. Is it worth just using an Enum here, like I've done with search type?
             case 1: // ! Using ENUMS would mean I can just directly get the enum and convert it to a string instead of working on a switch statement to handle showing permissions.
                 permissionField.setText("Permissions: TEACHER");
@@ -206,6 +214,7 @@ public class Main {
         });
         manageStudents.addActionListener(e -> new StudentManagement().openManageStudentsGUI(username, password));
         manageForms.addActionListener(e -> new FormManagement().openManageFormsGUI(username, password));
+        manageClasses.addActionListener(e -> new ClassManagement().openManageClassGUI(username, password));
         admin.addActionListener(e -> {
             //TODO MAKE GUI THAT OPENS FOR THE CONFIGURE SECTION
             // HAVE A SECTION WITHIN THAT CONFIGURE SECTION WHICH OPENS MANAGE TEACHERS

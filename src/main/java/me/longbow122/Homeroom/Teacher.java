@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * The class representing the Teacher object. This class makes use of the {@link me.longbow122.Homeroom.utils.DBUtils} class to make database queries and edit information about particular students.
- * This class holds serveral constructors and methods which can be used to get instances of the class, depending on the case of what needs to be used where.
+ * The class representing the Teacher object. This class makes use of the {@link me.longbow122.Homeroom.utils.DBUtils} class to make database queries and edit information about particular Teachers.
+ * This class holds several constructors and methods which can be used to get instances of the class, depending on the case of what needs to be used where.
+ *
+ * @author Dhruvil Patel
  */
 public class Teacher {
 

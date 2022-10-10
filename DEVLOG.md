@@ -509,3 +509,78 @@ All of these changes stem from a singular idea behind the way I currently handle
 **P.S:** My concerns about the deadline for finishing the project are still valid, and are still something I am concerned about, as to how I plan on fixing this issue, I'm unsure. I will have to see how everything goes.
 
 ## 14/05/2022 - Sunday
+Got to make a start on Classes in terms of the data structure, and laid out the framework for the class itself and it's database methods. Apart from that, nothing has been done in terms of the management system, and how the object would interact with the rest of the system yet.
+
+This will have to be done after the exams, and just before the deadline, since I need a bit more time to focus on the system and its implementation.
+
+I am still concerned about myself not being able to meet the deadline, since it's right after exams, and there will likely be not enough time to meet said deadline. I'll have to see.
+As of right now, the current plan is to implement as much as possible, and hopefully get away with not implementing the main feature behind Homeroom, which is register taking and class scheduling. This is a system which will take an incredibly long time to develop, so I'm not completely sure as to where I'm going to find the time to handle this.
+
+## 06/09/2022 - Tuesday
+Made a minor plan for the Class data structure. I just need to finish it at home since the codebase is too large to work on a singular screen. 
+
+## 17/09/2022 - Saturday
+Made a good plan as to what needs to be done, along with making major progress on the report portion of the programming project. I've also done a lot in terms of working on external documentation for Homeroom. Due to deadline issues, I've had to cut out the scheduling and registers feature entirely, and just make this based around holding and managing the data of Teachers and Students.
+
+Given more time, which I should hopefully find soon, I will be able to make progress on these features, and should hopefully manage to finish it before the actual hand-in deadline for the project.
+
+## 19/09/2022 - Monday
+Managed to make some progress, but I should really try to work a lot faster if I want to get the entire project done in time for the deadline. The reduced-functionality version of the program will be done in time, but i'm unsure how long it'll take me to get the entire thing done.
+
+## 21/09/2022 - Wednesday
+Made a minor plan for the Schedule object in the meantime, but I'm only able to make major progress when I have access to more than one monitor. I should ensure that I can complete as much documentation in the meantime.
+
+**P.S:** Made some progress towards fully implementing Class management to release a barebones edition of Homeroom as a proof of concept for the programming project itself. While this has not been completed in the sense that class scheduling and registers are nowhere near to being added, everything else in terms of the management and handling of student, class and form information will be finished on time. 
+Given more time, I will have hopefully finished the entire program, making it ready for a first release. Finishing Classes and Class Management will not be difficult, nor will it take too long. I just need to dedicate a few hours this week towards getting the code written specifically towards Classes. Apart from that, it's a basic copy and paste job.
+
+**P.P.S:** I also want to be able to finish my actual write-up in time for Christmas, which it looks like I may be on track to do. If I manage this, then I will be able to finish the product itself during the Christmas holidays, where I can then make minor refactors to a few parts of the report to reflect the needed changes. 
+
+## 24/09/2022 - Saturday
+Managed to fully implement the entire Class Management feature. Since it's been a while since I've last had a detailed flick through everything I need to do to this branch, both in terms of refactors and TODOs, I'm going to sweep through and try fixing anything that majorly stands out to me before testing through and adding anything that might potentially need to be done.
+
+Once I'm done with generating sample datasets, testing and documenting, I can declare the first release of 'Homeroom' ready. There is still a **lot** of work to be done on 'Homeroom', and I want to be able to get it all done before Christmas. Whether I do or not is a different story.
+
+If I fail to meet my Christmas deadline in terms of getting 'Homeroom' to the stage I want it to be in, then I will just give up on it, and finish off the write-up and any other relevant documentation that may be needed. In terms of post-deadline project life, I'll have to see what I decide.
+
+## 07/10/2022 - Friday
+Found a few minor issues with class management and adding classes. This issue relates to the main addition window not being closed after the addition of the class going through. There was also an issue of buttons displaying at the wrong moment. This was a simple issue of removing and adding a few basic lines. 
+
+Also found a minor issue where a feature was entirely missing. When students were added to a class (since this is done on-edit, not during the initial addition of the class), the GUI for the form also closes (intentional design issue, to be fixed) to ensure that refreshes for the data actually carry through. Once they re-opened the Class Information GUI, it is an intended feature for the user to be able to view the student in the class as a clickable button. This was not originally the case. This has since been resolved.
+
+**P.S:** Managed to finish the last pieces of testing documentation for the first iteration. All that needs to be written now is the testing tables containing the needed testing data for documentation. After that, the last pieces of documentation can be written and the first iteration of 'Homeroom' can be considered finished.
+
+It is also worth noting that user documentation is not something that has been written yet. This will likely be held on GitHub, and is something I will likely be writing soon after I finish up testing tables and documentation, along with the final merge and commit.
+
+**P.P.S:** Forgot to implement one final feature for Class Management and as such, that needs to be implemented before testing documentation can be finished. The user needs to be able to search and select a form for addition to a class. This will allow users to add all the students within a form to the class. 
+
+## 08/10/2022 - Saturday
+Found a minor issue with permissions which needs to be quickly tested. Fortunately it was nothing too major, access to a feature was accidentally left out due to a stray check. 
+
+Another feature was also implemented where all students within a form can now be added to a class with one click of a button. If the student is already in the class in question, then they will be ignored.
+
+It is worth noting that this feature requires thorough testing, along with most other class-based features that have been implemented. Adding in the testing documentation and tables will be the last step needed towards finishing the last piece of this project.
+
+After that, I can declare the first iteration finished.
+
+**P.S:** Somehow managed to overlook four key features of Homeroom that must be implemented to both Forms and Classes. Fortunately, these features should only require a major rework of JavaDoc documentation, along with the rework of some methods.
+Fortunately, I don't see this becoming too complicated apart from changing a few method implementations. It should just require the addition of an option pane menu, asking whether they would like the entity added or removed to the form. From there, code can be shifted over to their new sections, or newly written where applicable.
+
+However, it is worth noting that a rework of this scale will likely take time to properly push through, test, along with cleaning up the general structure of the code. This is something that should be accounted for, and will likely greatly increase the amount of time I have to work on the first iteration.
+
+Due to my constrained schedule, I don't foresee this taking any longer than a week, provided everything goes right.
+
+## 09/10/2022 - Sunday
+Made a minor start on the Class Student removal feature, and written the key methods that are needed for the feature to work. All that's left to do is test it before moving onto something else. As the logic, along with the method itself is entirely untested, testing will take quite a long time before I can declare the feature completely working. Once I've tested and documented this feature, I will likely move onto another feature which is also similar.
+
+Just finished implemented both Student removal from Classes and Forms. Fortunately, after a quick flick through the documentation, the change was not major. Will now be moving onto Class and Form removal from Teachers.
+
+Managed to finish the Teacher removal work for both Classes and Forms. All that is left to do is continue work on the testing documentation, writing the right explanation for these features, along with providing the right testing tables and data for these features.
+
+I firmly believe that (bar proper refreshing of the GUI) that the addition of these last-minute features now means the end of the first iteration of Homeroom. After this, comes testing documentation and the last finishing details on GitHub. I will likely be able to commit and merge this branch once the final iteration is complete.
+
+I will also need to take the time to go through the motions of using Homeroom to its fullest capacity to ensure I can showcase everything within Homeroom to examiners for submission.
+
+## 10/10/2022 - Monday
+Managed to finish all relevant testing documentation for 'Homeroom', and managed to implement all missing features. These features have been thoroughly tested to a suitable degree and now just need to be documented using screenshots. 
+
+**The first iteration of Homeroom is now complete.**

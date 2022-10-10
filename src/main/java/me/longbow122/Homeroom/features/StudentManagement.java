@@ -1,6 +1,7 @@
 package me.longbow122.Homeroom.features;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import me.longbow122.Homeroom.Class;
 import me.longbow122.Homeroom.Form;
 import me.longbow122.Homeroom.Student;
 import me.longbow122.Homeroom.StudentSearchType;
@@ -28,6 +29,110 @@ import java.util.List;
  * Needs a great amount of improvement.
  */
 public class StudentManagement {
+
+    /**
+     * Method which handles {@link Student} removal from a Class.
+     * It is worth noting that a method of this nature should really be written in the {@link Student} class, but due to the higher amount of GUI-based lines it holds, I oped to keep it within this class. <p></p>
+     * It is worth noting that this method will allow for selection of all classes that the Student in question is currrently in, then ask for confirmation before removing them from said class. <b>There is no searching of any kind done within this method.</b>
+     * @param username The username used to log into 'Homeroom' and the one used to query the database.
+     * @param password The password used to log ito 'Homeroom' and the one used to query the database.
+     * @param student The {@link Student} you will be removing from a specific {@link Class}.
+     */
+    protected void classStudentRemoval(String username, String password, Student student, GUIUtils parentGUI) {
+        GUIUtils gui = new GUIUtils("Search and Select Classes | Homeroom", 1000, 1220, 300, 0, false);
+        Class c = new Class(username, password);
+        List<Class> classesIn = c.getAllClassesStudentIn(student);
+        if(classesIn == null || classesIn.isEmpty()) {
+            System.out.print("Nothing needs to happen, the student is in no classes!");
+            JOptionPane.showMessageDialog(gui.getFrame(), student.getStudentName() + " is in no Classes. As such, no class can be removed from there!", "Homeroom | Student Management", JOptionPane.INFORMATION_MESSAGE);
+            gui.closeFrame();
+            return; // End it here, nothing can be displayed
+        }
+        int xLoc = 0;
+        int yLoc = 100;
+        if(searchButtonsPages != null) {
+            for(List<JButton> x : searchButtonsPages) {
+                for(JButton i : x) {
+                    i.setVisible(false);
+                }
+            }
+        }
+        List<List<JButton>> pages = new ArrayList<>();
+        List<JButton> buttons = new ArrayList<>();
+        for(Class x : classesIn) {
+            JButton option = gui.addButtonToFrame(x.getClassName(), 50, 150, xLoc, yLoc);
+            option.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
+            option.addActionListener(e -> {
+                Object[] options = {"Yes", "No"};
+                // Ask for confirmation before removing the Student from said class
+                int option1 = JOptionPane.showOptionDialog(gui.getFrame(), "Are you sure you would like to remove " + student.getStudentName() + " from " + x.getClassName() + "?", "Homeroom | Class Management", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, UIManager.getIcon("OptionPane.questionIcon"), options, "TEST");
+                System.out.println(option1);
+                switch (option1) {
+                    case 0: // Should be "yes", meaning they want the Student removed
+                        System.out.println("User selected yes, they want the Student removed from their class");
+                        c.modifyClassStudents(x, 2, student);
+                        JOptionPane.showMessageDialog(gui.getFrame(), "You have successfully removed " + student.getStudentName() + " from " + x.getClassName() + "!", "Homeroom | Class Management", JOptionPane.INFORMATION_MESSAGE);
+                        gui.closeFrame();
+                        parentGUI.closeFrame();
+                        return;
+                    case 1:
+                        System.out.println("User does not want their class removed from that student! Nothing needs to happen!");
+                        return;
+                }
+            });
+            buttons.add(option);
+            System.out.println("The buttons for " + x.getClassName() + " has been implemented, but has not been made visible!");
+            option.setVisible(false);
+            xLoc = xLoc + 150;
+            if(xLoc > 1050) {
+                yLoc = yLoc + 50;
+                xLoc = 0;
+            }
+            if(yLoc > 930) {
+                pages.add(buttons); //Add it to the list of lists to ensure that you know what goes within each page
+                System.out.println("A list of buttons has been added to the page list!");
+                buttons = new ArrayList<JButton>();
+                yLoc = 100;
+
+            }
+        }
+        pages.add(buttons); //Add it to the list of lists to ensure you know what goes within each page
+        JButton nextPage = gui.addButtonToFrame(">>", 30, 60, 980, 65);
+        JButton backPage = gui.addButtonToFrame("<<", 30, 60, 920, 65);
+        nextPage.setToolTipText("Go to the next page of search results.");
+        backPage.setToolTipText("Go to the previous page of search results.");
+        if(!pages.isEmpty()) {
+            List<JButton> firstPage = pages.get(0);
+            for(JButton i : firstPage) {
+                i.setVisible(true);
+            }
+        } else {
+            for(JButton x : buttons) {
+                x.setVisible(true);
+            }
+        }
+        searchButtonIndex = 0;
+        setSearchButtons(pages);
+        nextPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Pages list is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, 1, gui); //Go forward one page
+        });
+        backPage.addActionListener(e -> {
+            System.out.println("Current index: " + searchButtonIndex);
+            if(pages.isEmpty()) {
+                JOptionPane.showMessageDialog(gui.getFrame(), "There are no further pages for you to move between!");
+                System.out.println("Page is empty!");
+                return;
+            }
+            shiftPage(searchButtonIndex, -1, gui); //Go back one page
+        });
+        System.out.println("Did the button message actually display?");
+    }
 
     /** TODO THIS METHOD WORKS AS INTENDED, BUT IMPROVEMENTS NEED TO BE MADE TO ALLOW FOR STUDENTS TO BE ADDED TO A FORM ON CREATION
      * Method which handles {@link Student} selection and addition to a form. This method is part of a collection of methods that makes use of method overloading to perform certain tasks that involve the searching and selection of a Student. <p></p>
@@ -495,6 +600,30 @@ public class StudentManagement {
             gui.closeFrame();
             new FormManagement().formStudentAddition(username, password, student);
         });
+        JButton removeForm = gui.addButtonToFrame("Remove Form", 50, 150, 400, 200);
+        if(formName.equals("")) { // ? Effectively check if the student has a form. If they do, the string would not be empty.
+            removeForm.setVisible(false);
+        }
+        removeForm.addActionListener(e -> {
+            Form studentForm = f.getFormFromID(student.getFormID());
+            Object[] options = {"Yes", "No"};
+            int option1 = JOptionPane.showOptionDialog(gui.getFrame(), "Are you sure you would like to remove " + student.getStudentName() + " from " + studentForm.getFormName() + "?", "Homeroom | Form Management", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.questionIcon"), options, "TEST");
+            System.out.println(option1); // ? Ask the user for confirmation before removing them from the form
+            switch (option1) {
+                case 0: // User clicked "yes", meaning that they wanted the form removed
+                    System.out.println("Form removal beginning!");
+                    f.modifyFormStudents(studentForm, 2, student);
+                    JOptionPane.showMessageDialog(gui.getFrame(), student.getStudentName() + " has successfully been removed from " + studentForm.getFormName() + "!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
+                    gui.closeFrame(); //Close the frame to allow for refresh
+                    parentGUI.closeFrame(); //Also close the management menu
+                    return;
+                case 1: // User clicked "no", meaning they they do not want the form removed!
+                    System.out.println("Cancel any form of removal");
+                    return;
+            }
+        });
+        JButton removeClass = gui.addButtonToFrame("Remove From Class", 50, 150, 250, 200);
+        removeClass.addActionListener(e -> classStudentRemoval(username, password, student, gui));
         JButton deleteStudent = gui.addButtonToFrame("Delete Student", 50, 150, 100, 200);
         deleteStudent.addActionListener(e -> {
             Object[] options = {"Delete Student", "Cancel"};
@@ -523,6 +652,8 @@ public class StudentManagement {
             dp.setVisible(false);
             deleteStudent.setVisible(false);
             formGroupPicker.setVisible(false);
+            removeClass.setVisible(false);
+            removeForm.setVisible(false);
             for(JTextComponent x : entryFields) {
                 x.setEditable(false);
             }

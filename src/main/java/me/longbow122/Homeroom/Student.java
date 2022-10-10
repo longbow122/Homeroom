@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 /**
  * The class representing the Student object. This class makes use of the {@link me.longbow122.Homeroom.utils.DBUtils} class to make database queries, and edit information about particular students.
  * This class holds several constructors which can be used to get instances of the class, depending on the case of what needs to be used where.
+ *
+ * @author Dhruvil Patel
  */
 public class Student {
     private String studentID;
@@ -137,7 +139,11 @@ public class Student {
                 if(!x.containsKey("FormID") || x.get("FormID") == null) {
                     formID = "";
                 } else formID = x.get("FormID").toString();
-                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID);
+                String medical;
+                if(!x.containsKey("StudentMedical") || x.get("StudentMedical") == null) {
+                    medical = "";
+                } else medical = x.get("StudentMedical").toString();
+                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medical, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID);
             }
             return null;
         }

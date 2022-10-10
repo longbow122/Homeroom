@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 /**
  * The class representing the Form object. This class makes use of the {@link me.longbow122.Homeroom.utils.DBUtils} class to make database queries, and edit information about particular forms.
  * This class holds several constructors which can be used to get instances of the form, depending on the case of what needs to be used where.
+ *
+ * @author Dhruvil Patel
  */
 public class Form {
 
@@ -32,11 +34,11 @@ public class Form {
     // THIS WAY YOU CAN JUST MAKE A STATIC CALL TO A METHOD WHICH RETURNS A FORM, USING A DATABASE OPERATION THAT DOES WHATEVER YOU NEED IT TO DO.
 
     /*
-    FORM DATABASE STRUCTURE:
-    String FormID
-    String TeacherName
-    String FormName
-    Array students (Array of UUIDs denoting StudentID)
+    ? FORM DATABASE STRUCTURE:
+    ? String FormID
+    ? String TeacherConnectionName
+    ? String FormName
+    ? Array students (Array of UUIDs denoting StudentID)
      */
 
     private String formID;
@@ -114,7 +116,7 @@ public class Form {
     }
 
     /**
-     * Basic getter method to get the StudentID as a Version 4 UUID of every single Student within the formm. Can be used to verify or modify information.
+     * Basic getter method to get the StudentID as a Version 4 UUID of every single Student within the form. Can be used to verify or modify information.
      * Other convenience methods to make the insertion of students into forms easier will also be handled, but this will likely have to come at a later date.
      * @return A list of the Student ID of every single student as Strings.
      */
@@ -154,10 +156,10 @@ public class Form {
     }
 
     /**
-     * Basic method written to add students to the database of Homeroom. This method also generates a version 4 UUID for the user to make of when working within the program and when handling data.
+     * Basic method written to add forms to the database of Homeroom. This method also generates a version 4 UUID for the user to make of when working within the program and when handling data.
      * Checks are already made to ensure that the UUID will be valid within the database and will not be wrong. <br>
      * This method should generally be used with an instance of {@link Form} class that is able to make connections. If this method is not possible, then the developer should make use of the {@link #connect(String, String)} method.
-     * @param teacherConnectionName The name of the teacher who is under control of the form class.
+     * @param teacherConnectionName The mongo connection name of the teacher. The username of the teacher account.
      * @param formName The name of the form in question. Forms can be given an identifying name which should be unique where posssible.
      * @param studentIDs The IDs of the {@link Student}s in the form group. This should be stored as an array to ensure that MongoDB can take the data.
      * @return An Object representing the Form group, which can be used within the rest of the program.
@@ -180,6 +182,12 @@ public class Form {
         return new Form(uuid.toString(), teacherConnectionName, formName, fromIDListToStudents(studentIDs));
     }
 
+    /**
+     * Basic convienience method to get the list of IDs, and convert it to a list of {@link Student}s for whatever purpose you may need.
+     * It is worth noting that it is best you handle everything in terms of StudentIDs, since that will work out safer than comparing the objects themselves.
+     * @param studentIDs The IDs of the {@link Student}s in the {@link Form}.
+     * @return {@link List} of {@link Student}s within the form.
+     */
     private List<Student> fromIDListToStudents(List<String> studentIDs) {
         Student util = new Student(connectionUsername, connectionPassword);
         List<Student> studentList = new ArrayList<>();
@@ -326,6 +334,7 @@ public class Form {
      * Basic convenience method to check whether the form object you have gotten is valid. This method is normally called everywhere, and should be to ensure safety.
      * @param form The {@link Form} object you are checking for, to ensure that it is valid.
      * @return {@link Boolean} representing whether the Form is present within the database or not using the exact attributes provided.
+     * @deprecated This method is not used anywhere in favour of other more useful checks, that are likely more efficient and involve less database calls. This fact should be confirmed before removing this method.
      */
     public boolean isFormValid(Form form) {
         if(form == null) return false;
