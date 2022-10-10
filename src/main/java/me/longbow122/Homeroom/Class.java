@@ -189,7 +189,7 @@ public class Class {
     /**
      * Method that returns a list of all {@link Class}es depending on the {@link ClassSearchType}. The parameter string will look for an exact match or a similar match.
      * This is used within the user interface for "searching" of Classes. Users will then be able to click on a Class and access its information from there. <br>
-     * WARNING: THIS METHOD DOES NOT HAVE ANY SCOPE FOR PROPER NULL HANDLING!!! THIS NEEDS TO BE HANDLED SEPERATELY.
+     * WARNING: THIS METHOD DOES NOT HAVE ANY SCOPE FOR PROPER NULL HANDLING!!! THIS NEEDS TO BE HANDLED SEPARATELY.
      * @param searchString The string to search for. Depends on what your search criteria is, but that can be applied with the search filter in the GUI.
      * @return {@link List} of all {@link Class}es representing all Classes that match the search.
      */
@@ -232,7 +232,21 @@ public class Class {
         return found;
     }
 
-    //TODO DELETE CLASS METHOD NEEDS TO BE WRITTEN
+    /**
+     * Method that deletes a specific record of a {@link Class} that has been specified. This is done by getting the Student's ID.
+     * @param clazz The {@link Class} to delete.
+     * @return {@link Boolean} that represents the success or failure of this operation.
+     */
+    public boolean deleteClass(Class clazz) {
+        if(db.isConnected() != 0) {
+            return false;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection<Document> classes = homeroom.getCollection("Classes");
+        Document queryDoc = new Document("ClassID", clazz.getClassID());
+        classes.deleteOne(queryDoc);
+        return true;
+    }
 
     /**
      * Method that updates a specified field of a {@link Class} that has been specified. Any field can be updated provided that the right field name has been given.
@@ -284,14 +298,14 @@ public class Class {
                     allStudentIDs.add(x.getStudentID());
                     System.out.println(x.getStudentName());
                 }
-                System.out.println("This is who is NOW in the form after ADDING a student, supposedly.");
+                System.out.println("This is who is NOW in the class after ADDING a student, supposedly.");
                 return updateClass(clazz, "Students", allStudentIDs);
             case 2: //2 should be passed into the method to REMOVE a student from the form.
                 if(!(clazz.getStudentsInClassID().contains(student.getStudentID()))) {
                     System.out.println("CASE 2 FOR MODIFY IS CLAIMING THAT THE LIST OF STUDENTS DOES NOT CONTAIN STUDENT IN QUESTION");
                     return true;
                 }
-                System.out.println("This is who is NOW in the form after removing a student, supposedly");
+                System.out.println("This is who is NOW in the class after removing a student, supposedly");
                 MongoDatabase homeroom = db.getHomeroomDB();
                 MongoCollection<Document> classes = homeroom.getCollection("Classes");
                 Document queryDoc = new Document("ClassID", clazz.getClassID());
@@ -301,5 +315,78 @@ public class Class {
                 return true; // What would happen is anything were to fail along this line?
         }
         return false;
+    }
+
+    /**
+     * A quick, simple method to check whether a specific {@link Student} is in a class. This method should be called only using a resource constructor.
+     * @param student The {@link Student} to check for, to ensure that they are in the specified {@link Class}.
+     * @param clazz The {@link Class} to check for, to ensure that the specified Student is in said Class.
+     * @return {@link Boolean} representing whether the specified Student is in the specified Class or not.
+     */
+    public boolean isStudentInClass(Student student, Class clazz) {
+        List<Student> students = clazz.getStudents();
+        return students.contains(student);
+    }
+
+    /**
+     * Method used to get a list of Classes that the {@link Student} is currently in. This is more often used within StudentManagement classes to ensure that Student and Class removal works easier. <p></p>
+     * It is worth noting that this method should be used in combination with a search class constructor to ensure that a connection with the database is actually established. <p></p>
+     * WARNING: THIS METHOD DOES NOT HAVE ANY SCOPE FOR PROPER NULL HANDLING!!! THIS NEEDS TO BE HANDLED SEPARATELY.
+     * @param student The {@link Student} you wish to get a list for all the classes they are in for.
+     * @return A {@link List} containing all the {@link Class}es they are in.
+     */
+    public List<Class> getAllClassesStudentIn(Student student) {
+        if(db.isConnected() != 0) {
+            return null;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection classes = homeroom.getCollection("Classes");
+        List<Document> matches = (List<Document>) classes.find(Filters.eq("Students", student.getStudentID())).into(new ArrayList<Document>()); // ? Find all classes with the Student array containing the ID of the student.
+        List<Class> found = new ArrayList<>();
+        if(matches.isEmpty()) {
+            return null;
+        }
+        GUIUtils progress = new GUIUtils("Search Progress | Homeroom", 200, 400, 400, 400, false);
+        progress.addLabelToFrame("Searching...", 170, 20, 70, 30, true, 10);
+        JProgressBar bar = progress.addProgressBar(50, 60, 300, 20, 0);
+        for(Document x : matches) {
+            int roundedPercent = Math.round((matches.indexOf(x) / matches.size() - 1) * 100);
+            bar.setString("Searching for Classes: " + roundedPercent + "%");
+            bar.setValue(roundedPercent);
+            found.add(new Class(x.get("ClassID").toString(), x.get("ClassName").toString(), x.get("TeacherConnectionName").toString(), fromIDListToStudents((List<String>) x.get("Students"))));
+        }
+        progress.closeFrame();
+        return found;
+    }
+
+    /**
+     * Method used to get a list of Classes that the {@link Teacher} is currently teaching. This is often used within TeacherManagement classes to ensure that Student and Class removal works easier. <p></p>
+     * It is worth nothing that this method should be used in combination with a search class constructor to ensure that a connection with the database is actually established. <p></p>
+     * WARNING: THIS METHOD DOES NOT HAVE ANY SCOPE FOR PROPER NULL HANDLING!!! THIS NEEDS TO BE HANDLED SEPARATELY.
+     * @param teacher The {@link Teacher} you wish to get a list for all the classes they are in for.
+     * @return A {@link List} containing all the {@link Class}es they are in.
+     */
+    public List<Class> getAllClassesTeacherIn(Teacher teacher) {
+        if(db.isConnected() != 0) {
+            return null;
+        }
+        MongoDatabase homeroom = db.getHomeroomDB();
+        MongoCollection classes = homeroom.getCollection("Classes");
+        List<Document> matches = (List<Document>) classes.find(Filters.eq("TeacherConnectionName", teacher.getConnectionUsername())).into(new ArrayList<Document>());
+        List<Class> found = new ArrayList<>();
+        if(matches.isEmpty()) {
+            return null;
+        }
+        GUIUtils progress = new GUIUtils("Search Progress | Homeroom", 200, 400, 400, 400, false);
+        progress.addLabelToFrame("Searching...", 170, 20, 70, 30, true, 10);
+        JProgressBar bar = progress.addProgressBar(50, 60, 300, 20, 0);
+        for(Document x : matches) {
+            int roundedPercent = Math.round((matches.indexOf(x) / matches.size() - 1) * 100);
+            bar.setString("Searching for Classes: " + roundedPercent + "%");
+            bar.setValue(roundedPercent);
+            found.add(new Class(x.get("ClassID").toString(), x.get("ClassName").toString(), x.get("TeacherConnectionName").toString(), fromIDListToStudents((List<String>) x.get("Students"))));
+        }
+        progress.closeFrame();
+        return found;
     }
 }

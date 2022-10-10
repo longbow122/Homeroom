@@ -17,7 +17,8 @@ import java.io.IOException;
  */
 public class GUIUtils extends JFrame {
 
-
+    //TODO
+    // ADD A METHOD FOR MAKING ADDING PROMPTS TO TEXT COMPONENTS EASIER
 
     private final Window frame;
 

@@ -139,7 +139,11 @@ public class Student {
                 if(!x.containsKey("FormID") || x.get("FormID") == null) {
                     formID = "";
                 } else formID = x.get("FormID").toString();
-                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), x.get("StudentMedical").toString(), x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID);
+                String medical;
+                if(!x.containsKey("StudentMedical") || x.get("StudentMedical") == null) {
+                    medical = "";
+                } else medical = x.get("StudentMedical").toString();
+                return new Student(x.get("StudentID").toString(), x.get("StudentName").toString(), x.get("StudentDOB").toString(), x.get("StudentAddress").toString(), x.get("StudentPhone").toString(), medical, x.get("GuardianName").toString(), x.get("GuardianAddress").toString(), x.get("GuardianPhone").toString(), formID);
             }
             return null;
         }

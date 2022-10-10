@@ -182,6 +182,12 @@ public class Form {
         return new Form(uuid.toString(), teacherConnectionName, formName, fromIDListToStudents(studentIDs));
     }
 
+    /**
+     * Basic convienience method to get the list of IDs, and convert it to a list of {@link Student}s for whatever purpose you may need.
+     * It is worth noting that it is best you handle everything in terms of StudentIDs, since that will work out safer than comparing the objects themselves.
+     * @param studentIDs The IDs of the {@link Student}s in the {@link Form}.
+     * @return {@link List} of {@link Student}s within the form.
+     */
     private List<Student> fromIDListToStudents(List<String> studentIDs) {
         Student util = new Student(connectionUsername, connectionPassword);
         List<Student> studentList = new ArrayList<>();

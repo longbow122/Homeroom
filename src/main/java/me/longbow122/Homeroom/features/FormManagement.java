@@ -226,6 +226,8 @@ public class FormManagement {
      * through their search results when needed.
      * @param searchResults The List of {@link Form}s found within the database query.
      * @param gui The {@link JFrame} in the questions
+     * @param username Username used to query the database with.
+     * @param password Password used to query the database with.
      */
     private void showSearchResults(List<Form> searchResults, GUIUtils gui, String username, String password ) {
         int xLoc = 0;
@@ -597,7 +599,9 @@ public class FormManagement {
         searchField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
-                selectTeacher(username, password, searchClass, searchField.getText(), gui, formGroup);
+                if(e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    selectTeacher(username, password, searchClass, searchField.getText(), gui, formGroup);
+                } //TODO INVESTIGATE WHY THE ENTER CHECK WASN'T IN THIS BEFORE?
             }
 
             @Override
@@ -824,7 +828,7 @@ public class FormManagement {
                 if(formGroup.getTeacherConnectionName().equals(x.getConnectionUsername())) { // ? Should check for if the form group currently assigned is equal to the
                     // ? teacher that is currently being selected. AKA, is the teacher in the same form?
                     System.out.println("The teacher was already in the form and as such, no database operations need to happen!");
-                    JOptionPane.showMessageDialog(gui.getFrame(), "The Teacher is already in " + formGroup.getFormName() + "! Nothing needs to happen!");
+                    JOptionPane.showMessageDialog(gui.getFrame(), "The Teacher is already in " + formGroup.getFormName() + "! Nothing needs to happen!", "Homeroom | Form Management", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
                 if(searchClass.isTeacherInForm(x)) {
@@ -930,6 +934,5 @@ public class FormManagement {
             shiftPage(searchButtonIndex, -1, gui); //Go back one page
         });
         System.out.println("Did the button message actually display?");
-        return;
     }
 }

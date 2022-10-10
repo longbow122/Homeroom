@@ -200,7 +200,7 @@ When a Form no longer needs to be in the system, presumably because the Form has
 
 This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to tested as much, but should be tested somewhat extensively.
 
-Permissions are also involved in this section of the program and as such, only users granted administrative permissions should be able to delete permissions. This aspect of testing was **successful**.
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions should be able to delete Forms. This aspect of testing was **successful**.
 
 | Form Name | Teacher Name | Students                                       | Deletion Successful? |
 |-----------|--------------|------------------------------------------------|----------------------|
@@ -229,6 +229,58 @@ It is worth noting that due to a later design change, Students could no longer b
 **P.S:** An issue was encountered where the addition of forms would fail due to MongoDB not being able to accept Arrays of String into their Arrays data type within their Collections. This issue was rectified with a little bit of research, allowing me to realise that an ArrayList would be needed to insert an Array to the database.
 Once the ArrayList was used, the problem was solved.
 
+## Form Student Addition
+When a Student joins the institution, the school must add their data to the database to ensure that they can make use of this data within the school as and when is needed.
+In this context, a Student has just joined the school, and must be added to a Form once they have joined the school.
+
+This a feature that 'Homeroom' is able to handle through the searching and selection of a Student. Upon the searching of the Student, the user is able to select the Student for the addition to the Form.
+
+It is worth noting that due to a later design change, Students could not be added to a Form initially on creation. This is now down as a part of data editing, and will be treated as such as in terms of any testing that may need to be done.
+
+| Form Name | Student Name | Addition Successful? |
+|-----------|--------------|----------------------|
+| 9 Planet  | Abby Dawson  | Yes!                 |
+| 12 Cosmos | Bob Jenkins  | Yes!                 |
+| 5 Thunder | Cole Bean    | Yes!                 |
+
+## Form Student Removal
+When a Student leaves the Form, presumably because the Student has left school as a whole or simply needs to change Forms. This is something that Homeroom needs to account for in the form of removal from the Form. 
+
+This is achieved through the simple clicking of a button within Student Management. The user is able to click a button to remove the Student from their current form, provided they are actually in one to begin with.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions should be able to remove Students from Forms. This aspect of testing was **successful.**
+
+| Form Name | Student Name | Removal Successful? |
+|-----------|--------------|---------------------|
+| 9 Planet  | Abby Dawson  | Yes!                |
+| 12 Cosmos | Bob Jenkins  | Yes!                |
+| 5 Thunder | Cole Bean    | Yes!                |
+
+## Form Teacher Addition
+When a Teacher joins the institution, the school must add their data to the database to ensure that they can make use of tis data within the school as and when is needed. In this context, a Teacher has just joined the school, and must be given a Form once they have joined the school.
+
+This is a feature that 'Homeroom' is able to handle through the searcing and selection of a Teacher. Upon the searching of the Teacher, the user is able to select the Teacher for the addition to the Form.
+
+It is worth noting that due to a later design change, Teachers could not be added to a Form initially on creation. This is now down as a part of data editing, and will be treated as such in terms of any testing that may need to be done.
+
+| Form Name | Teacher Name | Teacher Mongo Connection Name | Addition Successful? |
+|-----------|--------------|-------------------------------|----------------------|
+| 9 Planet  | Mr Gill      | teacher                       | Yes!                 |
+| 12 Cosmos | Mr Arnell    | arnell                        | Yes!                 |
+| 5 Thunder | Mr Thunder   | thunder                       | Yes!                 |
+
+## Form Teacher Removal
+When a Teacher leaves the Form, presumably because the Teacher has left the school as a whole or simply needs to change Forms. This is something that Homeroom needs to account for in the form of removal from the Form.
+
+This is achieved through the simple clicking of a button within Form Management. The user is able to click a button to remove the Teacher from their current form, provided they are acually in one to begin with.
+
+Permissions are also involved in this section of the program and as such, onl users granted administrative permissions should be able to remove Teachers from Forms. This aspect of testing was **successful.**
+
+| Form Name | Teacher Name | Teacher Mongo Connection Name | Removal Successful? |
+|-----------|--------------|-------------------------------|---------------------|
+| 9 Planet  | Mr Gill      | teacher                       | Yes!                |
+| 12 Cosmos | Mr Arnell    | arnell                        | Yes!                |
+| 5 Thunder | Mr Thunder   | thunder                       | Yes!                |
 ## Student Data Editing through Form Management GUI
 As Students can be found and associated through their Forms, this is something that Homeroom needs to account for in the form of Student Management. Users should be able to view the information of a Student in a Form, and edit their information through that same GUI.
 
@@ -339,13 +391,151 @@ Null-Handling has already been accounted for, and it should ensure that when a n
 
  
 ## Class Addition
+When a Class needs to be created, the school must add their data to the database to ensure that they can make use of this data within the school as and when needed.
+
+This is a feature that 'Homeroom' is able to handle through a basic GUI-based form. The user can enter data through this form, then either close the form or press a button within a form to send the data and add the data for the Form to the database.
+
+Certain fields also MUST not be empty, and certain fields of text within the form are forced to follow a certain format due to being uneditable, and only editable through a GUI.
+
+It is worth noting that due to a later design change, Students could no longer be added to a Class. This is now done as a part of data edited, and will be treated as such in terms of any testing that may need to be done.
+
+| Class Name | Addition Successful? |
+|------------|----------------------|
+| 9 Thunder  | Yes!                 |
+| 12 Water   | Yes!                 |
+| 7 Cosmos   | Yes!                 |
 
 ## Class Deletion
+When a Class no longer needs to be in the system, presumably because the Class has left school as a whole, (or the class needs to be disbanded) the school (as per data protection law and as is good practise) are required to delete all relevant data on their alumni after a certain amount of time.
+
+This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to be tested as much, but should be tested somewhat extensively.
+
+Permissions are also involved in this section of the program, and as such, only users granted administrative permissions should be able to delete Classes. This aspect of testing was **successful**
+
+| Class Name | Deletion Successful? |
+|------------|----------------------|
+| 9 Thunder  | Yes!                 |
+| 12 Water   | Yes!                 |
+| 7 Cosmos   | Yes!                 |
 
 ## Class Data Editing
+Each Class will hold certain sets of information that can be edited through the use of Homeroom's GUI.
+
+Each field of information which the document holds can be edited and updated. This needs to be tested thoroughly to ensure that the system is robust.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Class information. This aspect of testing was **successful.**
+
+
+
+## Class Student Addition
+When a Student joins the institution, the school must add their data to the database to ensure that they can make use of this data within the school as and when needed. In this context, the Student would have just joined the school, just been assigned a form and now needs to be given their respective classes to ensure that they can actually study at the institution as a recorded student.
+
+This is done through the searching function that has already been pre-implemented. A method has been written to ensure that Students can be searched for within this GUI, and on selection of a Student, their information is updated accordingly across several collections to ensure that they are added to the database.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Class information. This aspect of testing was **successful**.
+
+| Class Name | Student to be Added? | Addition of Student Successful? |
+|------------|----------------------|---------------------------------|
+| 9 Thunder  | Allana Dyer          | Yes!                            |
+| 12 Water   | Cole Bean            | Yes!                            |
+| 7 Cosmos   | Neel Kalyan          | Yes!                            |
+
+## Class Student Removal
+When a Student leaves the institution, the school must remove their data from the database, as is good practise and in accordance to data protection laws. In this context, the Student would have just left the school, and now needs to be removed from their classes to ensure that no unneeded data is held on the Student, since they are no longer in the institution itself.
+
+This is something that 'Homeroom' is able to handle through the clicking of a button. This does not not need to be tested as much, but should be testing somewhat extensively. A search function was written to get every class that the Student may be in. The user is then able to work with this, selecting the class that the Student should be removed from.
+
+Permissions are also involved in this section of the program, and as such only users granted administrative permissions should be able to remove Students from Classes. This aspect of testing wss **successful.**
+
+| Class Name | Student Name | Deletion From Class Successful? |
+|------------|--------------|---------------------------------|
+| 9 Planet   | Allana Dyer  | Yes!                            |
+| 12 Cosmos  | Cole Bean    | Yes!                            |
+| 5 Thunder  | Neel Kalyan  | Yes!                            |
+
+## Class Teacher Addition
+When Teachers are employed, they are normally given Classes to teach immediately. This situation is extremely common within all schools. 
+
+This can be done through a pre-implemented searching function. A method has been written to ensure that Classes can be searched for through a GUI, and on selection of a Class, the Teacher can then be added to the Class through several database information.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions wil be able to edit Teacher information. This aspect of testing was **successful.**
+
+| Class Name | Teacher Name | Teacher Mongo Connection Name | Addition to Class Successful? |
+|------------|--------------|-------------------------------|-------------------------------|
+| 9 Planet   | Mr Gill      | teacher                       | Yes!                          |
+| 12 Cosmos  | Mr Arnell    | arnell                        | Yes!                          |
+| 5 Thunder  | Mr Rasool    | rasool                        | Yes!                          |
+
+## Class Teacher Removal
+When a Teacher leaves the institution, the school must remove their data from the database, as is good practise and in accordance to data protection laws. In this context, the Teacher would have just left the school, or may need a chnge in classes.
+
+This is something that 'Homeroom' is able to handle through the clicking of a button. This does not need to be tested as much, but should be testing somewhat extensively. A search function was written to get every class that the Teacher may be in. The user is then able to work with this, selecting the class that the Teacher should be removed from.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Teacher information. This aspect of testing was **successful.**
+
+| Class Name | Teacher Name | Teacher Mongo Connection Name | Removal to Class Successful? |
+|------------|--------------|-------------------------------|------------------------------|
+| 9 Planet   | Mr Gill      | teacher                       | Yes!                         |
+| 12 Cosmos  | Mr Arnell    | arnell                        | Yes!                         |
+| 4 Planet   | Mr Thunder   | thunder                       | Yes!                         |
+
+## Class Form Addition
+When Classes are made, it is generally common for the lower-school to have all their classes together, within their form group. This situation is also more common within primary schools. As such, this is something that 'Homeroom' must be able to account for by ensuring that their data can be added to the database. 
+
+This can be done through a pre-implemented searching function. A method has been written to ensure that Forms can be searched for within a GUI, and on selection of a Form, all Students within that Form are taken and added across several collections to ensure that they have been added to the classes database.
+
+Permissions are also involved in this section of the program and as such, only users granted administrative permissions will be able to edit Class information. This aspect of testing was **successful**.
+
+| Class Name | Form to be Added? | Addition of Students Successful? |
+|------------|-------------------|----------------------------------|
+| 9 Thunder  | 12 Planet         | Yes!                             |
+| 12 Water   | 3 Fire            | Yes!                             |
+| 7 Cosmos   | 6 Aether          | Yes!                             |
 
 ## Exact Class Searching through Primary Key
+Each Class will be assigned a version 4 UUID when being added to the Collection. Homeroom will automatically account for this and assign a UUID accordingly.
+
+In this section, a method was written to test for specific searching of forms using their unique user ID. This can be passed through a method and can be used to retrieve information of any form, no matter what field may be identical.
+
+Data that was passed through in this test were UUIDs, and random strings. In the case of a random string being passed through, a message should be returned. Later down the line, some other form of error handling will have to be written to account for the rest of it.
+
+| Type of Data    | ID Search Input                      | Expected Result  | Achieved Result? |
+|-----------------|--------------------------------------|------------------|------------------|
+| Expected/Normal | 2a413ed0-7eed-42e1-afcd-e00dd722b030 | Class Found!     | Yes!             |
+| Expected/Normal | 394b6ec1-f588-4457-a804-6c8dad1af8bc | Class Found!     | Yes!             |
+| Errorneous      | 123123123123121                      | Class Not Found! | Yes!             |
+| Errorneous      | adasdasdasdadada                     | Class Not Found! | Yes!             |
 
 ## Class Searching through Search Parameters
+Each Class will obviously hold certain sets of information that they can also be identified with. This means that Homeroom can make use of these pieces of information to identify Classes.
+
+These fields of information can now be used to search for Classes within Homeroom's database, using many different types of parameters. Users would enter in a search string, and the system would check each field to see whether the search term started with that field. If this is a match, then it will identify it as a found search result. This is something that needs to be tested for each field, and each potential type of input.
+
+Null-Handling has already been accounted for, and it should ensure that a null list (AKA, nothing has been found that matches the search) is returned, the program is able to cope with this sort of data being fed through, and can adjust to it while providing a different output.
+
+| Type of Search | Type of Data    | Inputted Data                        | Expected Result      | Achieved Result? |
+|----------------|-----------------|--------------------------------------|----------------------|------------------|
+| UUID           | Expected/Normal | 810bc697-f3e1-4d2f-83ba-73d453937e76 | One Result Found!    | Yes!             |
+| UUID           | Edge-Case       | 9                                    | Two Results Found!   | Yes!             |
+| UUID           | Errorneous      | 47343454543459734957348957348979     | No Results Found!    | Yes!             |
+| Name           | Expected/Normal | 12 Fire                              | One Result Found!    | Yes!             |
+| Name           | Edge-Case       | 11                                   | Three Results Found! | Yes!             |
+| Name           | Errorneous      | 54578934895789345734895789347        | No Results Found!    | Yes!             |
 
 ## Student Data Editing through Class Management
+As Students can also be found and associated through their Classes, this is something that Homeroom needs to account for in the form of Class Management. Users should be able to view the information of a Student in a Class, and edit their information through that same GUI.
+
+It is worth noting that permissions were also involved in this section of the program, but they will not be tested here, since they should have been tested already in previous blocks of code and previous tests. Additionally, due to the behaviour of this feature and the code behind it, there is no such table required for testing. If one instance of testing this feature works, then it more than safe to assume that this feature is robust enough under most cases.
+
+This aspect of testing was **successful**.
+
+| Type of Edit     | Original Data Value                                                    | New Data Value                  | Expected Result                 | Achieved Result? |
+|------------------|------------------------------------------------------------------------|---------------------------------|---------------------------------|------------------|
+| Student Name     | Dave Gordon                                                            | Bill Gordon                     | Bill Gordon                     | Yes!             |
+| Student DOB      | 09/08/2002                                                             | 05/12/1998                      | 05/12/1998                      | Yes!             |
+| Student Address  | 9 Farman Street, Hove, HN3 1AL                                         | 55 Farman Street, Hove, HN3 1AL | 55 Farman Street, Hove, HN3 1AL | Yes!             |
+| Student Phone    | +44 7911 242246                                                        | +44 7911 242243                 | +44 7911 242243                 | Yes!             |
+| Student Medical  | Student has ADHD, student gets restless and loses concentration easily | N/A                             | N/A                             | Yes!             |
+| Guardian Phone   | +44 7457 331582                                                        | +44 7457 331599                 | +44 7457 331599                 | Yes!             |
+| Guardian Address | 9 Farman Street, Hove, HN3 1AL                                         | 99 Farman Street, Hove, HN3 1AL | 99 Farman Street, Hove, HN3 1AL | Yes!             |
+| Guardian Name    | Jerry Gordon                                                           | Juan Gordon                     | Juan Gordon                     | Yes!             |
