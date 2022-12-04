@@ -9,6 +9,9 @@ A MIS (Management Information System) for schools. Handles register, safety and 
 
 
 ##### Testing
-[A markdown file is also being used to work with any testing of any features that may need to be done.](https://github.com/longbow122/Homeroom/blob/main/DEVLOG.md)
+[A markdown file is also being used to work with any testing of any features that may need to be done.](https://github.com/longbow122/Homeroom/blob/main/TESTING.md)
 
 *I believe you're able to link GitHub issues to Trello cards through the use of a power-up or some sort of integration. If someone knows of any ways through which this can be done, please let me know! (Will have to look into it when I get the time)*
+
+##### Documentation
+[Documentation for Homeroom can be found here.](https://longbow122.github.io/homeroom-docs/)
