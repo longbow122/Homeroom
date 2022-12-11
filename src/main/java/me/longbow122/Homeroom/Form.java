@@ -329,18 +329,4 @@ public class Form {
         }
         return false;
     }
-
-    /**
-     * Basic convenience method to check whether the form object you have gotten is valid. This method is normally called everywhere, and should be to ensure safety.
-     * @param form The {@link Form} object you are checking for, to ensure that it is valid.
-     * @return {@link Boolean} representing whether the Form is present within the database or not using the exact attributes provided.
-     * @deprecated This method is not used anywhere in favour of other more useful checks, that are likely more efficient and involve less database calls. This fact should be confirmed before removing this method.
-     */
-    public boolean isFormValid(Form form) {
-        if(form == null) return false;
-        String checkID = form.getFormID();
-        Form found = getFormFromID(checkID);
-        return found != null;
-    }
-
 }

@@ -55,6 +55,7 @@ public class GUIUtils extends JFrame {
         frame.setBounds(locationX, locationY, width, height);
         frame.setLayout(null);
         frame.setVisible(true);
+        frame.setResizable(false); //Ensure that the user cannot re-size the frame.
         this.frame = frame;
         try {
             frame.setIconImage(ImageIO.read(new File("homeroom.png")));

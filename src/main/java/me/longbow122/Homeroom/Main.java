@@ -29,10 +29,9 @@ public class Main {
     The called program
      */
     public static void main(String[] args) {
-        Main main = new Main();
         File config = Main.getConfigFile();
         System.out.println(new ConfigReader(config).getConnectionStringFromConfig());
-        main.openLoginPage();
+        openLoginPage();
     }
 
     /*
@@ -44,7 +43,7 @@ public class Main {
     But then how would I add the action listener without ending up with the same amount of lines as before?
     Trying to keep lines of code to a minimum and clean up this code where possible.
      */
-    private void openLoginPage() {
+    private static void openLoginPage() {
         GUIUtils loginGUI = new GUIUtils("Homeroom Login", 300, 600, 700, 300, true);
         loginGUI.addLabelToFrame("Username: ", 30, 100, 70, 30, false);
         JTextField usernameField = loginGUI.addTextField(100, 100, 400, 25, "Enter the username used to log into Homeroom here!");
@@ -71,31 +70,31 @@ public class Main {
                         int connection = new DBUtils(username, password).isConnected();
                         while(connection != 0 && connection != 99) {
                             switch (connection) {
-                                case 1: //Timed out or failed connection
+                                case 1 -> { //Timed out or failed connection
                                     System.out.println("Connection timed out, failed connection!");
                                     Object[] options = new Object[]{"Reconnect", "Cancel, Exit Homeroom"};
                                     int reconnectOption = JOptionPane.showOptionDialog(loginGUI.getFrame(), "Failed to connect due to a timeout! Would you like to reconnect?", "Homeroom failed to connect!", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"), options, "Test");
                                     System.out.println(reconnectOption);
                                     switch (reconnectOption) {
-                                        case 0:
+                                        case 0 -> {
                                             System.out.println("Reconnect button clicked!");
                                             connection = new DBUtils(username, password).isConnected();
-                                            break;
-                                        case 1:
+                                        }
+                                        case 1 -> {
                                             System.out.println("Cancel button pressed!");
                                             System.exit(0);
-                                            break;
-                                        default:
+                                        }
+                                        default -> {
                                             System.out.println("Failed login!");
                                             JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed login due to a misc error. Please try again!", "Whoops!", JOptionPane.ERROR_MESSAGE);
-                                            break;
+                                        }
                                     }
-                                    break;
-                                case 2: //Bad credentials passed through
+                                }
+                                case 2 -> { //Bad credentials passed through
                                     System.out.println("Bad credentials passed through, cannot log in!");
                                     JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed to connect due to bad credentials! Please try logging in again.", "Whoops!", JOptionPane.ERROR_MESSAGE);
                                     connection = 99;
-                                    break;
+                                }
                             }
                         }
                         System.out.println("Wasn't 0, get passed through as valid connection");
@@ -126,16 +125,12 @@ public class Main {
                         int reconnectOption = JOptionPane.showOptionDialog(loginGUI.getFrame(), "Failed to connect due to a timeout! Would you like to reconnect?", "Homeroom failed to connect!", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, UIManager.getIcon("OptionPane.errorIcon"), options, "Test");
                         System.out.println(reconnectOption);
                         switch (reconnectOption) {
-                            case 0:
-                                System.out.println("Reconnect button clicked!");
-                                break;
-                            case 1:
-                                System.out.println("Cancel button pressed!");
-                                break;
-                            default:
+                            case 0 -> System.out.println("Reconnect button clicked!");
+                            case 1 -> System.out.println("Cancel button pressed!");
+                            default -> {
                                 System.out.println("Failed login!");
                                 JOptionPane.showMessageDialog(loginGUI.getFrame(), "Failed login due to a misc error. Please try again!", "Whoops!", JOptionPane.ERROR_MESSAGE);
-                                break;
+                            }
                         }
                     case 2: //Bad credentials passed through
                         System.out.println("Bad credentials passed through, cannot log in!");
@@ -162,7 +157,7 @@ public class Main {
      * Open to worded suggestions if anyone had any. (As in, you tell me what you think would work, but try to avoid directly
      * spoonfeeding the answer where possible. Thank you!)
      */
-    private void openMainGUI(String username, String password) {
+    private static void openMainGUI(String username, String password) {
         GUIUtils mainGUI = new GUIUtils("Homeroom", 1000, 1220, 300, 0, true);
         JButton manageStudents = mainGUI.addButtonToFrame("Manage Students", 300, 400, 0, 50);
         manageStudents.setToolTipText("Manage all Students in your school from here.");
@@ -229,7 +224,7 @@ public class Main {
         // BUTTON LISTENERS FOR EVERY BUTTON.
     }
 
-    private void openConfigureGUI(String username, String password) {
+    private static void openConfigureGUI(String username, String password) {
         GUIUtils gui = new GUIUtils("Homeroom | Configure Homeroom", 1000, 1220, 300, 0, false);
         JButton manageTeachers = gui.addButtonToFrame("Manage Teachers", 300, 400, 0, 50);
         manageTeachers.addActionListener(e -> new TeacherManagement().openManageTeacherGUI(username, password));

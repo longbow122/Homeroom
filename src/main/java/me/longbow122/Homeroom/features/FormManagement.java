@@ -400,7 +400,7 @@ public class FormManagement {
         teacherField.setFont(new Font(gui.getFrame().getFont().getName(), Font.PLAIN, 15));
         JButton selectTeacher = gui.addButtonToFrame("Select Teacher", 30, 150, 275, 60);
         selectTeacher.setFont(new Font(gui.getFrame().getFont().getName(), Font.BOLD, 15));
-        selectTeacher.addActionListener(e -> formTeacherAddition(username, password, form));//TODO TEST
+        selectTeacher.addActionListener(e -> formTeacherAddition(username, password, form));
         List<Student> studentsInForm = new ArrayList<>();
         Student s = new Student(username, password);
         for(String x : form.getStudentsInFormID()) {
@@ -446,6 +446,7 @@ public class FormManagement {
         if(permission != 2) {
             addStudent.setVisible(false); // Normal users should not be able to add to the database.
             deleteForm.setVisible(false); //Normal uses should also not be able to delete forms from the database.
+            selectTeacher.setVisible(false); //Normal users should also not be able to select teachers to add to a form.
             for(JTextComponent x : entryFields) {
                 x.setEditable(false);
             }

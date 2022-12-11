@@ -9,9 +9,9 @@ This main section of the devlog details the main development process for 'Homero
 ### 19/01/2022 - Wednesday
 Some progress was made. Main documentation for ‘Homeroom’ was done through the use of a GitHub repository. Main wiki for a user manual will be held there as will the software licensing. GitHub repository will also be used to store source code (obviously!) for ‘Homeroom’. A Trello board will serve as the main form of task tracking and should ensure I see what needs to be done first and soonest. Only thing I need to be aware of is falling behind on that and accidentally missing deadlines. 
 
-Additionally worked on some issue templates for GitHub. Had a minor look at Milestones, Projects and Actions which seem like a good way to automate a few things such as releases. Projects seem like a good way to organise some more stuff. I need to look into that, as right now it sounds similar to a Trello in terms of organisation. Should this be the case, it’s not really best for me.
+Additionally worked on some issue templates for GitHub. Had a minor look at Milestones, Projects and Actions which seem like a good way to automate a few things such as releases. Projects seem like a good way to organise some more stuff. I need to look into that, as right now it sounds similar to a Trello in terms of organisation. Should this be the case, it’s not perfect for me.
 
-Also started working on a stakeholder interview form. This will be distributed across to teachers, administrative staff and tutors where I deem fit. I am also considering users on Reddit as a reliable source of potential stakeholder opinion due to the wide range of people their community holds. It will not be hard to find school administrators and teachers willing to fill out a small survey. Teachers within my school will also be able to help with the completion of this survey. Due to privacy issues within the [REDACTED FOR PRIVACY PURPOSES], the forms have had to be hosted on my personal computer. A .csv file holding results will need to be attached detailing any useful results. 
+Also started working on a stakeholder interview form. This will be distributed across to teachers, administrative staff and tutors where I deem fit. I am also considering users on Reddit as a reliable source of potential stakeholder opinion due to the wide range of people their community holds. It will not be hard to find school administrators and teachers willing to fill out a small survey. Teachers within my school will also be able to help with the completion of this survey. Due to privacy issues within [REDACTED FOR PRIVACY PURPOSES], the forms have had to be hosted on my personal computer. A .csv file holding results will need to be attached detailing any useful results. 
 
 ### 18/02/2022 - Friday
 Did some extra planning and finally got some form of order in as to what should be worked on first in terms of the writing of code. This is a decent step forward in the right direction, ensuring that the code written behind ‘Homeroom’ is written as fast as possible. 
@@ -32,7 +32,7 @@ I plan on beginning work on this as soon as I can.
 ### 04/03/2022 - Friday
 Started work on the program itself. The code analysis workflow I’ve established to run checks every commit seems to be working nicely with the first initial commit, and as I plan on working on both the front end and the back-end simultaneously, I’ll have to start working on the GUI along with the Client-Server Communication components. Should hopefully finish my experiments with Swing today, and then I can start working on reading and writing to a MongoDB database. I may consider making a switch to an SQL server, but I feel the way that it stores data won’t suit my project’s use-case properly.
 
-Started up a basic VPS thanks to Oracle for free today, along with a MongoDB cluster. Only the DB cluster will likely need to be used for now, but if the worst comes to worst, I can make use of the more control and options in trade for processing power by using the free VPS. I’ve also managed to make the first few initialising commits needed to start off ‘Homeroom’, and some decent experimentation and practise work with Swing has been done. I can now start actual work on the project itself.
+Started up a basic VPS thanks to Oracle for free today, along with a MongoDB cluster. Only the DB cluster will likely need to be used for now, but if the worse comes to worst, I can make use of the more control and options in trade for processing power by using the free VPS. I’ve also managed to make the first few initialising commits needed to start off ‘Homeroom’, and some decent experimentation and practise work with Swing has been done. I can now start actual work on the project itself.
 
 Login page logic is generally solid and good to go, along with the design of the GUI. Personally, it looks disgusting. But accounting for my absence of artistic talent, it’ll do until I can work on having a nicer one made. As I plan on working on both the frontend and the backend at the same time, I need to fully finish the inner working of the frontend GUI before I can weave in the backend needed for it. Once I feel that the login GUI is as fleshed out as is needed, I can work on establishing a connection with the MongoDB cluster, and I can start experimenting with sending data back and forth between the cluster.
 
@@ -584,3 +584,32 @@ I will also need to take the time to go through the motions of using Homeroom to
 Managed to finish all relevant testing documentation for 'Homeroom', and managed to implement all missing features. These features have been thoroughly tested to a suitable degree and now just need to be documented using screenshots. 
 
 **The first iteration of Homeroom is now complete.**
+
+# Second Iteration - Major Improvements to Codebase & Documentation
+This document also entails the second development log for 'Homeroom'. If any challenges are encountered, the solutions will also be documented. Documentation will be done every day that some form of relevant progress has been made.
+ 
+This main section of the devlog details the main development process for 'Homeroom'.
+
+## 03/12/2022 - Saturday
+Made a start to the key parts of developer and user documentation. I've managed to find a way to locally write Markdown files on my computer, using a lightweight code editor known as [Visual Studio Code](https://code.visualstudio.com/). This code editor is what I will be using to write documentation for Homeroom.
+
+Using a set of automated scripts called [MkDocs](https://www.mkdocs.org/), along with a GitHub repository and the service [GitHub Pages](https://pages.github.com/), I am now able to write a static website using Markdown, and have it automatically converted to a series of HTML files and held on a GitHub repository for storage and hosting. This will allow me to locally write the website in a higher-level language, and have it generated and pushed to a hosting service in one click.
+
+This will make writing documentation much faster, along with making hosting much easier. All that is left to do in terms of development documentation and user documentation is to write down the details. It is worth noting that having supplementary features such as buttons, tooltips, footnotes, formatting, tabs and tables are much harder to implement using markdown rather than working directly with the HTML files. However, this learning curve would likely be much easier to go through than manually writing and configuring every small piece of style configuration to allow for the features I wish to implement.
+
+## 04/12/2022 - Sunday
+I have chosen to take inspiration from [BetonQuest Documentation](https://docs.betonquest.org/RELEASE/) owing to the fact that their documentation is incredibly easy to understand and use. 
+
+I have also managed to design the first few pages of the documentation with all needed content and design with general success. All that needs to be done is linking between each page, and further content for other sections within the page. This will likely have to be done tomorrow.
+
+## 05/12/2022 - Monday
+Made an incredibly major start to documentation and managed to finish the landing pages for most sections. I have also managed to finish the entirety of the landing and contributors sections and can now move onto working on the core parts of documentation through User and Administrative documentation.
+
+These will take the most amount of time to write, but will be worth it for both users and administrators in the long-run. Fortunately, since I (the developer of Homeroom) will be writing the program myself, I know the system back-to-front. This will allow me to write documentation much faster. The only challenge in terms of writing documentation will be handling screenshot work.
+
+## 11/12/2022 - Sunday
+Managed to implement most of the entire documentation site. Every single page within documentation has been fully worked on and has all decoration and styles implemented onto them.
+
+The only page that is left is the initial setup page, which has been left until the project will be entirely finished, or until it is needed. This is owing to the fact that the stages of setup could change, depending on what the developer chooses to do with the rest of the codebase in the time that is left until project submission.
+
+**P.S:** Made some minor fixes that were found when looking at documentation for Homeroom. The GUI can no longer be forcefully re-sized by the user, nor can the "Add Form" and "Add Teacher" buttons within Class and Teacher Management respectively be viewed by normal sub-users. This was never intended and as such, has now been patched.  

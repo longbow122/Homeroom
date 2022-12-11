@@ -454,9 +454,9 @@ public class ClassManagement {
             Object[] options = {"Delete Class", "Cancel"};
             int option = JOptionPane.showOptionDialog(gui.getFrame(), "Are you sure you would like to delete " + clazz.getClassName() + " from Homeroom?", "Homeroom | Class Management", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("informationIcon"), options, "Test");
             switch (option) {
-                case 0: //They have chosen to delete the class!
+                case 0 -> { //They have chosen to delete the class!
                     System.out.println("Class will now be deleted!");
-                    for(Student x : studentsInClass) {
+                    for (Student x : studentsInClass) {
                         c.modifyClassStudents(clazz, 2, x);
                         // * Only Classes hold Student information, since we want a one-to-many relationship where possible.
                         // * There is no need to have Students hold Class information, since we can pull this through other means
@@ -466,10 +466,9 @@ public class ClassManagement {
                     JOptionPane.showMessageDialog(gui.getFrame(), clazz.getClassName() + " has successfully been deleted from Homeroom!", "Homeroom | Class Management", JOptionPane.INFORMATION_MESSAGE);
                     gui.closeFrame();
                     parentGUI.closeFrame();
-                    break;
-                case 1: //They have chosen to cancel, nothing needs to happen!
-                    System.out.println("Cancelling!");
-                    break;
+                }
+                case 1 -> //They have chosen to cancel, nothing needs to happen!
+                        System.out.println("Cancelling!");
             }
         });
         if(permission != 2) {
@@ -477,6 +476,7 @@ public class ClassManagement {
             deleteClass.setVisible(false); // Normal users should not be able to delete forms within the database.
             nameField.setEditable(false); // Normal users should not be able to edit the name of a class
             selectTeacher.setVisible(false); // Normal users should not be able to change the teacher of a class
+            addForm.setVisible(false); // Normal users should not be able to add an entire form worth of students to a class.
         }
         JTextComponent[] entryFields = {nameField, teacherField};
         for(JTextComponent x : entryFields) {
